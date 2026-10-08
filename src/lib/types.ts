@@ -27,4 +27,6 @@ export interface BskyPost {
   hasMedia: boolean; // true if images, video, or external thumb
   mediaThumb?: string; // best available thumbnail URL
   isRepost?: boolean; // true if this appeared as a repost in the feed
+  repostedAt?: string; // when Nate reposted it (reposts only)
+  quoted?: BskyPost; // the post this one quotes, with its original author
 }

@@ -121,10 +121,14 @@ export function blobUrl(did: string, cid: string): string {
 // === Bluesky public API ===
 
 function mapBskyPost(post: any): BskyPost {
-  const embedType = post.embed?.$type;
+  // recordWithMedia = quote post + own media; split it into the two halves.
+  const isRecordWithMedia = post.embed?.$type === 'app.bsky.embed.recordWithMedia#view';
+  const embed = isRecordWithMedia ? post.embed.media : post.embed;
+  const quoteView = isRecordWithMedia ? post.embed.record?.record : post.embed?.$type === 'app.bsky.embed.record#view' ? post.embed.record : undefined;
+  const embedType = embed?.$type;
 
   const images = embedType === 'app.bsky.embed.images#view'
-    ? post.embed.images.map((img: any) => ({
+    ? embed.images.map((img: any) => ({
         thumb: img.thumb,
         fullsize: img.fullsize,
         alt: img.alt || '',
@@ -134,18 +138,18 @@ function mapBskyPost(post: any): BskyPost {
 
   const video = embedType === 'app.bsky.embed.video#view'
     ? {
-        playlist: post.embed.playlist,
-        thumbnail: post.embed.thumbnail,
-        aspectRatio: post.embed.aspectRatio,
+        playlist: embed.playlist,
+        thumbnail: embed.thumbnail,
+        aspectRatio: embed.aspectRatio,
       }
     : undefined;
 
   const externalEmbed = embedType === 'app.bsky.embed.external#view'
     ? {
-        uri: post.embed.external.uri,
-        title: post.embed.external.title || '',
-        description: post.embed.external.description || '',
-        thumb: post.embed.external.thumb,
+        uri: embed.external.uri,
+        title: embed.external.title || '',
+        description: embed.external.description || '',
+        thumb: embed.external.thumb,
       }
     : undefined;
 
@@ -173,6 +177,9 @@ function mapBskyPost(post: any): BskyPost {
     repostCount: post.repostCount ?? 0,
     hasMedia: !!(images?.length || video || externalEmbed?.thumb),
     mediaThumb,
+    quoted: quoteView?.$type === 'app.bsky.embed.record#viewRecord'
+      ? mapBskyPost({ ...quoteView, record: quoteView.value, embed: quoteView.embeds?.[0] })
+      : undefined,
   };
 }
 
@@ -203,6 +210,7 @@ export async function fetchBskyFeed(limit: number = 20, excludeRkeys: Set<string
     .map((item: any) => {
       const p = mapBskyPost(item.post);
       p.isRepost = item.reason?.$type === 'app.bsky.feed.defs#reasonRepost';
+      if (p.isRepost) p.repostedAt = item.reason.indexedAt;
       return p;
     })
     .filter((p: BskyPost) => !excludeRkeys.has(p.rkey));
