@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" fill="none" stroke="#000" stroke-width="2" font-family="'Courier New', Courier, monospace" font-size="18">
+  <title>Fig. 1: Shelf Goblin daily catalog refresh</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10" fill="none" stroke="#000" stroke-width="1.5"/>
+    </marker>
+    <pattern id="h" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#000" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- title block -->
+  <text x="40" y="52" fill="#000" stroke="none" font-size="26" letter-spacing="2">FIG. 1</text>
+  <text x="40" y="80" fill="#000" stroke="none" font-size="15">DAILY CATALOG REFRESH, 08:17 UTC</text>
+
+  <!-- private boundary (dashed) -->
+  <rect x="40" y="120" width="560" height="560" stroke-dasharray="10 7"/>
+  <text x="58" y="148" fill="#000" stroke="none" font-size="14">PRIVATE PRODUCER (shelfgoblin-data)</text>
+
+  <!-- 10 sources: stacked sheets -->
+  <path d="M236 196 h10 v96 h-150 v-10"/>
+  <path d="M226 186 h10 v96 h-150 v-10"/>
+  <rect x="76" y="176" width="150" height="96"/>
+  <line x1="92" y1="200" x2="208" y2="200"/>
+  <line x1="92" y1="216" x2="190" y2="216"/>
+  <line x1="92" y1="232" x2="200" y2="232"/>
+  <line x1="92" y1="248" x2="170" y2="248"/>
+
+  <!-- 12 database cylinder -->
+  <path d="M376 186 v84 a70 18 0 0 0 140 0 v-84"/>
+  <ellipse cx="446" cy="186" rx="70" ry="18"/>
+  <path d="M376 214 a70 18 0 0 0 140 0" />
+  <path d="M376 242 a70 18 0 0 0 140 0" />
+
+  <line x1="250" y1="230" x2="368" y2="230" marker-end="url(#a)"/>
+
+  <!-- 14 enrichment: gear-ish lens -->
+  <circle cx="446" cy="420" r="52"/>
+  <circle cx="446" cy="420" r="30" fill="url(#h)"/>
+  <g stroke-width="2">
+    <line x1="446" y1="358" x2="446" y2="368"/><line x1="446" y1="472" x2="446" y2="482"/>
+    <line x1="384" y1="420" x2="394" y2="420"/><line x1="498" y1="420" x2="508" y2="420"/>
+    <line x1="402" y1="376" x2="409" y2="383"/><line x1="483" y1="457" x2="490" y2="464"/>
+    <line x1="490" y1="376" x2="483" y2="383"/><line x1="409" y1="457" x2="402" y2="464"/>
+  </g>
+  <path d="M470 290 C 500 330, 500 350, 480 366" marker-end="url(#a)"/>
+  <path d="M412 368 C 392 350, 392 330, 420 294" marker-end="url(#a)"/>
+
+  <!-- 16 checkpoint: padlock -->
+  <rect x="120" y="540" width="100" height="80"/>
+  <path d="M140 540 v-28 a30 30 0 0 1 60 0 v28"/>
+  <circle cx="170" cy="572" r="8"/>
+  <line x1="170" y1="580" x2="170" y2="600"/>
+  <path d="M390 470 C 330 560, 280 580, 228 580" marker-end="url(#a)"/>
+
+  <!-- boundary crossing -->
+  <line x1="220" y1="620" x2="220" y2="620"/>
+  <path d="M228 610 C 420 640, 600 640, 690 600" marker-end="url(#a)"/>
+  <text x="300" y="666" fill="#000" stroke="none" font-size="13">only after checkpoint succeeds</text>
+
+  <!-- PUBLIC side -->
+  <text x="900" y="400" fill="#000" stroke="none" font-size="14">PUBLIC (shelfgoblin)</text>
+
+  <!-- 18 public JSON: folded sheet -->
+  <path d="M700 480 h120 l30 30 v120 h-150 z"/>
+  <path d="M820 480 v30 h30"/>
+  <text x="716" y="550" fill="#000" stroke="none" font-size="16">{ }</text>
+  <line x1="716" y1="570" x2="830" y2="570"/>
+  <line x1="716" y1="588" x2="810" y2="588"/>
+  <line x1="716" y1="606" x2="824" y2="606"/>
+
+  <!-- 20 clean checks -->
+  <rect x="700" y="300" width="150" height="100"/>
+  <path d="M724 350 l18 18 l34 -40"/>
+  <line x1="790" y1="335" x2="830" y2="335"/>
+  <line x1="790" y1="352" x2="830" y2="352"/>
+  <line x1="790" y1="369" x2="830" y2="369"/>
+  <line x1="775" y1="474" x2="775" y2="408" marker-end="url(#a)"/>
+
+  <!-- 22 deploy: clock gate -->
+  <circle cx="775" cy="200" r="46"/>
+  <line x1="775" y1="200" x2="775" y2="168"/>
+  <line x1="775" y1="200" x2="799" y2="212"/>
+  <path d="M740 170 A46 46 0 0 1 750 161" stroke-width="6"/>
+  <line x1="775" y1="294" x2="775" y2="254" marker-end="url(#a)"/>
+
+  <!-- 24 the shelf -->
+  <line x1="940" y1="250" x2="1160" y2="250" stroke-width="3"/>
+  <line x1="950" y1="250" x2="950" y2="270"/><line x1="1150" y1="250" x2="1150" y2="270"/>
+  <rect x="960" y="150" width="22" height="100"/>
+  <rect x="984" y="138" width="26" height="112" fill="url(#h)"/>
+  <rect x="1012" y="160" width="18" height="90"/>
+  <rect x="1032" y="146" width="24" height="104"/>
+  <path d="M1060 250 L1080 154 L1100 158 L1080 250 Z"/>
+  <rect x="1104" y="170" width="20" height="80" fill="url(#h)"/>
+  <line x1="826" y1="200" x2="930" y2="200" marker-end="url(#a)"/>
+
+  <!-- reference numerals and leaders -->
+  <g font-size="20" fill="#000" stroke="none">
+    <text x="60" y="320">10</text>
+    <text x="530" y="176">12</text>
+    <text x="520" y="460">14</text>
+    <text x="236" y="530">16</text>
+    <text x="864" y="530">18</text>
+    <text x="864" y="300">20</text>
+    <text x="830" y="150">22</text>
+    <text x="1130" y="128">24</text>
+  </g>
+  <g stroke-width="1">
+    <line x1="72" y1="306" x2="96" y2="280"/>
+    <line x1="528" y1="170" x2="508" y2="180"/>
+    <line x1="518" y1="452" x2="496" y2="440"/>
+    <line x1="234" y1="524" x2="210" y2="540"/>
+    <line x1="862" y1="524" x2="846" y2="512"/>
+    <line x1="862" y1="296" x2="848" y2="306"/>
+    <line x1="828" y1="146" x2="806" y2="166"/>
+    <line x1="1128" y1="124" x2="1112" y2="168"/>
+  </g>
+
+  <!-- legend -->
+  <g font-size="13" fill="#000" stroke="none">
+    <text x="660" y="680">10 sources · 12 SQLite · 14 enrichment · 16 private checkpoint</text>
+    <text x="660" y="702">18 public JSON · 20 checks, no secrets · 22 UTC-window deploy</text>
+    <text x="660" y="724">24 the shelf (shelfgobl.in)</text>
+  </g>
+</svg>

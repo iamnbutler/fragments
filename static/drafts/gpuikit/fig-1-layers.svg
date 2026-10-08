@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" fill="none" stroke="#000" stroke-width="2" font-family="'Courier New', Courier, monospace" font-size="18">
+<title>Fig. 1: gpuikit, exploded view of the layers</title>
+<defs><pattern id="h" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#000" stroke-width="1"/></pattern></defs>
+<text x="40" y="52" fill="#000" stroke="none" font-size="26" letter-spacing="2">FIG. 1</text>
+<text x="40" y="80" fill="#000" stroke="none" font-size="15">GPUIKIT, EXPLODED. EACH LAYER RESTS ON THE ONE BELOW.</text>
+<polygon points="680,800 750,750 750,804 680,854" fill="url(#h)"/>
+<rect x="120" y="800" width="560" height="54" fill="#fff" fill-opacity="0"/>
+<polygon points="120,800 680,800 750,750 190,750"/>
+<rect x="120" y="800" width="560" height="54"/>
+<text x="140" y="835" fill="#000" stroke="none" font-size="22" letter-spacing="1">GPUI</text>
+<line x1="715.0" y1="802.0" x2="805.0" y2="802.0" stroke-width="1.5"/>
+<circle cx="715.0" cy="802.0" r="3" fill="#000"/>
+<text x="815.0" y="809.0" fill="#000" stroke="none" font-size="22">10</text>
+<text x="815.0" y="832.0" fill="#000" stroke="none" font-size="13">Zed's GPU-accelerated UI framework</text>
+<line x1="195.0" y1="775.0" x2="195.0" y2="726" stroke-dasharray="3 5" stroke-width="1"/>
+<line x1="675.0" y1="775.0" x2="675.0" y2="726" stroke-dasharray="3 5" stroke-width="1"/>
+<polygon points="680,672 750,622 750,676 680,726" fill="url(#h)"/>
+<rect x="120" y="672" width="560" height="54" fill="#fff" fill-opacity="0"/>
+<polygon points="120,672 680,672 750,622 190,622"/>
+<rect x="120" y="672" width="560" height="54"/>
+<text x="140" y="707" fill="#000" stroke="none" font-size="22" letter-spacing="1">GPUI-UNOFFICIAL</text>
+<line x1="715.0" y1="674.0" x2="805.0" y2="674.0" stroke-width="1.5"/>
+<circle cx="715.0" cy="674.0" r="3" fill="#000"/>
+<text x="815.0" y="681.0" fill="#000" stroke="none" font-size="22">12</text>
+<text x="815.0" y="704.0" fill="#000" stroke="none" font-size="13">gpui on crates.io, cut from Zed release tags</text>
+<line x1="195.0" y1="647.0" x2="195.0" y2="598" stroke-dasharray="3 5" stroke-width="1"/>
+<line x1="675.0" y1="647.0" x2="675.0" y2="598" stroke-dasharray="3 5" stroke-width="1"/>
+<polygon points="680,544 750,494 750,548 680,598" fill="url(#h)"/>
+<rect x="120" y="544" width="560" height="54" fill="#fff" fill-opacity="0"/>
+<polygon points="120,544 680,544 750,494 190,494"/>
+<rect x="120" y="544" width="560" height="54"/>
+<text x="140" y="579" fill="#000" stroke="none" font-size="22" letter-spacing="1">FOUNDATIONS</text>
+<line x1="200.0" y1="544" x2="270.0" y2="494" stroke-width="1"/>
+<line x1="280.0" y1="544" x2="350.0" y2="494" stroke-width="1"/>
+<line x1="360.0" y1="544" x2="430.0" y2="494" stroke-width="1"/>
+<line x1="440.0" y1="544" x2="510.0" y2="494" stroke-width="1"/>
+<line x1="520.0" y1="544" x2="590.0" y2="494" stroke-width="1"/>
+<line x1="600.0" y1="544" x2="670.0" y2="494" stroke-width="1"/>
+<line x1="715.0" y1="546.0" x2="805.0" y2="546.0" stroke-width="1.5"/>
+<circle cx="715.0" cy="546.0" r="3" fill="#000"/>
+<text x="815.0" y="553.0" fill="#000" stroke="none" font-size="22">14</text>
+<text x="815.0" y="576.0" fill="#000" stroke="none" font-size="13">theme · control scale · a11y</text>
+<text x="815.0" y="594.0" fill="#000" stroke="none" font-size="13">focus · keymap · input · layout</text>
+<line x1="195.0" y1="519.0" x2="195.0" y2="470" stroke-dasharray="3 5" stroke-width="1"/>
+<line x1="675.0" y1="519.0" x2="675.0" y2="470" stroke-dasharray="3 5" stroke-width="1"/>
+<polygon points="680,416 750,366 750,420 680,470" fill="url(#h)"/>
+<rect x="120" y="416" width="560" height="54" fill="#fff" fill-opacity="0"/>
+<polygon points="120,416 680,416 750,366 190,366"/>
+<rect x="120" y="416" width="560" height="54"/>
+<text x="140" y="451" fill="#000" stroke="none" font-size="22" letter-spacing="1">ELEMENTS</text>
+<line x1="170.9" y1="416" x2="240.9" y2="366" stroke-width="1"/>
+<line x1="221.8" y1="416" x2="291.8" y2="366" stroke-width="1"/>
+<line x1="272.7" y1="416" x2="342.7" y2="366" stroke-width="1"/>
+<line x1="323.6" y1="416" x2="393.6" y2="366" stroke-width="1"/>
+<line x1="374.5" y1="416" x2="444.5" y2="366" stroke-width="1"/>
+<line x1="425.5" y1="416" x2="495.5" y2="366" stroke-width="1"/>
+<line x1="476.4" y1="416" x2="546.4" y2="366" stroke-width="1"/>
+<line x1="527.3" y1="416" x2="597.3" y2="366" stroke-width="1"/>
+<line x1="578.2" y1="416" x2="648.2" y2="366" stroke-width="1"/>
+<line x1="629.1" y1="416" x2="699.1" y2="366" stroke-width="1"/>
+<line x1="137.5" y1="403.5" x2="697.5" y2="403.5" stroke-width="1"/>
+<line x1="155.0" y1="391.0" x2="715.0" y2="391.0" stroke-width="1"/>
+<line x1="172.5" y1="378.5" x2="732.5" y2="378.5" stroke-width="1"/>
+<line x1="715.0" y1="418.0" x2="805.0" y2="418.0" stroke-width="1.5"/>
+<circle cx="715.0" cy="418.0" r="3" fill="#000"/>
+<text x="815.0" y="425.0" fill="#000" stroke="none" font-size="22">16</text>
+<text x="815.0" y="448.0" fill="#000" stroke="none" font-size="13">44 modules, accordion to typography</text>
+<line x1="195.0" y1="391.0" x2="195.0" y2="342" stroke-dasharray="3 5" stroke-width="1"/>
+<line x1="675.0" y1="391.0" x2="675.0" y2="342" stroke-dasharray="3 5" stroke-width="1"/>
+<polygon points="680,288 750,238 750,292 680,342" fill="url(#h)"/>
+<rect x="120" y="288" width="560" height="54" fill="#fff" fill-opacity="0"/>
+<polygon points="120,288 680,288 750,238 190,238" stroke-dasharray="10 7"/>
+<rect x="120" y="288" width="560" height="54" stroke-dasharray="10 7"/>
+<text x="140" y="323" fill="#000" stroke="none" font-size="22" letter-spacing="1">YOUR APP</text>
+<line x1="715.0" y1="290.0" x2="805.0" y2="290.0" stroke-width="1.5"/>
+<circle cx="715.0" cy="290.0" r="3" fill="#000"/>
+<text x="815.0" y="297.0" fill="#000" stroke="none" font-size="22">18</text>
+<text x="815.0" y="320.0" fill="#000" stroke="none" font-size="13">depends on gpui, gpui_platform and gpuikit</text>
+</svg>
