@@ -74,7 +74,7 @@ export function pressRun() {
     return best;
   };
   addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.metaKey || e.ctrlKey || e.altKey || root.classList.contains('flats-open')) return;
     const t = e.target as HTMLElement;
     if (t.closest('input, textarea, select, [contenteditable], video')) return;
     const next = e.key === 'j' || e.key === 'ArrowRight';
@@ -89,6 +89,9 @@ export function pressRun() {
   if (finePointer()) {
     for (const clip of document.querySelectorAll<HTMLElement>('[data-drag]')) dragClip(clip);
   }
+
+  // ── flats: every spread at once ───────────────────────────────────────
+  import('./flats').then((m) => m.flats(sheets));
 
   // ── cover ──────────────────────────────────────────────────────────────
   const cover = document.querySelector<HTMLElement>('.sheet[data-kind="cover"]');
