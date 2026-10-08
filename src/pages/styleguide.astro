@@ -118,7 +118,7 @@ const groups: { key: string; no: string; title: string; dek: string; specs: Spec
   {
     key: 'proofs', no: 'G4', title: 'PROOF features', dek: 'Local drafts print as art-directed features, each with its own ink pairing from the ramp. Only the opening spread is stamped PROOF.',
     specs: [
-      ...drafts.flatMap((d) => spec(`draft-${d.slug}`, `${d.title}, opening`, `drafts/${({ shelfgoblin: 'ShelfGoblin', ace2: 'Ace', 'desktop-tools': 'DesktopTools', gpuikit: 'Gpuikit', telephone: 'Telephone' } as Record<string, string>)[d.slug] ?? 'Generic'}.astro`, `${d.kicker}. Inks: ${(spreads.find((s) => s.kind === 'draft' && s.draft.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'draft' && s.draft.slug === d.slug && s.part === 0))),
+      ...drafts.flatMap((d) => spec(`draft-${d.slug}`, `${d.title}, opening`, `drafts/${({ ace2: 'Ace', 'desktop-tools': 'DesktopTools', gpuikit: 'Gpuikit', telephone: 'Telephone' } as Record<string, string>)[d.slug] ?? 'Generic'}.astro`, `${d.kicker}. Inks: ${(spreads.find((s) => s.kind === 'draft' && s.draft.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'draft' && s.draft.slug === d.slug && s.part === 0))),
       ...spec('draft-later', 'A later spread of a feature', 'drafts/Telephone.astro', 'Later spreads keep the quiet “Proof” running head and lose the stamp.', find((s) => s.kind === 'draft' && s.part === 2)),
     ],
   },
