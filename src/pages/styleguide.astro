@@ -1,0 +1,568 @@
+---
+/**
+ * The specimen book: PRESS RUN's inks, papers, type, grid, print effects,
+ * motion and every part and spread layout, printed from the live issue so
+ * the examples are the real thing. Tune the system here.
+ */
+import Base from '../layouts/Base.astro';
+import Reg from '../components/riso/Reg.astro';
+import Plate from '../components/riso/Plate.astro';
+import Clipping from '../components/riso/Clipping.astro';
+import ProofStamp from '../components/riso/drafts/ProofStamp.astro';
+import Cover from '../components/riso/Cover.astro';
+import Contents from '../components/riso/Contents.astro';
+import PostSpread from '../components/riso/PostSpread.astro';
+import ShotSpread from '../components/riso/ShotSpread.astro';
+import ListSpread from '../components/riso/ListSpread.astro';
+import BulletinSpread from '../components/riso/BulletinSpread.astro';
+import ClippingsSpread from '../components/riso/ClippingsSpread.astro';
+import SectionSpread from '../components/riso/SectionSpread.astro';
+import JumpSpread from '../components/riso/JumpSpread.astro';
+import DraftSpread from '../components/riso/drafts/DraftSpread.astro';
+import '../styles/styleguide.css';
+import { loadDrafts } from '../lib/drafts';
+import { loadStream, type FragmentItem, type ReshareItem } from '../lib/stream';
+import { impose, blocks, takeBlocks, OPENER_CHARS, INK_PAIRS, INK_HEX, SECTIONS, type Spread, type Ink } from '../lib/zine';
+import { measureAll, isDark } from '../lib/tone';
+import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
+
+const stream = await loadStream();
+const drafts = loadDrafts();
+const spreads = impose(stream, drafts);
+await measureAll(stream.flatMap((i) => {
+  if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
+  return i.media.filter((m) => !m.video || m.video.endsWith('.m3u8')).map((m) => m.src);
+}));
+const counts: Record<string, number> = {};
+for (const i of stream) counts[i.kind] = (counts[i.kind] ?? 0) + 1;
+const issue = stream.filter((i) => i.kind !== 'note' && i.kind !== 'reshare').length;
+const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+// ── specimens: one of every spread, found in the issue or set specially ──
+type S = Spread;
+let extra = 0;
+/** A spread the issue didn't happen to print: set it on a spare page. */
+const setUp = (s: S): S => ({ ...s, page: 900 + 2 * extra, n: 450 + extra++ } as S);
+/** Give each specimen its own copyfitting chain, apart from the essay it came from. */
+const own = (s: S): S => {
+  const tag = `~sg${s.page}`;
+  if (s.kind === 'draft') return { ...s, draft: { ...s.draft, key: s.draft.key + tag } };
+  if ('item' in s) return { ...s, item: { ...(s as any).item, key: (s as any).item.key + tag } } as S;
+  return s;
+};
+const find = (pred: (s: S) => boolean) => spreads.find(pred);
+
+interface Spec { id: string; name: string; when: string; file: string; spread: S }
+const used = new Set<number>();
+const spec = (id: string, name: string, file: string, when: string, s: S | undefined): Spec[] => {
+  if (!s || used.has(s.page)) return [];
+  used.add(s.page);
+  return [{ id, name, when, file, spread: own(s) }];
+};
+
+const posts = spreads.filter((s): s is Extract<S, { kind: 'post' }> => s.kind === 'post');
+const postOf = (layout: 'tower' | 'banner' | 'toner') => {
+  const hit = posts.find((p) => p.layout === layout);
+  if (hit) return hit;
+  const base = posts[0];
+  if (!base) return undefined;
+  const bs = blocks(base.item.text, base.item.title, { refs: true });
+  return setUp({ ...base, layout, blocks: takeBlocks(bs, OPENER_CHARS[layout]).blocks, jump: undefined, paper: layout === 'toner' ? 'toner' : 'newsprint' });
+};
+const shots = spreads.filter((s): s is Extract<S, { kind: 'shot' }> => s.kind === 'shot');
+const shotOf = (layout: Extract<S, { kind: 'shot' }>['layout']) => {
+  const hit = shots.find((s) => s.layout === layout);
+  if (hit) return hit;
+  if (layout === 'diptych') {
+    const lone = stream.filter((i): i is FragmentItem => i.kind === 'shot' && i.media.length === 1 && !i.media[0].video);
+    return lone.length >= 2 ? setUp({ ...shots[0], layout, items: lone.slice(0, 2) }) : undefined;
+  }
+  const many = shots.find((s) => s.items[0].media.length >= (layout === 'contact' ? 4 : 1));
+  return many && setUp({ ...many, layout, items: [many.items[0]], paper: layout === 'toner' ? 'toner' : 'newsprint' });
+};
+const lists = spreads.filter((s): s is Extract<S, { kind: 'list' }> => s.kind === 'list');
+const listOf = (layout: 'index' | 'ledger') => lists.find((l) => l.layout === layout) ?? (lists[0] && setUp({ ...lists[0], layout }));
+const bulletins = spreads.filter((s): s is Extract<S, { kind: 'bulletin' }> => s.kind === 'bulletin');
+const clips = spreads.filter((s): s is Extract<S, { kind: 'clippings' }> => s.kind === 'clippings');
+const textClips = stream.filter((i): i is ReshareItem => i.kind === 'reshare' && !i.original.media.length && !i.original.link && !!i.original.text && i.original.text.length < 300 && (i.comment?.length ?? 0) < 60);
+const wall = clips.find((c) => c.layout === 'wall')
+  ?? (clips[0] && textClips.length >= 3 ? setUp({ ...clips[0], layout: 'wall', items: textClips.slice(0, 4), paper: 'cream' }) : undefined);
+const bulletinWith = (n: number) => bulletins.find((b) => b.items.length === n && !b.items.some((i) => i.kind === 'link'))
+  ?? bulletins.find((b) => b.items.length === n);
+
+const groups: { key: string; no: string; title: string; dek: string; specs: Spec[] }[] = [
+  {
+    key: 'front', no: 'G1', title: 'Front matter', dek: 'The two spreads every issue opens on.',
+    specs: [
+      ...spec('cover', 'Cover', 'Cover.astro + scripts/cover-gl.ts', 'Always spread 0. A WebGL press prints the pink block, the screened red sun and the masthead, then lets the pointer knock them out of register; the CSS plates underneath are the fallback.', find((s) => s.kind === 'cover')),
+      ...spec('contents', 'Contents', 'Contents.astro', 'Always spread 1. Lists every department and every spread a reader can land on, with the colophon.', find((s) => s.kind === 'contents')),
+    ],
+  },
+  {
+    key: 'sections', no: 'G2', title: 'Section openers', dek: 'Each department opens on a flood of its light ink with the name run up the page.',
+    specs: [
+      ...spec('section-features', 'Opener on newsprint', 'SectionSpread.astro', 'Features, Dispatches and Library open on the issue’s paper.', find((s) => s.kind === 'section' && s.key === 'features')),
+      ...spec('section-plates', 'Opener on toner', 'SectionSpread.astro', 'Plates always opens on toner.', find((s) => s.kind === 'section' && s.key === 'plates')),
+    ],
+  },
+  {
+    key: 'essays', no: 'G3', title: 'Essays and jumps', dek: 'Long writing gets an opener chosen to fit its length, then plain jump spreads; outbound links become numbered margin notes.',
+    specs: [
+      ...spec('post-tower', 'Essay: tower', 'PostSpread.astro', 'Condensed title stacked on the left page, two columns of text on the right. Holds about 1,900 characters.', postOf('tower')),
+      ...spec('post-banner', 'Essay: banner', 'PostSpread.astro', 'Spaced title across both pages over a heavy rule, with a pull quote. The roomiest opener, about 2,900 characters.', postOf('banner')),
+      ...spec('post-toner', 'Essay: toner', 'PostSpread.astro', 'A photocopied black spread: the fragment number in the light ink, the text on a taped slip. About 1,050 characters.', postOf('toner')),
+      ...spec('jump-plain', 'Jump', 'JumpSpread.astro', 'Where an essay continues. Four columns, a link back to where it came from.', find((s) => s.kind === 'jump' && !s.refs.length && !s.proof)),
+      ...spec('jump-notes', 'Jump with margin notes', 'JumpSpread.astro', 'When the text links out, the links are numbered in the copy and listed in the outer margin.', find((s) => s.kind === 'jump' && s.refs.length > 0)),
+    ],
+  },
+  {
+    key: 'proofs', no: 'G4', title: 'PROOF features', dek: 'Local drafts print as art-directed features, each with its own ink pairing from the ramp. Only the opening spread is stamped PROOF.',
+    specs: [
+      ...drafts.flatMap((d) => spec(`draft-${d.slug}`, `${d.title}, opening`, `drafts/${({ shelfgoblin: 'ShelfGoblin', ace2: 'Ace', 'desktop-tools': 'DesktopTools', gpuikit: 'Gpuikit', telephone: 'Telephone' } as Record<string, string>)[d.slug] ?? 'Generic'}.astro`, `${d.kicker}. Inks: ${(spreads.find((s) => s.kind === 'draft' && s.draft.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'draft' && s.draft.slug === d.slug && s.part === 0))),
+      ...spec('draft-later', 'A later spread of a feature', 'drafts/Telephone.astro', 'Later spreads keep the quiet “Proof” running head and lose the stamp.', find((s) => s.kind === 'draft' && s.part === 2)),
+    ],
+  },
+  {
+    key: 'plates', no: 'G5', title: 'Plates', dek: 'Shots, printed as large as the page allows. Every photo is separated into a light plate and a key plate.',
+    specs: [
+      ...spec('shot-bleed', 'Plate: bleed', 'ShotSpread.astro', 'One picture across both pages, its label on a slip in a seeded corner.', shotOf('bleed')),
+      ...spec('shot-plate', 'Plate: plate and notes', 'ShotSpread.astro', 'The picture fills one page; the other carries the description, a strip of further frames and the title.', shotOf('plate')),
+      ...spec('shot-contact', 'Plate: contact sheet', 'ShotSpread.astro', 'Four or more frames on a grid, one circled in grease pencil.', shotOf('contact')),
+      ...spec('shot-toner', 'Plate: toner', 'ShotSpread.astro', 'Paper-coloured halftone on a black spread.', shotOf('toner')),
+      ...spec('shot-diptych', 'Plate: diptych', 'ShotSpread.astro', 'Two single-frame shots with no text face each other.', shotOf('diptych')),
+    ],
+  },
+  {
+    key: 'dispatches', no: 'G6', title: 'Dispatches and clippings', dek: 'Short notes, links as tear-off coupons, short essays, and other people’s posts pasted in as photocopies.',
+    specs: [
+      ...spec('bulletin-1', 'Notices: one', 'BulletinSpread.astro', 'A single notice, centred.', bulletinWith(1)),
+      ...spec('bulletin-2', 'Notices: two', 'BulletinSpread.astro', 'One notice a page.', bulletinWith(2)),
+      ...spec('bulletin-3', 'Notices: three', 'BulletinSpread.astro', 'One large, two stacked.', bulletinWith(3)),
+      ...spec('bulletin-coupon', 'Notices with a coupon', 'BulletinSpread.astro', 'Recommended links print as coupons in the light ink.', bulletins.find((b) => b.items.some((i) => i.kind === 'link'))),
+      ...spec('clip-solo', 'Clippings: solo', 'ClippingsSpread.astro + Clipping.astro', 'One post, its author’s name ghosted behind it.', clips.find((c) => c.layout === 'solo')),
+      ...spec('clip-pair', 'Clippings: pair', 'ClippingsSpread.astro + Clipping.astro', 'Two posts, one a page. Nate’s note, when he quoted it, is in blue marker.', clips.find((c) => c.layout === 'pair')),
+      ...spec('clip-trio', 'Clippings: trio', 'ClippingsSpread.astro + Clipping.astro', 'Three posts, stepped down the spread.', clips.find((c) => c.layout === 'trio')),
+      ...spec('clip-blowup', 'Clippings: blowup', 'ClippingsSpread.astro', 'One short post enlarged, its author’s avatar as a full plate.', clips.find((c) => c.layout === 'blowup')),
+      ...spec('clip-wall', 'Clippings: wall', 'ClippingsSpread.astro + Clipping.astro', 'Short text posts pinned up in a scatter.', wall),
+    ],
+  },
+  {
+    key: 'library', no: 'G7', title: 'Library', dek: 'Lists Nate keeps adding to.',
+    specs: [
+      ...spec('list-index', 'Index', 'ListSpread.astro', 'A huge entry count in the light ink, then up to 16 entries with leaders.', listOf('index')),
+      ...spec('list-ledger', 'Ledger', 'ListSpread.astro', 'A spaced title over a rule and two columns of up to 26 entries.', listOf('ledger')),
+    ],
+  },
+];
+
+// ── parts ──
+const shotMedia = stream.flatMap((i) => (i.kind === 'shot' ? i.media.filter((m) => !m.video) : []));
+const light = shotMedia.find((m) => !isDark(m.src) && (m.aspect ?? 1.4) > 1.1) ?? shotMedia[0];
+const dark = shotMedia.find((m) => isDark(m.src) && (m.aspect ?? 1.4) > 1.1);
+const clipping = stream.find((i): i is ReshareItem => i.kind === 'reshare' && !!i.comment && i.original.text.length > 40 && i.original.text.length < 220 && !i.original.media.length);
+const paper = PAPERS.newsprint;
+const pct = (i: number, n: number) => `${((i / (n - 1)) * 100).toFixed(1)}%`;
+const SPOT_ROLE: Record<string, string> = {
+  pink: 'Light plate. Floods, tape, halftone highlights, the cover block.',
+  red: 'Light plate. Coupons, rules, the screened sun; every clipping stamp and the PROOF stamp.',
+  blue: 'Key plate on pink. Nate’s marker notes; a lighter blue (#6A7DD4) sets them on toner.',
+  black: 'Key plate. Type, rules, shadows.',
+};
+const TOKENS: [string, string, string][] = [
+  ['--lt', 'per spread', 'The light plate of the spread’s ink pair.'],
+  ['--dk', 'per spread', 'The key plate: shadows, type in ink, page numbers.'],
+  ['--sheet', 'per paper', 'The paper colour of the spread.'],
+  ['--text', 'per paper', 'Black on light papers, newsprint on toner.'],
+  ['--copy', '#F5F4EF', 'Photocopy white: clippings, slips, taped notes.'],
+  ['--desk', '#BDB9B0 / #1D1C1B', 'The pasteboard behind the spreads, light and dark.'],
+  ['--desk-ink', '#2B2A28 / #B7B2A7', 'Type set on the desk.'],
+  ['--blue-lit', '#6A7DD4', 'Blue for type on toner.'],
+  ['--mx, --my', '±2.4px, ±1.8px', 'Each spread’s seeded misregistration.'],
+  ['--lx, --ly', '±26px, ±18px', 'Where a spread’s plates come from as they land.'],
+];
+const EASES: [string, string, string, string][] = [
+  ['--ease-press', 'cubic-bezier(0.16, 1, 0.3, 1)', '1.1s', 'Plates landing: the light plate first, the key plate 0.32s after.'],
+  ['--ease-roller', 'cubic-bezier(0.65, 0, 0.25, 1)', '0.8s', 'The roller wiping ink on (clip-path).'],
+  ['--ease-paper', 'cubic-bezier(0.34, 1.45, 0.5, 1)', '0.9s', 'Clippings dropping onto the page, each 0.12s after the last.'],
+  ['stamp', 'cubic-bezier(0.5, 0, 0.9, 0.4)', '0.35s', 'Rubber stamps coming down, 0.7s in (PROOF at 0.9s).'],
+  ['marker', 'steps(14)', '1s', 'Nate’s notes written in, 1s in.'],
+];
+const SCREENS = [
+  ['Light plate', 'lt', '5px square cell, 0°', 'The whole tonal range.'],
+  ['Key plate', 'dk', '8px cell, 45°', 'Only the shadows (curve exponent 0.42).'],
+  ['Reverse', 'rev', '6px cell, 45°', 'Paper-coloured dots on toner.'],
+  ['Avatar', 'av', '4px cell, 45°', 'Small portraits in clippings.'],
+];
+---
+<Base title="Specimen book" description="PRESS RUN, the house style of nate.rip: inks, papers, type, grid, print effects, motion and every spread layout." bodyClass="styleguide" noindex>
+  <main class="sb" style="--lt:var(--pink);--dk:var(--black);--mx:1.6px;--my:-1.1px;--lx:0px;--ly:0px">
+    <nav class="single-nav sb-nav" aria-label="Site">
+      <a href="/">nate.rip, issue {issue}</a>
+      <span>Specimen book</span>
+    </nav>
+
+    <header class="sb-board sb-title paper-newsprint">
+      <p class="cap sb-kicker">PRESS RUN, the house style of nate.rip</p>
+      <Reg as="h1" text="Specimen book" class="t-tower" style="--fs:13cqw" />
+      <div class="sb-title-foot">
+        <p class="sb-lede">Every ink, paper, typeface, screen and spread the zine prints with, set from the live issue. The colourway is the Printmaking Challenge spectrum: four spot inks cut from one ramp, on warm newsprint, with near-black toner for contrast.</p>
+        <ol class="sb-toc" aria-label="In this book">
+          <li><a href="#inks"><span>A</span>Inks and paper</a></li>
+          <li><a href="#type"><span>B</span>Type</a></li>
+          <li><a href="#grid"><span>C</span>Space and grid</a></li>
+          <li><a href="#print"><span>D</span>Print</a></li>
+          <li><a href="#motion"><span>E</span>Motion</a></li>
+          <li><a href="#parts"><span>F</span>Parts</a></li>
+          <li><a href="#spreads"><span>G</span>Spreads</a></li>
+          <li><a href="#flats"><span>H</span>Flats</a></li>
+        </ol>
+      </div>
+    </header>
+
+    <aside class="sb-knobs" aria-label="Press settings">
+      <p class="sb-knobs-head">Press settings</p>
+      <label>Misregistration <input type="range" min="0" max="4" step="0.1" value="1" data-knob="mis" /> <output>1×</output></label>
+      <label>Desk grain <input type="range" min="0" max="0.4" step="0.01" value="0.11" data-knob="grain" /> <output>0.11</output></label>
+      <button type="button" class="sb-btn" data-replay>Print again</button>
+    </aside>
+
+    <!-- A ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="inks" aria-labelledby="inks-h">
+      <header class="sb-part-head"><span class="sb-part-no">A</span><h2 id="inks-h" class="sb-h">Inks and paper</h2></header>
+
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Spot inks</h3>
+        <p class="sb-note">Four inks from the main row of the swatch sheet. Each spread prints in a pair: a light plate and a key plate. Contrast is against newsprint.</p>
+        <ul class="sb-inks">
+          {Object.entries(SPOT).map(([name, hex]) => (
+            <li class="sb-ink" style={`--c:var(--${name})`}>
+              <span class="sb-ink-chip" aria-hidden="true"></span>
+              <span class="sb-ink-name">{name[0].toUpperCase() + name.slice(1)}</span>
+              <code class="sb-hex">{hex}</code>
+              <span class="sb-ink-var">var(--{name})</span>
+              <span class="sb-ink-cr">{contrast(hex, paper).toFixed(1)}:1</span>
+              <span class="sb-ink-role">{SPOT_ROLE[name]}</span>
+            </li>
+          ))}
+        </ul>
+
+        <h3 class="sb-sub">Ink pairs</h3>
+        <p class="sb-note">The generator picks one of these for each spread and never repeats the last pair. Overprinted, the two plates multiply.</p>
+        <ul class="sb-pairs">
+          {INK_PAIRS.map(([lt, dk]) => (
+            <li style={`--lt:var(--${lt});--dk:var(--${dk})`}>
+              <span class="sb-over" aria-hidden="true"><i></i><b></b></span>
+              <Reg as="p" text="Aa" class="sb-pair-reg t-tower" style="--fs:5cqw" />
+              <span class="cap">{lt} + {dk}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="sb-board paper-newsprint sb-swatchbook">
+        <h3 class="sb-sub">The ramp</h3>
+        <p class="sb-note">The whole spectrum, light to dark, as the swatch sheet sets it: the nine named swatches, every other step, and all 39. The spot inks are marked.</p>
+        <div class="sb-sheet-rows">
+          <ol class="sb-row sb-row-main">
+            {MAIN.map((h) => <li style={`--c:${h}`} class:list={[Object.values(SPOT).includes(h as any) && 'is-spot']}><span>{h.slice(1)}</span></li>)}
+          </ol>
+          <ol class="sb-row sb-row-mid">
+            {MID.map((h) => <li style={`--c:${h}`}><span>{h.slice(1)}</span></li>)}
+          </ol>
+          <ol class="sb-row sb-row-ramp">
+            {RAMP.map((h) => <li style={`--c:${h}`}><span>{h.slice(1)}</span></li>)}
+          </ol>
+          <div class="sb-sweep" aria-hidden="true" style={`background:linear-gradient(90deg, ${RAMP.map((h, i) => `${h} ${pct(i, RAMP.length)}`).join(', ')})`}></div>
+          <p class="sb-sheet-cap cap">Printmaking Challenge<br />the Wonderful Spectrum<br />Src: src/lib/spectrum.ts</p>
+        </div>
+      </div>
+
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Papers</h3>
+        <ul class="sb-papers">
+          {Object.entries(PAPERS).map(([name, hex]) => (
+            <li class={`paper-${name}`}>
+              <span class="sb-paper-chip" aria-hidden="true"></span>
+              <span class="sb-ink-name">{name[0].toUpperCase() + name.slice(1)}</span>
+              <code class="sb-hex">{hex}</code>
+              <span class="sb-ink-var">.paper-{name}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="sb-note">Spreads print on newsprint twice as often as bone or cream. Toner is for contrast: the Plates opener, toner essays and plates, and some clippings.</p>
+
+        <h3 class="sb-sub">Semantic tokens</h3>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Use</th></tr></thead>
+          <tbody>{TOKENS.map(([t, v, u]) => <tr><th scope="row"><code>{t}</code></th><td>{v}</td><td>{u}</td></tr>)}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- B ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="type" aria-labelledby="type-h">
+      <header class="sb-part-head"><span class="sb-part-no">B</span><h2 id="type-h" class="sb-h">Type</h2></header>
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Families</h3>
+        <div class="sb-faces">
+          <figure class="sb-face">
+            <p class="sb-face-big" style="font-variation-settings:'wdth' 62;font-weight:860">Press run</p>
+            <p class="sb-face-big" style="font-variation-settings:'wdth' 100;font-weight:500">Press run</p>
+            <p class="sb-face-big" style="font-variation-settings:'wdth' 125;font-weight:300">PRESS RUN</p>
+            <figcaption class="cap">Archivo, variable: width 62–125, weight 100–900. Display, labels, folios. <code>--f-display</code></figcaption>
+          </figure>
+          <figure class="sb-face">
+            <p class="sb-face-serif">The collected work of Nate Butler, and the posts from other people he couldn’t stop thinking about. <i>Set in italic for decks and pull quotes.</i></p>
+            <figcaption class="cap">Source Serif 4, optical sizes 8–60. Running text, decks, quotes. <code>--f-serif</code></figcaption>
+          </figure>
+          <figure class="sb-face">
+            <p class="sb-face-hand">ahh this is great — nate</p>
+            <figcaption class="cap">Gochi Hand. Only Nate’s marker notes on clippings. <code>--f-hand</code></figcaption>
+          </figure>
+        </div>
+
+        <h3 class="sb-sub">Styles</h3>
+        <dl class="sb-styles">
+          <dt><code>.reg .t-tower</code><span>Essay towers, index and contact titles. Width 62, weight 860, caps, line height 0.84. Size fitted to title length: <code>min(12, max(4.4, 112 / len^0.72))</code> cqw.</span></dt>
+          <dd><Reg as="p" text="Building UI in GPUI" class="t-tower" style="--fs:7cqw" /></dd>
+          <dt><code>.reg .t-spaced</code><span>Banner and ledger titles, plate labels. Width 125, weight 300, tracked 0.34em.</span></dt>
+          <dd><Reg as="p" text="Contents" class="t-spaced" style="--fs:4.4cqw" /></dd>
+          <dt><code>.t-reverse</code><span>Titles on toner: newsprint type with a light-ink shadow.</span></dt>
+          <dd class="sb-dd-toner paper-toner"><p class="t-reverse" style="--fs:5cqw">Powering a static site</p></dd>
+          <dt><code>.prose-cols .dropcap</code><span>Running text. <code>--fs-body: clamp(12px, 1.06cqw, 17px)</code>, line height 1.5, hyphenated, indented paragraphs, run-in heads and square bullets.</span></dt>
+          <dd>
+            <div class="prose-cols cols-2 dropcap sb-prose">
+              <p>This site doesn’t have a database or a CMS. Every piece of content lives on the AT Protocol as records on a Personal Data Server, and the site is static Astro that fetches everything at build time.</p>
+              <p class="b-h">Custom lexicons</p>
+              <p>AT Protocol uses lexicons to define record schemas; this site uses four.</p>
+              <p class="b-li">rip.nate.post, long-form writing</p>
+              <p class="b-li">rip.nate.shot, images with blob references</p>
+              <p class="b-q">Acceptance is not a read receipt.</p>
+              <pre class="b-code">{`{ "lexicon": 1, "id": "rip.nate.post" }`}</pre>
+            </div>
+          </dd>
+          <dt><code>.pull</code><span>Pull quotes: serif italic over a heavy light-ink rule.</span></dt>
+          <dd><blockquote class="pull sb-pull"><p>But for a personal site that rebuilds on push, it’s fine.</p></blockquote></dd>
+          <dt><code>.cap</code><span>Captions and credits. <code>--fs-cap: clamp(10.5px, 0.8cqw, 13px)</code>, width 82.</span></dt>
+          <dd><p class="cap">Essay no. 62, 7 Feb 2026. About 3 minutes to read.</p></dd>
+          <dt><code>.dispatch-word</code><span>Notice heads: spaced caps over a rule.</span></dt>
+          <dd><p class="dispatch-head sb-dh"><span class="dispatch-word">Dispatch</span> <time>6 Mar 2025</time></p></dd>
+        </dl>
+      </div>
+    </section>
+
+    <!-- C ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="grid" aria-labelledby="grid-h">
+      <header class="sb-part-head"><span class="sb-part-no">C</span><h2 id="grid-h" class="sb-h">Space and grid</h2></header>
+      <div class="sb-board paper-newsprint">
+        <p class="sb-note">A spread is two pages at an aspect of 1.45, as wide as the screen allows. Inside it, everything is sized in container units (1cqw is 1% of the spread’s width, 12.8px at the 1280px design width), so a spread composes the same way at every desktop size. Below 760px a spread becomes a stack of pages set in pixels.</p>
+        <div class="sb-gridspread" aria-label="The spread grid: 12 columns, 8 rows">
+          <div class="sb-grid-cells" aria-hidden="true">{Array.from({ length: 96 }, () => <i></i>)}</div>
+          <span class="sb-gpad sb-gpad-l" aria-hidden="true"><b>pg-l</b> 5 / 4.5 / 5 / 4cqw</span>
+          <span class="sb-gpad sb-gpad-r" aria-hidden="true"><b>pg-r</b> 5 / 4 / 5 / 4.5cqw</span>
+          <span class="sb-ggutter" aria-hidden="true"><b>gutter</b> 9cqw</span>
+          <span class="sb-gfolio sb-gfolio-l" aria-hidden="true">folio 2.6 / 1.9cqw</span>
+          <span class="sb-gfolio sb-gfolio-r" aria-hidden="true">running head 1.7cqw</span>
+        </div>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">At 1280px</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Columns, rows</th><td>12 × 8</td><td>107 × 110px</td></tr>
+            <tr><th scope="row">Page margin, top and bottom</th><td>5cqw</td><td>64px</td></tr>
+            <tr><th scope="row">Page margin, outside / inside</th><td>4 / 4.5cqw</td><td>51 / 58px</td></tr>
+            <tr><th scope="row">Column gap</th><td>2.4cqw</td><td>31px</td></tr>
+            <tr><th scope="row">Heavy rule</th><td>0.35cqw</td><td>4.5px</td></tr>
+            <tr><th scope="row">Phone page padding</th><td>44 / 20 / 40px</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- D ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="print" aria-labelledby="print-h">
+      <header class="sb-part-head"><span class="sb-part-no">D</span><h2 id="print-h" class="sb-h">Print</h2></header>
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Plates</h3>
+        <p class="sb-note">Photos are separated at build time by SVG filters in <code>Inks.astro</code>: each plate is a halftone of one ink on transparent, stacked and multiplied, and knocked out of register by the spread’s <code>--mx</code>/<code>--my</code> and the pointer. Dark screenshots print as negatives so their light lines take the ink.</p>
+        <div class="sb-plates">
+          {light && (
+            <Fragment>
+              <figure class="sb-plate"><Plate media={light} inks={['pink', 'black']} alt="" proof /><figcaption class="cap">Duotone, pink + black <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>
+              <figure class="sb-plate" style="--lt:var(--red);--dk:var(--blue)"><Plate media={light} inks={['red', 'blue']} alt="" /><figcaption class="cap">Duotone, red + blue</figcaption></figure>
+              <figure class="sb-plate"><Plate media={light} inks={['pink', 'blue']} mode="key" alt="" /><figcaption class="cap">Key plate only, blue</figcaption></figure>
+              <figure class="sb-plate"><Plate media={light} inks={['black', 'black']} mode="mono" alt="" /><figcaption class="cap">Mono, as in clippings</figcaption></figure>
+              <figure class="sb-plate sb-plate-toner paper-toner"><Plate media={light} inks={['pink', 'black']} mode="rev" alt="" /><figcaption class="cap">Reverse, on toner</figcaption></figure>
+            </Fragment>
+          )}
+          {dark && <figure class="sb-plate" style="--lt:var(--pink);--dk:var(--blue)"><Plate media={dark} inks={['pink', 'blue']} alt="" proof /><figcaption class="cap">Negative, for dark UI <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>}
+        </div>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Screen</th><th scope="col">Filter</th><th scope="col">Cell</th><th scope="col">Carries</th></tr></thead>
+          <tbody>{SCREENS.map(([n, id, c, u]) => <tr><th scope="row">{n}</th><td><code>ht-{id}-*</code></td><td>{c}</td><td>{u}</td></tr>)}</tbody>
+        </table>
+
+        <h3 class="sb-sub">Registration</h3>
+        <p class="sb-note">Display type prints twice: the light plate is a pseudo-element offset by 1.8 × the misregistration, the key plate is the text. Move the pointer over a spread to push the plates apart; the Misregistration dial above scales every spread’s offset.</p>
+        <div class="sb-reg-row">
+          {(['pink', 'red'] as Ink[]).map((lt) => <Reg as="p" text="Out of register" class="t-tower" style={`--fs:6cqw;--lt:var(--${lt});--mx:3px;--my:-2px`} />)}
+        </div>
+
+        <h3 class="sb-sub">Texture</h3>
+        <ul class="sb-textures">
+          <li><span class="sb-tex sb-tex-grain" aria-hidden="true"></span><span class="cap"><b>Desk grain.</b> A fixed noise layer over everything at 0.11 opacity.</span></li>
+          <li><span class="sb-tex sb-tex-paper paper-newsprint" aria-hidden="true"></span><span class="cap"><b>Paper.</b> Fibre noise and a soft vignette on every spread.</span></li>
+          <li><span class="sb-tex sb-tex-toner paper-toner" aria-hidden="true"></span><span class="cap"><b>Toner.</b> Scan lines and streaked dropout.</span></li>
+          <li><span class="sb-tex sb-tex-xerox" aria-hidden="true"><span>Photocopied text</span></span><span class="cap"><b>#xerox.</b> Toner wobble on clipped text.</span></li>
+          <li><span class="sb-tex sb-tex-rubber" aria-hidden="true"><span>STAMPED</span></span><span class="cap"><b>#rubber.</b> Uneven ink and chewed edges.</span></li>
+          <li><span class="sb-tex sb-tex-marker" aria-hidden="true"><span>marker</span></span><span class="cap"><b>#marker.</b> A bleeding felt tip.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- E ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="motion" aria-labelledby="motion-h">
+      <header class="sb-part-head"><span class="sb-part-no">E</span><h2 id="motion-h" class="sb-h">Motion</h2></header>
+      <div class="sb-board paper-newsprint">
+        <p class="sb-note">Motion is the press at work: plates land as a spread scrolls into view, a page lifts as it leaves, clippings drop, stamps come down. With reduced motion everything prints at once and nothing moves. <span class="sb-rm">Reduced motion is on, so these demos jump to their end.</span></p>
+        <ul class="sb-eases">
+          {EASES.map(([name, fn, dur, use]) => (
+            <li class="sb-ease" style={`--fn:${fn};--dur:${dur}`}>
+              <code class="sb-ease-name">{name}</code>
+              <span class="sb-track" aria-hidden="true"><i></i></span>
+              <span class="sb-ease-meta"><code>{fn}</code>, {dur}</span>
+              <span class="sb-ease-use">{use}</span>
+            </li>
+          ))}
+        </ul>
+        <button type="button" class="sb-btn" data-ease-run>Run all</button>
+
+        <h3 class="sb-sub">A spread printing</h3>
+        <p class="sb-note">The same sequence the issue runs, on one block: light plate, key plate 0.32s later, then the stamp.</p>
+        <div class="sb-printdemo" data-printdemo>
+          <span class="sb-pd-lt" aria-hidden="true"></span>
+          <span class="sb-pd-dk" aria-hidden="true">Press run</span>
+          <span class="sb-pd-stamp stamp" aria-hidden="true" style="--stamp-rot:-8deg"><span class="stamp-top">Clipped from</span><span class="stamp-handle">@nate.rip</span></span>
+        </div>
+        <button type="button" class="sb-btn" data-print-run>Print it</button>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Moment</th><th scope="col">How</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Spread arrives, leaves</th><td>Scroll-driven <code>view()</code> timeline: tilts in from rotateX(−16°), lifts away to rotateX(18°). Desktop only.</td></tr>
+            <tr><th scope="row">Print-in</th><td><code>.is-printed</code> added at 28% visibility; plates translate from <code>--lx</code>/<code>--ly</code> and wipe on with the roller.</td></tr>
+            <tr><th scope="row">Pointer push</th><td><code>--px</code>/<code>--py</code> eased at 0.12 a frame; light plate moves ×9px, key plate ×−3px.</td></tr>
+            <tr><th scope="row">Clipping swing</th><td>Dragged clippings swing up to 14° and settle like paper on a pin.</td></tr>
+            <tr><th scope="row">Flats zoom</th><td>One continuous scale from the spread you’re on to the whole pasteboard.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- F ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="parts" aria-labelledby="parts-h">
+      <header class="sb-part-head"><span class="sb-part-no">F</span><h2 id="parts-h" class="sb-h">Parts</h2></header>
+      <div class="sb-board paper-newsprint sb-parts">
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage"><div class="stamp sb-static" style="--stamp-rot:-6deg"><span class="stamp-top">Clipped from</span><span class="stamp-handle">@meodai.bsky.social</span><span class="stamp-date">15 Sep 2026</span></div></div>
+          <figcaption class="cap"><b>Clipping stamp.</b> Always red, so a reshare can’t be mistaken for Nate’s own work. <code>.stamp</code></figcaption>
+        </figure>
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage"><ProofStamp date={drafts[0]?.date ?? '2026-10-08'} class="sb-static" /></div>
+          <figcaption class="cap"><b>PROOF stamp.</b> On the opening spread of each draft feature. <code>ProofStamp.astro</code></figcaption>
+        </figure>
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage"><p class="archive-mark sb-static"><span>From the archive</span><span class="archive-year">2021</span></p></div>
+          <figcaption class="cap"><b>Archive mark.</b> Essays older than three years. <code>.archive-mark</code></figcaption>
+        </figure>
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage"><aside class="annot sb-static"><svg class="annot-arrow" viewBox="0 0 100 60" aria-hidden="true"><path d="M4 40 C 30 6, 70 4, 92 30 M92 30 l-14 -2 M92 30 l-2 -13" /></svg><p>god ui, great tool</p><span class="annot-sig">nate</span></aside></div>
+          <figcaption class="cap"><b>Marker note.</b> Nate’s words when he quoted a post. <code>.annot</code></figcaption>
+        </figure>
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage"><span class="tape sb-static sb-tape" aria-hidden="true"></span></div>
+          <figcaption class="cap"><b>Tape.</b> The light ink mixed into translucent paper. <code>.tape</code></figcaption>
+        </figure>
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage sb-stage-text">
+            <p class="jump-from"><a href="#parts">Continued from page 50</a><span class="jump-slug">Powering a static site</span></p>
+            <a class="cont" href="#parts">Continued on page 52</a>
+          </div>
+          <figcaption class="cap"><b>Jump lines.</b> <code>.jump-from</code>, <code>.cont</code></figcaption>
+        </figure>
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage sb-stage-text">
+            <p class="prose-cols">Records live on a Personal Data Server<sup class="ref">1</sup> and blobs on the PDS too<sup class="ref">2</sup>.<span class="end-mark" aria-hidden="true"></span></p>
+            <aside class="margin-notes sb-mn"><p class="mn-head">Notes</p><ol><li><a href="https://atproto.com">AT Protocol</a><span class="mn-where">atproto.com</span></li><li><a href="https://bsky.social">Bluesky PDS</a><span class="mn-where">bsky.social</span></li></ol></aside>
+          </div>
+          <figcaption class="cap"><b>References, margin notes, end mark.</b> <code>sup.ref</code>, <code>.margin-notes</code>, <code>.end-mark</code></figcaption>
+        </figure>
+        {clipping && (
+          <figure class="sb-part-cell sb-part-wide">
+            <div class="sb-part-stage sb-stage-clip"><Clipping clip={clipping} i={0} seed={7} /></div>
+            <figcaption class="cap"><b>Clipping.</b> Someone else’s post as a photocopy: avatar, name, handle, words, the stamp, and Nate’s note. Drag it. <code>Clipping.astro</code></figcaption>
+          </figure>
+        )}
+      </div>
+    </section>
+
+    <!-- G ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="spreads" aria-labelledby="spreads-h">
+      <header class="sb-part-head"><span class="sb-part-no">G</span><h2 id="spreads-h" class="sb-h">Spreads</h2></header>
+      <p class="sb-desk-note">Every layout the generator can choose, printed with real content from the current issue. The generator seeds layout, ink pair, paper and misregistration from each item, and never repeats a layout or ink pair twice running.</p>
+      <ol class="sb-spec-toc" aria-label="Spread layouts">
+        {groups.map((g) => <li><a href={`#${g.specs[0]?.id ?? g.key}`}><span>{g.no}</span>{g.title}</a></li>)}
+      </ol>
+      <div class="zine sb-spreads">
+        {groups.map((g) => (
+          <Fragment>
+            <header class="sb-group-head" id={g.key}>
+              <span class="sb-part-no">{g.no}</span>
+              <h3 class="sb-h3">{g.title}</h3>
+              <p>{g.dek}</p>
+            </header>
+            {g.specs.map((sp) => {
+              const s = sp.spread;
+              return (
+                <article class="sb-spec" id={sp.id} aria-label={sp.name}>
+                  <p class="sb-ticket">
+                    <span class="sb-ticket-name">{sp.name}</span>
+                    <span class="sb-ticket-when">{sp.when}</span>
+                    <span class="sb-ticket-file"><code>{sp.file}</code>, inks {s.inks[0]} + {s.inks[1]}, {s.paper}</span>
+                  </p>
+                  {s.kind === 'cover' ? <Cover spread={s} issue={issue} counts={counts} printed={printed} />
+                    : s.kind === 'contents' ? <Contents spread={s} spreads={spreads} issue={issue} />
+                    : s.kind === 'post' ? <PostSpread spread={s} />
+                    : s.kind === 'shot' ? <ShotSpread spread={s} />
+                    : s.kind === 'list' ? <ListSpread spread={s} />
+                    : s.kind === 'bulletin' ? <BulletinSpread spread={s} />
+                    : s.kind === 'clippings' ? <ClippingsSpread spread={s} />
+                    : s.kind === 'section' ? <SectionSpread spread={s} />
+                    : s.kind === 'jump' ? <JumpSpread spread={s} />
+                    : s.kind === 'draft' ? <DraftSpread spread={s} />
+                    : null}
+                </article>
+              );
+            })}
+          </Fragment>
+        ))}
+      </div>
+    </section>
+
+    <!-- H ─────────────────────────────────────────────────────────── -->
+    <section class="sb-part" id="flats" aria-labelledby="flats-h">
+      <header class="sb-part-head"><span class="sb-part-no">H</span><h2 id="flats-h" class="sb-h">Flats</h2></header>
+      <div class="sb-board paper-newsprint sb-flats-board">
+        <p class="sb-note">Press F, or the Flats button at the bottom right, to zoom out from the spread you’re on to every spread on the pasteboard, grouped by section, with crop marks and a colour bar. Here it lays out the specimens above; in the issue, the whole issue. Click a spread to zoom back in; Escape returns to where you were.</p>
+        <button type="button" class="sb-btn" data-flats>Show the flats</button>
+        <p class="cap">Thumbnails are live clones of the spreads at a 1280px design width, with the halftone filters swapped for cheap CSS duotones. <code>scripts/flats.ts</code></p>
+      </div>
+    </section>
+
+    <footer class="colophon-end"><p>End of the specimen book. Back to <a href="/">the issue</a>.</p></footer>
+  </main>
+  <script>
+    import { pressRun } from '../scripts/press';
+    import { styleguide } from '../scripts/styleguide';
+    pressRun();
+    styleguide();
+  </script>
+</Base>

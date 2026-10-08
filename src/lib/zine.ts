@@ -173,7 +173,7 @@ export function rng(seed: number) {
   };
 }
 
-const INK_PAIRS: [Ink, Ink][] = [
+export const INK_PAIRS: [Ink, Ink][] = [
   ['pink', 'black'],
   ['red', 'black'],
   ['pink', 'blue'],
@@ -190,7 +190,7 @@ export const SHORT_WORDS = 170;
 const words = (md: string) => md.split(/\s+/).filter(Boolean).length;
 
 /** How much set text each opener holds, and each jump spread after it. */
-const OPENER_CHARS: Record<PostLayout, number> = { tower: 1900, banner: 2900, toner: 1050 };
+export const OPENER_CHARS: Record<PostLayout, number> = { tower: 1900, banner: 2900, toner: 1050 };
 const JUMP_CHARS = 4400;
 const MAX_JUMPS = 3;
 /** Less than this left over isn't worth a jump; pick a roomier opener. */
