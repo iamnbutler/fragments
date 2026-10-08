@@ -1,198 +1,157 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { fetchAllFragments, blobUrl, DID } from '../../lib/atproto';
+import Reg from '../../components/riso/Reg.astro';
+import Plate from '../../components/riso/Plate.astro';
+import { fetchAllFragments } from '../../lib/atproto';
+import { fragmentItem } from '../../lib/stream';
+import { measureAll } from '../../lib/tone';
 import { renderMarkdownWithHeadings } from '../../lib/markdown';
+import { domain, hash, inline, listEntries, paragraphs, printDate, readingMinutes, rng, type Ink } from '../../lib/zine';
 import type { Fragment } from '../../lib/types';
 
 export async function getStaticPaths() {
   const fragments = await fetchAllFragments();
-  return fragments.map(f => ({
+  return fragments.map((f) => ({
     params: { id: String(f.id) },
     props: { fragment: f, allFragments: fragments },
   }));
 }
 
-const { fragment, allFragments } = Astro.props as {
-  fragment: Fragment;
-  allFragments: Fragment[];
-};
-
+const { fragment, allFragments } = Astro.props as { fragment: Fragment; allFragments: Fragment[] };
+const item = fragmentItem(fragment);
+await measureAll(item.media.filter((m) => !m.video).map((m) => m.src));
 const { html, headings } = fragment.content
   ? await renderMarkdownWithHeadings(fragment.content)
   : { html: '', headings: [] };
-const imageCount = fragment.images?.length ?? 0;
 
-const wordCount = fragment.content
-  ? fragment.content.replace(/[#*_\[\]()>`~\-]/g, '').split(/\s+/).filter(Boolean).length
-  : 0;
-
-// Prev/next by fragment ID
 const sorted = [...allFragments].sort((a, b) => a.id - b.id);
-const idx = sorted.findIndex(f => f.id === fragment.id);
+const idx = sorted.findIndex((f) => f.id === fragment.id);
 const prev = idx > 0 ? sorted[idx - 1] : null;
 const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
-// Related: same type, exclude current, newest first, take 6
-const related = allFragments
-  .filter(f => f.type === fragment.type && f.id !== fragment.id)
-  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  .slice(0, 6);
-
-const typeAccent: Record<string, string> = {
-  post: 'var(--accent)',
-  shot: 'var(--accent-2)',
-  list: 'var(--list-accent)',
-  link: 'var(--link-accent)',
-};
-const accent = typeAccent[fragment.type] || 'var(--accent)';
-const date = new Date(fragment.createdAt).toISOString().slice(0, 10);
+const PAIRS: [Ink, Ink][] = [['pink', 'black'], ['orange', 'black'], ['pink', 'blue'], ['orange', 'blue']];
+const seed = hash(`f-${fragment.id}`);
+const r = rng(seed);
+const inks = PAIRS[seed % PAIRS.length];
+const mx = r.range(-2.4, 2.4).toFixed(2);
+const my = r.range(-1.8, 1.8).toFixed(2);
+const date = printDate(fragment.createdAt);
+const mins = readingMinutes(fragment.content ?? '');
+const len = fragment.title.length;
+const titleSize = Math.min(15, Math.max(6, 120 / Math.pow(len, 0.7)));
+const KIND = { post: 'Essay', shot: 'Plate', list: 'Index', link: 'Recommended reading' } as const;
+const entries = fragment.type === 'list' ? listEntries(fragment.content ?? '') : [];
+const sections = [...new Set(entries.map((e) => e.section ?? ''))];
+const intro = fragment.type === 'list' ? paragraphs(fragment.content ?? '', fragment.title)[0] : '';
+const hasLinkItems = entries.some((e) => e.href);
+const issue = allFragments.length;
+const desc = inline(paragraphs(fragment.content ?? '', fragment.title)[0] ?? '').slice(0, 160);
 ---
-<Base title={fragment.title} wide atUri={fragment.atUri}>
-  <div class="detail-page" style={`--type-accent: ${accent}`}>
+<Base title={fragment.title} atUri={fragment.atUri} description={desc || undefined} bodyClass="single">
+  <main
+    class:list={['single-page', `single-${fragment.type}`]}
+    style={`--lt:var(--${inks[0]});--dk:var(--${inks[1]});--mx:${mx}px;--my:${my}px;--lx:${r.range(-26, 26).toFixed(1)}px;--ly:${r.range(-18, 18).toFixed(1)}px`}
+  >
+    <nav class="single-nav" aria-label="Issue">
+      <a href="/">nate.rip, issue {issue}</a>
+      <span>Page {fragment.id}</span>
+    </nav>
 
-    <!-- === Chrome bar header === -->
-    <header class="d-chrome">
-      <div class="d-chrome-rivets"><i /><i /><i /><i /></div>
-      <a href="/" class="d-chrome-back">&larr; index</a>
-      <span class={`d-chrome-type type-${fragment.type}`}>{fragment.type}</span>
-      <span class="d-chrome-id">#{String(fragment.id).padStart(2, '0')}</span>
-      <time class="d-chrome-date">{date}</time>
-      <div class="d-chrome-ticks"><i /><i /><i /><i /><i /></div>
-    </header>
+    <article class="sheet single-sheet paper-newsprint" data-kind={fragment.type}>
+      <div class="single-paper">
+        <header class="single-head">
+          <p class="single-kind">{KIND[fragment.type]} no. {fragment.id}</p>
+          <Reg as="h1" text={fragment.title} class="t-tower single-title" style={`--fs:clamp(44px, ${titleSize.toFixed(2)}vw, ${(titleSize * 12).toFixed(0)}px)`} />
+          <p class="cap single-meta">
+            <time datetime={fragment.createdAt}>{date}</time>
+            {fragment.type === 'post' && <span>{mins} minute read</span>}
+            {fragment.type === 'shot' && <span>{item.media.length} frame{item.media.length === 1 ? '' : 's'}</span>}
+            {fragment.type === 'list' && <span>{entries.length} entries</span>}
+            {fragment.type === 'link' && item.url && <span>{domain(item.url)}</span>}
+          </p>
+        </header>
 
-    <!-- === Title === -->
-    <h1 class="d-title">{fragment.title}</h1>
-
-    <!-- === Body: main + sidebar === -->
-    <div class="d-body">
-
-      <!-- Main content -->
-      <main class="d-main">
-
-        {/* Shot gallery */}
-        {fragment.type === 'shot' && fragment.images && (
-          <div class="d-gallery">
-            {fragment.images.map((img, i) => {
-              const isFirst = i === 0;
-              const isLast = i === imageCount - 1;
-              const oddRemaining = (imageCount - 1) % 2 === 1;
-              const spanFull = isFirst || (isLast && oddRemaining && imageCount > 1);
-              const isVideo = img.mimeType.startsWith('video/');
-              return (
-                <div class:list={['d-gallery-item', spanFull && 'd-gallery-full', isVideo && 'd-gallery-video']}>
-                  {isVideo ? (
-                    <video controls playsinline preload="metadata" aria-label={img.alt || fragment.title}>
-                      <source src={blobUrl(DID, img.cid)} type={img.mimeType} />
-                      <a href={blobUrl(DID, img.cid)}>Open video: {img.alt || fragment.title}</a>
-                    </video>
-                  ) : (
-                    <img src={blobUrl(DID, img.cid)} alt={img.alt || fragment.title} loading="lazy" />
-                  )}
-                  <div class="d-gallery-chrome">
-                    <span class="d-gallery-n">{String(i + 1).padStart(2, '0')}/{String(imageCount).padStart(2, '0')}</span>
-                    <span class="d-gallery-exposure">f/{fragment.id}</span>
-                  </div>
-                  {/* Crosshair overlays */}
-                  {!isVideo && <div class="d-gallery-crosshair" />}
+        {fragment.type === 'shot' && (
+          <div class="single-plates">
+            {item.media.map((m, i) => (
+              <div class="single-plate">
+                <Plate media={m} inks={i % 2 ? [inks[0] === 'pink' ? 'orange' : 'pink', inks[1]] : inks} fit="contain" alt={m.alt || `${fragment.title}${item.media.length > 1 ? `, frame ${i + 1}` : ''}`} proof={!m.video} eager={i === 0} />
+                <div class="single-plate-foot">
+                  <span class="cap">Frame {i + 1} of {item.media.length}</span>
+                  {!m.video && <button class="proof-toggle" type="button" aria-pressed="false">Show original color</button>}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Prose content — no wrapping container */}
-        {html && (
-          <div class="d-prose" set:html={html} />
+        {fragment.type === 'link' && item.url && (
+          <div class="single-coupon">
+            <article class="notice coupon" style="--tilt:-1.2deg">
+              <svg class="scissors" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8.1 7.6 20 18M8.1 16.4 20 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              <div class="coupon-in">
+                <p class="coupon-no">Recommended reading, no. {fragment.id}</p>
+                <p class="coupon-title"><a href={item.url} target="_blank" rel="noopener">Read “{fragment.title}”</a></p>
+                <p class="coupon-foot"><span class="coupon-domain">{domain(item.url)}</span></p>
+              </div>
+            </article>
+          </div>
         )}
 
-        {/* Link target */}
-        {fragment.type === 'link' && fragment.url && (
-          <a href={fragment.url} target="_blank" rel="noopener" class="d-link-target">
-            <span class="d-link-signal">&nearr;</span>
-            <span class="d-link-url">{fragment.url}</span>
-          </a>
-        )}
-      </main>
-
-      <!-- Sidebar -->
-      <aside class="d-sidebar">
-        {/* TOC */}
-        {headings.length > 0 && (
-          <div class="d-sb-panel">
-            <div class="d-sb-chrome">
-              <span class="d-sb-dot" /><span class="d-sb-dot" />
-              <span class="d-sb-label">contents</span>
+        {fragment.type === 'list' && hasLinkItems ? (
+          <div class="single-index">
+            {intro && <p class="index-intro">{intro}</p>}
+            {(
+              sections.map((s) => (
+                <section class="ix-section">
+                  {s && <h2 class="ix-section-title" id={s.toLowerCase().replace(/[^a-z0-9]+/g, '-')}>{s}</h2>}
+                  <ol class="index-list">
+                    {entries.filter((e) => (e.section ?? '') === s).map((e) => (
+                      <li>
+                        <span class="ix-no">{String(entries.indexOf(e) + 1).padStart(2, '0')}</span>
+                        <span class="ix-body">
+                          {e.href ? <a class="ix-label" href={e.href} target="_blank" rel="noopener">{e.label}</a> : <span class="ix-label">{e.label}</span>}
+                          {e.note && <span class="ix-note">{e.note}</span>}
+                        </span>
+                        <span class="ix-where">{e.href ? domain(e.href) : ''}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              ))
+            )}
+          </div>
+        ) : (
+          html && (
+            <div class:list={['single-body', headings.length > 1 && 'has-toc']}>
+              {headings.length > 1 && (
+                <nav class="margin-toc" aria-label="In this piece">
+                  <p class="cap">In this piece</p>
+                  <ol>
+                    {headings.map((h) => (
+                      <li class={`toc-${h.level}`}><a href={`#${h.slug}`}>{h.text}</a></li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
+              <div class:list={['prose-article', fragment.type === 'post' && 'dropcap-article']} set:html={html} />
             </div>
-            <nav class="d-sb-toc">
-              {headings.map(h => (
-                <a href={`#${h.slug}`} class:list={['d-toc-link', h.level === 3 && 'd-toc-sub']}>
-                  {h.text}
-                </a>
-              ))}
-            </nav>
-          </div>
+          )
         )}
+      </div>
+    </article>
 
-        {/* Prev/Next nav */}
-        <div class="d-sb-panel">
-          <div class="d-sb-chrome">
-            <span class="d-sb-dot" />
-            <span class="d-sb-label">nav</span>
-          </div>
-          <div class="d-sb-nav">
-            {prev ? (
-              <a href={`/f/${prev.id}`} class="d-nav-link">
-                <span class="d-nav-dir">&larr; prev</span>
-                <span class="d-nav-title">{prev.title}</span>
-              </a>
-            ) : <span class="d-nav-link d-nav-dead">&larr; —</span>}
-            {next ? (
-              <a href={`/f/${next.id}`} class="d-nav-link">
-                <span class="d-nav-dir">next &rarr;</span>
-                <span class="d-nav-title">{next.title}</span>
-              </a>
-            ) : <span class="d-nav-link d-nav-dead">&rarr; —</span>}
-          </div>
-        </div>
-
-        {/* Info panel — moved down */}
-        <div class="d-sb-panel">
-          <div class="d-sb-chrome">
-            <span class="d-sb-dot" /><span class="d-sb-dot" /><span class="d-sb-dot" />
-            <span class="d-sb-label">sys</span>
-          </div>
-          <div class="d-sb-rows">
-            <div class="d-sb-row"><span class="d-sb-k">TYPE</span><span class={`d-sb-v type-${fragment.type}`}>{fragment.type}</span></div>
-            <div class="d-sb-row"><span class="d-sb-k">FRAG</span><span class="d-sb-v">{fragment.id}</span></div>
-            <div class="d-sb-row"><span class="d-sb-k">DATE</span><span class="d-sb-v">{date}</span></div>
-            {wordCount > 0 && <div class="d-sb-row"><span class="d-sb-k">WORDS</span><span class="d-sb-v">{wordCount}</span></div>}
-            {imageCount > 0 && <div class="d-sb-row"><span class="d-sb-k">MEDIA</span><span class="d-sb-v">{imageCount}</span></div>}
-          </div>
-        </div>
-      </aside>
-    </div>
-
-    <!-- === Related === -->
-    {related.length > 0 && (
-      <section class="d-related">
-        <div class="d-related-chrome">
-          <div class="d-related-rivets"><i /><i /><i /></div>
-          <span class="d-related-label">more {fragment.type}s</span>
-          <span class="d-related-count">{related.length}</span>
-          <div class="d-related-ticks"><i /><i /><i /><i /><i /><i /><i /><i /></div>
-        </div>
-        <div class="d-related-rows">
-          {related.map((r, i) => (
-            <a href={`/f/${r.id}`} class="d-related-row">
-              <span class="d-related-id">{String(r.id).padStart(2, '0')}</span>
-              <span class={`d-related-type type-${r.type}`}>{r.type}</span>
-              <span class="d-related-title">{r.title}</span>
-              <time class="d-related-date">{new Date(r.createdAt).toISOString().slice(0, 10)}</time>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
-
-  </div>
+    <nav class="turn" aria-label="Turn the page">
+      {prev ? (
+        <a class="turn-prev" href={`/f/${prev.id}`}><span class="cap">Previous page, {prev.id}</span><span class="turn-title">{prev.title}</span></a>
+      ) : <span />}
+      {next ? (
+        <a class="turn-next" href={`/f/${next.id}`}><span class="cap">Next page, {next.id}</span><span class="turn-title">{next.title}</span></a>
+      ) : <span />}
+    </nav>
+  </main>
+  <script>
+    import { pressSingle } from '../../scripts/single';
+    pressSingle();
+  </script>
 </Base>

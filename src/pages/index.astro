@@ -1,369 +1,47 @@
 ---
-import Base from "../layouts/Base.astro";
-import {
-    fetchAllFragments,
-    DID,
-    fetchBskyPosts,
-    fetchBskyFeed,
-    parseBskyUrl,
-} from "../lib/atproto";
-import type { Fragment, BskyPost } from "../lib/types";
-import {
-    postMeta,
-    shotMeta,
-    linkVariant,
-    bskySize,
-    bskyTextVariant,
-    relTime,
-} from "../lib/variants";
+import Base from '../layouts/Base.astro';
+import Cover from '../components/riso/Cover.astro';
+import Contents from '../components/riso/Contents.astro';
+import PostSpread from '../components/riso/PostSpread.astro';
+import ShotSpread from '../components/riso/ShotSpread.astro';
+import ListSpread from '../components/riso/ListSpread.astro';
+import BulletinSpread from '../components/riso/BulletinSpread.astro';
+import ClippingsSpread from '../components/riso/ClippingsSpread.astro';
+import { loadStream } from '../lib/stream';
+import { impose } from '../lib/zine';
+import { measureAll } from '../lib/tone';
 
-// Tile components — posts
-import PostCassette from "../components/tiles/PostCassette.astro";
-import PostCircuit from "../components/tiles/PostCircuit.astro";
-import PostBlast from "../components/tiles/PostBlast.astro";
-import PostTerminal from "../components/tiles/PostTerminal.astro";
-// shots
-import ShotViewfinder from "../components/tiles/ShotViewfinder.astro";
-import ShotEvidence from "../components/tiles/ShotEvidence.astro";
-import ShotHud from "../components/tiles/ShotHud.astro";
-import ShotHero from "../components/tiles/ShotHero.astro";
-// bsky
-import BskyText from "../components/tiles/BskyText.astro";
-import BskyMedia from "../components/tiles/BskyMedia.astro";
-// links + lists
-import LinkRelay from "../components/tiles/LinkRelay.astro";
-import LinkDispatch from "../components/tiles/LinkDispatch.astro";
-import ListTile from "../components/tiles/ListTile.astro";
-
-// Pinned bsky post URLs
-const PINNED_BSKY_URLS = [
-    "https://bsky.app/profile/nate.rip/post/3mcs53dio3c2s",
-    "https://bsky.app/profile/nate.rip/post/3malzuto3x22s",
-    "https://bsky.app/profile/nate.rip/post/3lxqjbta66k2k",
-    "https://bsky.app/profile/nate.rip/post/3ltkowbdsuk2g",
-    "https://bsky.app/profile/nate.rip/post/3ljqadka7qk2r",
-    "https://bsky.app/profile/nate.rip/post/3ljixbqlta22z",
-    "https://bsky.app/profile/nate.rip/post/3li2ujkthr22x",
-    "https://bsky.app/profile/nate.rip/post/3lggjq25c6k2w",
-    "https://bsky.app/profile/nate.rip/post/3lbulbyvexk2v",
-    "https://bsky.app/profile/nate.rip/post/3ju4vkv7esa2p",
-];
-
-const pinnedRkeys = PINNED_BSKY_URLS.map((u) => parseBskyUrl(u)!).filter(
-    Boolean,
-);
-
-// Fetch everything in parallel
-const [fragments, pinnedPosts, feedPosts] = await Promise.all([
-    fetchAllFragments(),
-    fetchBskyPosts(pinnedRkeys),
-    fetchBskyFeed(25, new Set(pinnedRkeys)),
-]);
-
-// Build a unified timeline: fragments + pinned bsky posts, sorted by date desc
-type GridEntry =
-    | { kind: "fragment"; f: Fragment }
-    | { kind: "bsky"; p: BskyPost };
-
-const allEntries: GridEntry[] = [
-    ...fragments.map((f) => ({ kind: "fragment" as const, f })),
-    ...pinnedPosts.map((p) => ({ kind: "bsky" as const, p })),
-];
-allEntries.sort((a, b) => {
-    const da = new Date(
-        a.kind === "fragment" ? a.f.createdAt : a.p.createdAt,
-    ).getTime();
-    const db = new Date(
-        b.kind === "fragment" ? b.f.createdAt : b.p.createdAt,
-    ).getTime();
-    return db - da; // newest first
-});
-
-const hero = allEntries.find(
-    (e) => e.kind === "fragment" && e.f.type === "shot" && e.f.images?.length,
-);
-const grid = allEntries.filter((e) => e !== hero);
-
-const totalFragments = fragments.length;
-const myAvatar = 'https://github.com/iamnbutler.png';
-
-// Build render sequence with log + feed injected
-type RenderItem =
-    | { kind: "log" }
-    | { kind: "feed" }
-    | { kind: "entry"; e: GridEntry; i: number };
-
-const renderItems: RenderItem[] = [];
-grid.forEach((e, i) => {
-    if (i === 5) renderItems.push({ kind: "log" });
-    if (i === 12) renderItems.push({ kind: "feed" });
-    renderItems.push({ kind: "entry", e, i });
-});
-if (grid.length <= 5) renderItems.push({ kind: "log" });
-if (grid.length <= 12) renderItems.push({ kind: "feed" });
+const stream = await loadStream();
+const spreads = impose(stream);
+// Check every plate's tone so dark images can be separated as negatives.
+await measureAll(stream.flatMap((i) => {
+  if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
+  return i.media.filter((m) => !m.video || m.video.endsWith('.m3u8')).map((m) => m.src);
+}));
+const counts: Record<string, number> = {};
+for (const i of stream) counts[i.kind] = (counts[i.kind] ?? 0) + 1;
+const issue = stream.filter((i) => i.kind !== 'note' && i.kind !== 'reshare').length;
+const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
-
-<Base wide>
-    <main class="mosaic">
-        <header class="tile tile-header">
-            <h1>nate.rip</h1>
-            <span class="header-count">{totalFragments}</span>
-            <nav class="header-filters">
-                <button class="filter-btn active" aria-pressed="true" data-filter="post"
-                    >{fragments.filter((f) => f.type === "post").length} posts</button
-                >
-                <button class="filter-btn active" aria-pressed="true" data-filter="shot"
-                    >{fragments.filter((f) => f.type === "shot").length} shots</button
-                >
-                <button class="filter-btn active" aria-pressed="true" data-filter="list"
-                    >{fragments.filter((f) => f.type === "list").length} lists</button
-                >
-                <button class="filter-btn active" aria-pressed="true" data-filter="link"
-                    >{fragments.filter((f) => f.type === "link").length} links</button
-                >
-                <button class="filter-btn active" aria-pressed="true" data-filter="bsky"
-                    >{pinnedPosts.length} bsky</button
-                >
-            </nav>
-        </header>
-
-        {hero && hero.kind === "fragment" && hero.f.images && (
-            <ShotHero fragment={hero.f} cls="tile-hero" />
-        )}
-
-        {
-            renderItems.map((item) => {
-                // Log tile — tactical data terminal
-                if (item.kind === "log") {
-                    return (
-                        <nav class="tile tile-log">
-                            <div class="log-chrome-top">
-                                <div class="log-rivets">
-                                    <>
-                                        <i />
-                                        <i />
-                                        <i />
-                                        <i />
-                                    </>
-                                </div>
-                                <div class="log-label">log</div>
-                                <span class="log-count">
-                                    {allEntries.length}
-                                </span>
-                            </div>
-                            <div class="log-body">
-                                <div class="log-screen">
-                                    <div class="log-entries">
-                                        {allEntries.map((e) => {
-                                            if (e.kind === "fragment") {
-                                                return (
-                                                    <a
-                                                        href={`/f/${e.f.id}`}
-                                                        class="log-row"
-                                                    >
-                                                        <span class="log-id">
-                                                            {String(
-                                                                e.f.id,
-                                                            ).padStart(2, "0")}
-                                                        </span>
-                                                        <span
-                                                            class={`log-type type-${e.f.type}`}
-                                                        >
-                                                            {e.f.type}
-                                                        </span>
-                                                        <span class="log-title">
-                                                            {e.f.title}
-                                                        </span>
-                                                        <time class="log-date">
-                                                            {new Date(
-                                                                e.f.createdAt,
-                                                            )
-                                                                .toISOString()
-                                                                .slice(0, 10)}
-                                                        </time>
-                                                    </a>
-                                                );
-                                            }
-                                            return (
-                                                <a
-                                                    href={`https://bsky.app/profile/${e.p.author.handle}/post/${e.p.rkey}`}
-                                                    class="log-row"
-                                                    target="_blank"
-                                                >
-                                                    <span class="log-id log-bsky">
-                                                        bs
-                                                    </span>
-                                                    <span class="log-type type-bsky">
-                                                        bsky
-                                                    </span>
-                                                    <span class="log-title">
-                                                        {e.p.text.slice(0, 60)}
-                                                    </span>
-                                                    <time class="log-date">
-                                                        {new Date(e.p.createdAt)
-                                                            .toISOString()
-                                                            .slice(0, 10)}
-                                                    </time>
-                                                </a>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="log-chrome-bottom">
-                                <div class="log-ticks">
-                                    <>
-                                        <i />
-                                        <i />
-                                        <i />
-                                        <i />
-                                        <i />
-                                        <i />
-                                        <i />
-                                        <i />
-                                    </>
-                                </div>
-                            </div>
-                        </nav>
-                    );
-                }
-
-                // Feed tile — comms terminal with CRT effect
-                if (item.kind === "feed") {
-                    return (
-                        <div class="tile tile-feed" data-type="bsky">
-                            <div class="feed-bezel">
-                                <div class="feed-header">
-                                    <span class="feed-icon">@</span>
-                                    <span class="feed-label">
-                                        nate.rip on bsky
-                                    </span>
-                                    <div class="feed-signal">
-                                        <>
-                                            <i />
-                                            <i />
-                                            <i />
-                                        </>
-                                    </div>
-                                </div>
-                                <div class="feed-screen">
-                                    <div class="feed-crt" />
-                                    <div class="feed-vignette" />
-                                    <div class="feed-entries">
-                                        {feedPosts.slice(0, 15).map((p) => (
-                                            <a
-                                                href={`https://bsky.app/profile/${p.author.handle}/post/${p.rkey}`}
-                                                class="feed-row"
-                                                target="_blank"
-                                            >
-                                                <div class="feed-text">
-                                                    {p.text.length > 120
-                                                        ? p.text.slice(0, 120) +
-                                                          "..."
-                                                        : p.text}
-                                                </div>
-                                                <div class="feed-meta">
-                                                    <time>
-                                                        {relTime(p.createdAt)}
-                                                    </time>
-                                                    {p.isRepost && (
-                                                        <span class="feed-repost">
-                                                            repost
-                                                        </span>
-                                                    )}
-                                                    {p.images?.length ? (
-                                                        <span class="feed-stat">
-                                                            {p.images.length}{" "}
-                                                            img
-                                                        </span>
-                                                    ) : null}
-                                                </div>
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div class="feed-statusbar">
-                                    <span>{feedPosts.length} posts</span>
-                                    <span class="feed-pulse" />
-                                </div>
-                            </div>
-                        </div>
-                    );
-                }
-
-                // Grid entries
-                const { e, i } = item;
-
-                // Bsky pinned post tile
-                if (e.kind === "bsky") {
-                    const p = e.p;
-                    const sizeCls = bskySize(p, i);
-                    const hasMedia = !!(p.video || p.images?.length || p.externalEmbed?.thumb);
-
-                    if (hasMedia) {
-                        return <BskyMedia post={p} cls={sizeCls} />;
-                    }
-
-                    return <BskyText post={p} cls={sizeCls} />;
-                }
-
-                // Fragment entries
-                const f = e.f;
-
-                // Shots
-                if (f.type === "shot" && f.images?.length) {
-                    const { cls, isHero: promoted, variant } = shotMeta(i, f.images!.length);
-                    if (promoted) {
-                        return <ShotHero fragment={f} cls={cls} />;
-                    }
-                    if (variant === "viewfinder") return <ShotViewfinder fragment={f} cls={cls} />;
-                    if (variant === "evidence") return <ShotEvidence fragment={f} cls={cls} />;
-                    return <ShotHud fragment={f} cls={cls} />;
-                }
-
-                // Lists
-                if (f.type === "list") {
-                    return <ListTile fragment={f} />;
-                }
-
-                // Links
-                if (f.type === "link" && f.url) {
-                    const v = linkVariant(f);
-                    if (v === "dispatch") {
-                        return <LinkDispatch fragment={f} avatar={myAvatar} />;
-                    }
-                    return <LinkRelay fragment={f} avatar={myAvatar} />;
-                }
-
-                // Posts
-                const { cls, showExcerpt, variant: postVariant } = postMeta(i, f.content?.length ?? 0);
-
-                if (postVariant === "cassette") return <PostCassette fragment={f} cls={cls} showExcerpt={showExcerpt} />;
-                if (postVariant === "circuit") return <PostCircuit fragment={f} cls={cls} showExcerpt={showExcerpt} />;
-                if (postVariant === "terminal") return <PostTerminal fragment={f} cls={cls} showExcerpt={showExcerpt} />;
-                return <PostBlast fragment={f} cls={cls} showExcerpt={showExcerpt} />;
-            })
-        }
-    </main>
+<Base description={`nate.rip, issue ${issue}: work, writing and clippings from Nate Butler.`} bodyClass="issue">
+  <main class="zine">
+    {spreads.map((s) => {
+      switch (s.kind) {
+        case 'cover': return <Cover spread={s} issue={issue} counts={counts} printed={printed} />;
+        case 'contents': return <Contents spread={s} spreads={spreads} issue={issue} />;
+        case 'post': return <PostSpread spread={s} />;
+        case 'shot': return <ShotSpread spread={s} />;
+        case 'list': return <ListSpread spread={s} />;
+        case 'bulletin': return <BulletinSpread spread={s} />;
+        case 'clippings': return <ClippingsSpread spread={s} />;
+      }
+    })}
+    <footer class="colophon-end">
+      <p>End of issue {issue}. Back to the <a href="#p-0">cover</a>.</p>
+    </footer>
+  </main>
+  <script>
+    import { pressRun } from '../scripts/press';
+    pressRun();
+  </script>
 </Base>
-
-<script>
-    document.querySelectorAll(".filter-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const pressed = btn.classList.toggle("active");
-            btn.setAttribute("aria-pressed", String(pressed));
-            const active = new Set(
-                [...document.querySelectorAll(".filter-btn.active")].map(
-                    (b) => (b as HTMLElement).dataset.filter,
-                ),
-            );
-            document
-                .querySelectorAll<HTMLElement>("[data-type]")
-                .forEach((tile) => {
-                    tile.style.display = active.has(tile.dataset.type)
-                        ? ""
-                        : "none";
-                });
-        });
-    });
-</script>
