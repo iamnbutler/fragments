@@ -36,7 +36,7 @@
   pointer-events: none;
 }
 .paper-toner .proof-stamp { mix-blend-mode: normal; }
-.ps-word { font-size: clamp(18px, 3cqw, 46px); font-weight: 900; letter-spacing: 0.16em; margin-right: -0.16em; font-variation-settings: 'wdth' 100; }
+.ps-word { font-size: clamp(14px, 1.8cqw, 28px); font-weight: 900; letter-spacing: 0.16em; margin-right: -0.16em; font-variation-settings: 'wdth' 100; }
 .ps-line { font-size: clamp(7.5px, 0.62cqw, 10px); font-weight: 700; letter-spacing: 0.2em; }
 .ps-date { font-size: clamp(7.5px, 0.62cqw, 10px); font-weight: 600; letter-spacing: 0.24em; }
 .js-press .sheet:not(.is-printed) .proof-stamp { opacity: 0; scale: 1.4; }
@@ -471,7 +471,7 @@
   .zine .layout-dr .pg { display: flex !important; gap: 14px; }
   .zine .dr-prose { flex: none; overflow: visible; max-height: none !important; }
   .zine .proof-stamp { top: 34px; right: 14px; left: auto; bottom: auto; }
-  .zine .ps-word { font-size: 24px; }
+  .zine .ps-word { font-size: 16px; }
   .zine .ps-line, .zine .ps-date { font-size: 8px; }
   .zine .layout-dr .cap { font-size: 12px; }
   .zine .dr-kicker { font-size: 11px; }

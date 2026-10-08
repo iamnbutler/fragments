@@ -1,5 +1,5 @@
 ---
-/** The rubber stamp every draft spread carries: not yet published. */
+/** The rubber stamp on a draft's opening spread: not yet published. */
 interface Props { date: string; class?: string; }
 const { date, class: cls } = Astro.props;
 const d = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
