@@ -1,0 +1,68 @@
+---
+import Sheet from './Sheet.astro';
+import Reg from './Reg.astro';
+import { domain, listEntries, paragraphs, printDate, type Spread } from '../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'list' }>; }
+const { spread } = Astro.props;
+const { item, layout } = spread;
+const entries = listEntries(item.text);
+const intro = paragraphs(item.text, item.title)[0];
+const introShort = intro && intro.length > 300 ? intro.slice(0, 290).replace(/\s+\S*$/, '') + '…' : intro;
+const date = printDate(item.date);
+const pad = (i: number) => String(i + 1).padStart(2, '0');
+const shown = layout === 'index' ? entries.slice(0, 16) : entries.slice(0, 26);
+const rest = entries.length - shown.length;
+const clip = (t?: string, n = 72) => (t && t.length > n ? t.slice(0, n - 2).replace(/\s+\S*$/, '') + '…' : t);
+const half = Math.ceil(shown.length / 2);
+const titleSize = Math.min(9, Math.max(4, 80 / Math.pow(item.title.length, 0.7)));
+---
+<Sheet spread={spread} label={`List: ${item.title}`} layout={layout} running={`Index, ${entries.length} entries`}>
+  {layout === 'index' && (
+    <Fragment>
+      <div class="pg pg-l index-cover">
+        <span class="count" aria-hidden="true">{entries.length}</span>
+        <Reg as="h2" text={item.title} href={item.href} class="t-tower" style={`--fs:${titleSize.toFixed(2)}cqw`} />
+        {introShort && <p class="index-intro">{introShort}</p>}
+        <p class="cap">{entries.length} entries, compiled {date}.</p>
+      </div>
+      <ol class="pg pg-r index-list">
+        {shown.map((e, i) => (
+          <li>
+            <span class="ix-no">{pad(i)}</span>
+            {e.href ? <a class="ix-label" href={e.href} target="_blank" rel="noopener">{e.label}</a> : <span class="ix-label">{e.label}</span>}
+            <span class="ix-lead" aria-hidden="true"></span>
+            <span class="ix-where">{e.href ? domain(e.href) : e.note ?? ''}</span>
+          </li>
+        ))}
+        {rest > 0 && <li class="ix-more"><a href={item.href}>{rest} more entries on page {item.id}</a></li>}
+      </ol>
+    </Fragment>
+  )}
+
+  {layout === 'ledger' && (
+    <Fragment>
+      <header class="ledger-head">
+        <Reg as="h2" text={item.title} href={item.href} class="t-spaced" style={`--fs:${Math.min(5, 120 / item.title.length).toFixed(2)}cqw`} />
+        <p class="cap">{entries.length} entries. {date}.</p>
+      </header>
+      {[shown.slice(0, half), shown.slice(half)].map((col, c) => (
+        <table class:list={['pg', c ? 'pg-r' : 'pg-l', 'ledger']}>
+          {c === 0 && <caption class="visually-hidden">{item.title}</caption>}
+          <tbody>
+            {col.map((e, i) => (
+              <tr>
+                <th scope="row">{pad(i + c * half)}</th>
+                <td class="lg-label">{e.href ? <a href={e.href} target="_blank" rel="noopener">{e.label}</a> : e.label}</td>
+                <td class="lg-note">{clip(e.note) ?? (e.href ? domain(e.href) : '')}</td>
+              </tr>
+            ))}
+            {c === 1 && rest > 0 && (
+              <tr class="lg-more"><th scope="row"></th><td colspan="2"><a href={item.href}>{rest} more on page {item.id}</a></td></tr>
+            )}
+          </tbody>
+        </table>
+      ))}
+    </Fragment>
+  )}
+</Sheet>

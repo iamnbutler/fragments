@@ -1,0 +1,21 @@
+---
+/**
+ * Display type printed twice: the light plate (a pseudo-element) and the key
+ * plate (the real text), overprinted out of register.
+ */
+interface Props {
+  as?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
+  text: string;
+  class?: string;
+  style?: string;
+  href?: string;
+}
+const { as: Tag = 'h2', text, class: cls, style, href } = Astro.props;
+---
+<Tag class:list={['reg', cls]} style={style}>
+  {href ? (
+    <a href={href} class="reg-in" data-text={text}>{text}</a>
+  ) : (
+    <span class="reg-in" data-text={text}>{text}</span>
+  )}
+</Tag>

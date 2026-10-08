@@ -1,0 +1,52 @@
+---
+/**
+ * Notices: Nate's own short Bluesky dispatches and the links he recommends,
+ * printed as classifieds. Links are tear-off coupons in solid light-plate ink.
+ */
+import Sheet from './Sheet.astro';
+import Plate from './Plate.astro';
+import { domain, inline, printDate, type Spread } from '../../lib/zine';
+import type { FragmentItem, NoteItem } from '../../lib/stream';
+
+interface Props { spread: Extract<Spread, { kind: 'bulletin' }>; }
+const { spread } = Astro.props;
+const { items } = spread;
+const count = items.length;
+const tilts = [-1.6, 1.1, -0.6, 2];
+---
+<Sheet spread={spread} label={`Notices: ${count} item${count > 1 ? 's' : ''}`} layout={`n${count}`} running="Notices">
+  {items.map((it, i) => {
+    const slot = `slot-${i}`;
+    if (it.kind === 'note') {
+      const n = it as NoteItem;
+      const m = n.media[0];
+      return (
+        <article class:list={['notice', 'dispatch', slot]}>
+          <p class="dispatch-head"><span class="dispatch-word">Dispatch</span> <time datetime={n.date}>{printDate(n.date)}</time></p>
+          <p class="dispatch-text">{n.text}</p>
+          {m && (
+            <Plate media={m} inks={spread.inks} mode={i % 2 ? 'key' : 'duo'} alt={m.alt} class="dispatch-plate" href={n.href} />
+          )}
+          <a class="dispatch-src" href={n.href} target="_blank" rel="noopener">Posted on Bluesky</a>
+        </article>
+      );
+    }
+    const l = it as FragmentItem;
+    const d = domain(l.url);
+    const blurb = inline(l.text);
+    return (
+      <article class:list={['notice', 'coupon', slot]} style={`--tilt:${tilts[(spread.seed + i) % tilts.length]}deg`}>
+        <svg class="scissors" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8.1 7.6 20 18M8.1 16.4 20 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <div class="coupon-in">
+          <p class="coupon-no">Recommended reading, no. {l.id}</p>
+          <h2 class="coupon-title"><a href={l.url ?? l.href} target="_blank" rel="noopener">{l.title}</a></h2>
+          {blurb && <p class="coupon-blurb">{blurb}</p>}
+          <p class="coupon-foot">
+            <span class="coupon-domain">{d}</span>
+            <a class="coupon-local" href={l.href}>Page {l.id}</a>
+          </p>
+        </div>
+      </article>
+    );
+  })}
+</Sheet>

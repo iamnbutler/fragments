@@ -1,0 +1,45 @@
+---
+/**
+ * One spread of the zine: two facing pages, a gutter, folios and a running
+ * head. Every spread carries its own seeded misregistration (--mx/--my) and
+ * ink pair, which the content inside picks up through CSS variables.
+ */
+import { rng, type Spread } from '../../lib/zine';
+
+interface Props {
+  spread: Spread;
+  label: string;
+  layout?: string;
+  folio?: boolean;
+  running?: string;
+}
+const { spread, label, layout, folio = true, running } = Astro.props;
+const r = rng(spread.seed ^ 0x9e3779b9);
+const mx = r.range(-2.4, 2.4).toFixed(2);
+const my = r.range(-1.8, 1.8).toFixed(2);
+// where the plates come from as they land
+const lx = r.range(-26, 26).toFixed(1);
+const ly = r.range(-18, 18).toFixed(1);
+const [lt, dk] = spread.inks;
+---
+<section
+  class:list={['sheet', `paper-${spread.paper}`]}
+  id={`p-${spread.page}`}
+  data-kind={spread.kind}
+  aria-label={label}
+  style={`--lt:var(--${lt});--dk:var(--${dk});--mx:${mx}px;--my:${my}px;--lx:${lx}px;--ly:${ly}px`}
+  data-lt={lt}
+  data-dk={dk}
+>
+  <div class:list={['spread', `spread-${spread.kind}`, layout && `layout-${layout}`]}>
+    <slot />
+    <div class="gutter" aria-hidden="true"></div>
+    {folio && (
+      <Fragment>
+        <span class="folio folio-l" aria-hidden="true">{spread.page}</span>
+        <span class="folio folio-r" aria-hidden="true">{spread.page + 1}</span>
+        {running && <span class="running" aria-hidden="true">{running}</span>}
+      </Fragment>
+    )}
+  </div>
+</section>

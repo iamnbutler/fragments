@@ -1,0 +1,124 @@
+---
+/**
+ * The print shop: SVG filters that separate any photo into riso plates.
+ * Each filter turns an image into a halftone screen of ONE ink with a
+ * transparent background, so two stacked copies multiply into a duotone and
+ * can be knocked out of register independently.
+ */
+import { INK_HEX } from '../../lib/zine';
+
+const enc = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+
+// 0° screen: one dot per square cell. Gradient reaches white at the cell corner.
+const squareTile = (s: number) =>
+  enc(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}"><defs><radialGradient id="g" cx=".5" cy=".5" r=".7071"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></radialGradient></defs><rect width="${s}" height="${s}" fill="url(#g)"/></svg>`,
+  );
+
+// 45° screen: dots at the centre and corners of each cell, nearest dot wins.
+const diagTile = (s: number) => {
+  const h = s / 2;
+  const pts = [[h, h], [0, 0], [s, 0], [0, s], [s, s]];
+  const grads = pts
+    .map(([x, y], i) => `<radialGradient id="g${i}" gradientUnits="userSpaceOnUse" cx="${x}" cy="${y}" r="${h}"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></radialGradient>`)
+    .join('');
+  const circles = pts
+    .map((_, i) => `<rect width="${s}" height="${s}" fill="url(#g${i})" style="mix-blend-mode:darken"/>`)
+    .join('');
+  return enc(`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}"><defs>${grads}</defs><rect width="${s}" height="${s}" fill="#fff"/>${circles}</svg>`);
+};
+
+interface Role {
+  tile: string;
+  size: number;
+  exponent: number;
+  offset: number;
+  invert?: boolean;
+  grain: number;
+}
+
+const ROLES: Record<string, Role> = {
+  // light plate: carries the whole tonal range
+  lt: { tile: squareTile(5), size: 5, exponent: 0.95, offset: 0, grain: 0.18 },
+  // key plate: only the shadows, on a 45° screen
+  dk: { tile: diagTile(8), size: 8, exponent: 0.42, offset: 0.06, grain: 0.22 },
+  // reverse: paper-coloured dots on a toner-black page
+  rev: { tile: diagTile(6), size: 6, exponent: 1.1, offset: 0, invert: true, grain: 0.25 },
+  // avatar: fine screen for small portraits
+  av: { tile: diagTile(4), size: 4, exponent: 0.8, offset: 0, grain: 0.12 },
+};
+
+// Tone curve sampled into a lookup table: low values take ink.
+const curve = (role: Role) =>
+  Array.from({ length: 17 }, (_, k) => {
+    const x = k / 16;
+    const v = Math.pow(role.invert ? 1 - x : x, role.exponent) + role.offset;
+    return Math.min(1, Math.max(0, v)).toFixed(3);
+  }).join(' ');
+
+const neg = (r: Role): Role => ({ ...r, invert: !r.invert });
+
+const filters: { id: string; role: Role; color: string }[] = [];
+for (const ink of ['pink', 'orange', 'blue', 'black'] as const) {
+  filters.push({ id: `ht-lt-${ink}`, role: ROLES.lt, color: INK_HEX[ink] });
+  filters.push({ id: `ht-dk-${ink}`, role: ROLES.dk, color: INK_HEX[ink] });
+  // negatives, for dark images
+  filters.push({ id: `ht-lti-${ink}`, role: neg(ROLES.lt), color: INK_HEX[ink] });
+  filters.push({ id: `ht-dki-${ink}`, role: { ...neg(ROLES.dk), exponent: 0.55, offset: 0.08 }, color: INK_HEX[ink] });
+  // near-black line art: steep negative so faint light strokes print
+  filters.push({ id: `ht-ltx-${ink}`, role: { ...neg(ROLES.lt), exponent: 6 }, color: INK_HEX[ink] });
+  filters.push({ id: `ht-dkx-${ink}`, role: { ...neg(ROLES.dk), exponent: 3, offset: 0 }, color: INK_HEX[ink] });
+  // high-key, for pale line art: steep curve so faint strokes still print
+  filters.push({ id: `ht-lth-${ink}`, role: { ...ROLES.lt, exponent: 7 }, color: INK_HEX[ink] });
+  filters.push({ id: `ht-dkh-${ink}`, role: { ...ROLES.dk, exponent: 3.2, offset: 0 }, color: INK_HEX[ink] });
+}
+filters.push({ id: 'ht-av-black', role: ROLES.av, color: INK_HEX.black });
+filters.push({ id: 'ht-rev-paper', role: ROLES.rev, color: '#ece9e1' });
+filters.push({ id: 'ht-revi-paper', role: neg(ROLES.rev), color: '#ece9e1' });
+---
+<svg class="inks" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    {filters.map(({ id, role, color }) => (
+      <filter id={id} x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="matrix" values=".3 .59 .11 0 0 .3 .59 .11 0 0 .3 .59 .11 0 0 0 0 0 1 0" result="g" />
+        <feComponentTransfer in="g" result="tone">
+          <feFuncR type="table" tableValues={curve(role)} />
+          <feFuncG type="table" tableValues={curve(role)} />
+          <feFuncB type="table" tableValues={curve(role)} />
+        </feComponentTransfer>
+        <feImage href={role.tile} x="0" y="0" width={role.size} height={role.size} result="cell" />
+        <feTile in="cell" result="screen" />
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="1" seed="7" result="n0" />
+        <feColorMatrix in="n0" type="matrix" values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1" result="noise" />
+        <feComposite in="tone" in2="screen" operator="arithmetic" k2=".5" k3=".5" result="v" />
+        <feComposite in="v" in2="noise" operator="arithmetic" k2="1" k3={role.grain} k4={-role.grain / 2} result="vn" />
+        <feColorMatrix in="vn" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 1" result="inv" />
+        <feComponentTransfer in="inv" result="dots"><feFuncA type="discrete" tableValues="0 1" /></feComponentTransfer>
+        <feFlood flood-color={color} result="ink" />
+        <feComposite in="ink" in2="dots" operator="in" result="inked" />
+        <feComposite in="inked" in2="SourceAlpha" operator="in" />
+      </filter>
+    ))}
+
+    <!-- photocopy: toner wobble on clipped text -->
+    <filter id="xerox" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="t" />
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="1.1" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+
+    <!-- rubber stamp: uneven ink, knocked-out specks, chewed edges -->
+    <filter id="rubber" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="11" result="warp" />
+      <feDisplacementMap in="SourceGraphic" in2="warp" scale="3" xChannelSelector="R" yChannelSelector="G" result="wobbled" />
+      <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="3" seed="5" result="speck" />
+      <feColorMatrix in="speck" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -5 3.9" result="mask" />
+      <feComposite in="wobbled" in2="mask" operator="in" />
+    </filter>
+
+    <!-- marker: slightly bleeding felt-tip -->
+    <filter id="marker" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".06" numOctaves="2" seed="2" result="w" />
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="2.2" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+</svg>

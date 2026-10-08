@@ -1,0 +1,30 @@
+---
+import Sheet from './Sheet.astro';
+import type { Spread } from '../../lib/zine';
+
+interface Props { spread: Spread; issue: number; counts: Record<string, number>; printed: string; }
+const { spread, issue, counts, printed } = Astro.props;
+const line = [
+  counts.shot && `${counts.shot} plates`,
+  counts.post && `${counts.post} essays`,
+  counts.list && `${counts.list} indexes`,
+  counts.link && `${counts.link} recommendations`,
+  counts.note && `${counts.note} dispatches`,
+  counts.reshare && `${counts.reshare} clippings from friends`,
+].filter(Boolean).join(', ');
+---
+<Sheet spread={spread} label="Cover" folio={false}>
+  <canvas class="cover-gl" aria-hidden="true"></canvas>
+  <div class="cover-plates" aria-hidden="true">
+    <span class="cp cp-pink"></span>
+    <span class="cp cp-orange"></span>
+  </div>
+  <h1 class="masthead reg"><span class="reg-in" data-text="nate.rip">nate.rip</span></h1>
+  <svg class="solid" viewBox="-1.6 -1.6 3.2 3.2" aria-hidden="true"></svg>
+  <div class="cover-issue">
+    <p class="issue-no"><span class="issue-word">Issue</span> <span class="issue-n">{issue}</span></p>
+    <p class="issue-date">{printed}</p>
+  </div>
+  <p class="cover-blurb">The collected work of Nate Butler, designer at Zed, and the posts from other people he couldn't stop thinking about. In this issue: {line}.</p>
+  <a class="cover-turn" href="#p-2">Turn the page</a>
+</Sheet>

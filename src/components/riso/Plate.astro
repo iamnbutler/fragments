@@ -1,0 +1,67 @@
+---
+/**
+ * A photo printed as riso plates. `duo` stacks a light plate and a key plate
+ * (multiplied, independently misregistered); `rev` prints paper-coloured dots
+ * on a toner page; videos get a cheap CSS duotone so playback stays smooth.
+ */
+import type { Media } from '../../lib/stream';
+import { plateSrc, type Ink } from '../../lib/zine';
+import { isDark, isInky, isPale } from '../../lib/tone';
+
+interface Props {
+  media: Media;
+  inks: [Ink, Ink];
+  mode?: 'duo' | 'rev' | 'key' | 'mono';
+  alt?: string;
+  class?: string;
+  fit?: 'cover' | 'contain';
+  eager?: boolean;
+  /** bsky-hosted video: show the poster, link out */
+  href?: string;
+  proof?: boolean;
+  style?: string;
+}
+
+const { media, inks, mode = 'duo', alt, class: cls, fit = 'cover', eager, href, proof, style } = Astro.props;
+const label = alt ?? media.alt ?? '';
+const isFragmentVideo = !!media.video && !media.video.endsWith('.m3u8');
+const isBskyVideo = !!media.video && media.video.endsWith('.m3u8');
+const src = isBskyVideo ? media.src : plateSrc(media.src);
+const loading = eager ? 'eager' : 'lazy';
+const [lt, dk] = inks;
+const dark = isDark(media.src);
+const pale = !dark && isPale(media.src);
+const inky = dark && isInky(media.src);
+const L = inky ? 'ltx' : dark ? 'lti' : pale ? 'lth' : 'lt';
+const D = inky ? 'dkx' : dark ? 'dki' : pale ? 'dkh' : 'dk';
+const ratio = media.aspect ? `--ar:${media.aspect.toFixed(4)};` : '';
+---
+{isFragmentVideo ? (
+  <figure class:list={['plate', 'plate-video', `fit-${fit}`, cls]} data-lt={lt} style={ratio + (style ?? '')}>
+    <video controls playsinline preload="metadata" aria-label={label || 'Video'}>
+      <source src={media.video} type="video/mp4" />
+      <a href={media.video}>Open video{label ? `: ${label}` : ''}</a>
+    </video>
+  </figure>
+) : (
+  <figure class:list={['plate', `plate-${mode}`, dark && 'is-neg', `fit-${fit}`, proof && 'has-proof', cls]} style={ratio + (style ?? '')}>
+    <div class="plate-stack">
+      {mode === 'rev' ? (
+        <img class="ink ink-rev" src={src} alt={label} loading={loading} decoding="async" style={`filter:url(#ht-${dark ? 'rev' : 'revi'}-paper)`} />
+      ) : mode === 'mono' ? (
+        <img class="ink ink-dk" src={src} alt={label} loading={loading} decoding="async" style={`filter:url(#ht-${L}-${dk})`} />
+      ) : mode === 'key' ? (
+        <img class="ink ink-dk" src={src} alt={label} loading={loading} decoding="async" style={`filter:url(#ht-${D}-${dk})`} />
+      ) : (
+        <Fragment>
+          <img class="ink ink-lt" src={src} alt={label} loading={loading} decoding="async" style={`filter:url(#ht-${L}-${lt})`} />
+          <img class="ink ink-dk" src={src} alt="" aria-hidden="true" loading={loading} decoding="async" style={`filter:url(#ht-${D}-${dk})`} />
+        </Fragment>
+      )}
+      {proof && <img class="proof" src={media.src} alt="" aria-hidden="true" loading="lazy" decoding="async" />}
+    </div>
+    {isBskyVideo && href && (
+      <a class="plate-play" href={href} target="_blank" rel="noopener">Play video on Bluesky</a>
+    )}
+  </figure>
+)}

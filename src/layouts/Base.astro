@@ -1,8 +1,10 @@
 ---
-interface Props { title?: string; wide?: boolean; atUri?: string; }
-const { title, wide, atUri } = Astro.props;
-const pageTitle = title ? `${title} · nate.rip` : 'nate.rip';
-import '../styles/theme.css';
+import '../styles/riso.css';
+import Inks from '../components/riso/Inks.astro';
+
+interface Props { title?: string; atUri?: string; description?: string; bodyClass?: string; }
+const { title, atUri, description, bodyClass } = Astro.props;
+const pageTitle = title ? `${title} | nate.rip` : 'nate.rip';
 ---
 <!doctype html>
 <html lang="en">
@@ -10,14 +12,16 @@ import '../styles/theme.css';
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{pageTitle}</title>
+  {description && <meta name="description" content={description} />}
+  <meta name="theme-color" content="#ece9e1" />
   {atUri && <link rel="site.standard.document" href={atUri} />}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Gochi+Hand&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap" />
 </head>
-<body class:list={[wide && 'wide']}>
+<body class={bodyClass}>
+  <Inks />
   <slot />
-  <script>
-    if (new URLSearchParams(window.location.search).has('edit')) {
-      import('../components/ThemeEditorLoader').then(m => m.default());
-    }
-  </script>
+  <div class="grain" aria-hidden="true"></div>
 </body>
 </html>

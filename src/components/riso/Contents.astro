@@ -1,0 +1,40 @@
+---
+import Sheet from './Sheet.astro';
+import Reg from './Reg.astro';
+import { spreadTitle, type Spread } from '../../lib/zine';
+
+interface Props { spread: Spread; spreads: Spread[]; issue: number; }
+const { spread, spreads, issue } = Astro.props;
+const KIND: Record<string, string> = {
+  post: 'Essay',
+  shot: 'Plate',
+  list: 'Index',
+  bulletin: 'Notices',
+  clippings: 'Clippings',
+};
+const entries = spreads.filter((s) => s.kind !== 'cover' && s.kind !== 'contents');
+---
+<Sheet spread={spread} label="Contents" running={`Issue ${issue}`}>
+  <div class="contents-head">
+    <Reg as="h2" text="Contents" class="t-spaced" style="--fs:5.4cqw" />
+    <p class="colophon">
+      Printed in fluorescent pink, orange, blue and black on newsprint,
+      from whatever Nate published to his AT Protocol repository.
+      Set in Archivo, Source Serif 4 and Gochi Hand.
+      Use the arrow keys, or J and K, to turn the pages.
+    </p>
+  </div>
+  <nav class="contents-list" aria-label="Contents">
+    <ol>
+      {entries.map((s) => (
+        <li class={`ck-${s.kind}`}>
+          <a href={`#p-${s.page}`}>
+            <span class="ct-page">{s.page}</span>
+            <span class="ct-kind">{KIND[s.kind]}</span>
+            <span class="ct-title">{spreadTitle(s)}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+</Sheet>
