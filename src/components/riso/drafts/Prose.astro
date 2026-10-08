@@ -1,0 +1,14 @@
+---
+/**
+ * A frame of a draft's running text. All of a draft's frames, across its
+ * designed spreads and any jumps after them, are one chain for copyfitting.
+ */
+import Blocks from '../Blocks.astro';
+import type { Block } from '../../../lib/zine';
+
+interface Props { flow: string; blocks: Block[]; cols?: 1 | 2 | 3; class?: string; end?: boolean; dropcap?: boolean; }
+const { flow, blocks, cols = 2, class: cls, end = false, dropcap = false } = Astro.props;
+---
+<div class:list={['prose-cols', 'dr-prose', cols > 1 && `cols-${cols}`, dropcap && 'dropcap', cls]} data-flow={flow}>
+  <Blocks blocks={blocks} end={end} />
+</div>

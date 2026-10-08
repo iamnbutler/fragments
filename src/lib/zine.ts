@@ -1,4 +1,5 @@
 import type { StreamItem, FragmentItem, NoteItem, ReshareItem } from './stream';
+import type { Draft } from './drafts';
 
 /**
  * PRESS RUN: the stream, imposed as a printed zine.
@@ -71,12 +72,73 @@ export interface SectionEntry {
   kind: string;
 }
 
+/** What a jump spread needs from the piece it continues. */
+export interface JumpItem {
+  key: string;
+  title: string;
+  text: string;
+  href: string;
+}
+
+/**
+ * Art direction for each local draft: how many designed spreads it gets,
+ * roughly how much running text each one holds, and its inks and paper.
+ * Text that doesn't fit continues on plain jump spreads.
+ */
+export interface DraftDesign {
+  caps: number[];
+  inks: [Ink, Ink][];
+  paper: Paper[];
+  companion?: string;
+}
+export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
+  'desktop-tools': {
+    caps: [1500, 2300],
+    inks: [['orange', 'blue'], ['blue', 'orange']],
+    paper: ['newsprint', 'bone'],
+    companion: 'ace2',
+  },
+  ace2: {
+    caps: [2000, 700, 1900],
+    inks: [['pink', 'black'], ['blue', 'black'], ['orange', 'black']],
+    paper: ['newsprint', 'newsprint', 'bone'],
+    companion: 'desktop-tools',
+  },
+  shelfgoblin: {
+    caps: [0, 2300, 2000],
+    inks: [['pink', 'black'], ['blue', 'black'], ['orange', 'blue']],
+    paper: ['newsprint', 'blush', 'bone'],
+  },
+  telephone: {
+    caps: [1500, 1300, 1700, 1500],
+    inks: [['pink', 'black'], ['pink', 'blue'], ['orange', 'blue'], ['pink', 'black']],
+    paper: ['newsprint', 'bone', 'toner', 'newsprint'],
+  },
+  gpuikit: {
+    caps: [0, 1500, 1300],
+    inks: [['blue', 'black'], ['blue', 'black'], ['orange', 'blue']],
+    paper: ['bone', 'newsprint', 'newsprint'],
+  },
+};
+const GENERIC_DRAFT: DraftDesign = { caps: [2600], inks: [['pink', 'black']], paper: ['newsprint'] };
+export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAFT;
+
 export type Spread =
   | (SpreadBase & { kind: 'cover' })
   | (SpreadBase & { kind: 'contents' })
   | (SpreadBase & { kind: 'section'; key: SectionKey; entries: SectionEntry[] })
   | (SpreadBase & { kind: 'post'; layout: PostLayout; item: FragmentItem; blocks: Block[]; jump?: number; archive: boolean })
-  | (SpreadBase & { kind: 'jump'; item: FragmentItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean })
+  | (SpreadBase & { kind: 'jump'; item: JumpItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean; proof?: boolean })
+  | (SpreadBase & {
+      kind: 'draft';
+      draft: Draft;
+      part: number;
+      parts: number;
+      blocks: Block[];
+      jump?: number;
+      first: number;
+      companion?: { title: string; page: number };
+    })
   | (SpreadBase & { kind: 'shot'; layout: ShotLayout; items: FragmentItem[] })
   | (SpreadBase & { kind: 'list'; layout: ListLayout; item: FragmentItem })
   | (SpreadBase & { kind: 'bulletin'; items: (NoteItem | FragmentItem)[] })
@@ -136,7 +198,7 @@ const MIN_JUMP = 1000;
 
 const ARCHIVE_MS = 3 * 365 * 24 * 3600 * 1000;
 
-export function impose(stream: StreamItem[]): Spread[] {
+export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
   const spreads: Spread[] = [];
   let lastPair = -1;
   const history: string[] = [];
@@ -264,6 +326,60 @@ export function impose(stream: StreamItem[]): Spread[] {
     }
   };
 
+  /**
+   * A draft prints as its own designed spreads, then plain jumps for any
+   * text the design has no room for. Every spread of it is stamped PROOF.
+   */
+  const draftFeature = (d: Draft) => {
+    const design = draftDesign(d.slug);
+    const bs = blocks(d.text, d.title, { refs: true });
+    let next = 0;
+    let prev: { jump?: number } | null = null;
+    let from = 0;
+    let first = -1;
+    const parts = design.caps.length;
+    for (let part = 0; part < parts; part++) {
+      const cut = design.caps[part] ? takeBlocks(bs, design.caps[part], next) : { blocks: [], next };
+      next = cut.next;
+      mark('draft');
+      const s = push(`${d.key}-${part}`, (_r, b) => ({
+        ...b,
+        kind: 'draft',
+        draft: d,
+        part,
+        parts,
+        blocks: cut.blocks,
+        first: first < 0 ? b.page : first,
+        inks: design.inks[part] ?? design.inks[0],
+        paper: design.paper[part] ?? design.paper[0],
+      })) as Extract<Spread, { kind: 'draft' }>;
+      if (first < 0) first = s.page;
+      if (prev && cut.blocks.length) prev.jump = s.page;
+      if (cut.blocks.length) { prev = s; from = s.page; }
+    }
+    for (let part = 1; part <= 4 && next < bs.length; part++) {
+      const cut = takeBlocks(bs, JUMP_CHARS, next);
+      next = cut.next;
+      const j = push(`${d.key}-jump-${part}`, (_r, b) => ({
+        ...b,
+        kind: 'jump',
+        item: d,
+        blocks: cut.blocks,
+        refs: collectRefs(cut.blocks, d.text),
+        from,
+        part,
+        last: next >= bs.length,
+        proof: true,
+        inks: design.inks[design.inks.length - 1],
+        paper: 'newsprint',
+      })) as Extract<Spread, { kind: 'jump' }>;
+      mark('jump');
+      if (prev) prev.jump = j.page;
+      prev = j;
+      from = j.page;
+    }
+  };
+
   const shot = (queue: FragmentItem[], i: number): number => {
     const item = queue[i];
     const nxt = queue[i + 1];
@@ -337,7 +453,23 @@ export function impose(stream: StreamItem[]): Spread[] {
     opener.entries = spreads.slice(start).flatMap((s) => entryFor(s));
   };
 
-  department('features', features.length, (i) => (feature(features[i]), 1), si + quota.features, { max: 2, wall: false, run: 1 });
+  department(
+    'features',
+    drafts.length + features.length,
+    (i) => (i < drafts.length ? draftFeature(drafts[i]) : feature(features[i - drafts.length]), 1),
+    si + quota.features,
+    { max: 2, wall: false, run: 1 },
+  );
+
+  // Companion features point at each other by page.
+  const firstPage = new Map<string, number>();
+  for (const s of spreads) if (s.kind === 'draft' && s.part === 0) firstPage.set(s.draft.slug, s.page);
+  for (const s of spreads) {
+    if (s.kind !== 'draft') continue;
+    const c = draftDesign(s.draft.slug).companion;
+    const other = c && drafts.find((d) => d.slug === c);
+    if (other && firstPage.has(c)) s.companion = { title: other.title, page: firstPage.get(c)! };
+  }
   department('plates', plates.length, (i) => shot(plates, i), si + quota.plates, { max: 3, wall: false, run: 1 });
   department('dispatches', dispatches.length, (i) => bulletin(dispatches, i), shares.length, { max: 3, wall: true, run: 2 });
   department('library', library.length, (i) => {
@@ -354,6 +486,8 @@ function entryFor(s: Spread): SectionEntry[] {
   switch (s.kind) {
     case 'post':
       return [{ page: s.page, title: s.item.title, kind: 'Essay' }];
+    case 'draft':
+      return s.part === 0 ? [{ page: s.page, title: s.draft.title, kind: 'Proof' }] : [];
     case 'shot':
       return s.items.map((i) => ({ page: s.page, title: i.title, kind: 'Plate' }));
     case 'list':
@@ -539,6 +673,8 @@ export function spreadTitle(s: Spread): string {
       return SECTIONS[s.key].title;
     case 'jump':
       return `${s.item.title} (continued)`;
+    case 'draft':
+      return s.part === 0 ? s.draft.title : `${s.draft.title} (continued)`;
   }
 }
 

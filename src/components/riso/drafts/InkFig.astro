@@ -1,0 +1,30 @@
+---
+/**
+ * A line drawing printed as an ink plate. The figures are black strokes on
+ * transparent, so the file becomes a mask and the ink is whatever colour the
+ * page asks for. An optional ghost plate in a second ink sits out of register.
+ */
+import type { DraftImage } from '../../../lib/drafts';
+
+interface Props {
+  image?: DraftImage;
+  ink?: string;
+  ghost?: string;
+  class?: string;
+  style?: string;
+  caption?: boolean | string;
+  fit?: 'contain' | 'cover';
+}
+const { image, ink = 'dk', ghost, class: cls, style = '', caption = true, fit = 'contain' } = Astro.props;
+const ar = image?.aspect ?? 1.4;
+const cap = typeof caption === 'string' ? caption : caption ? image?.caption : undefined;
+---
+{image && (
+  <figure class:list={['inkfig', `fit-${fit}`, cls]} style={`--ar:${ar.toFixed(4)};--fig:url("${image.src}");--ink:var(--${ink});${ghost ? `--ghost:var(--${ghost});` : ''}${style}`}>
+    <div class="inkfig-plates" role="img" aria-label={image.alt}>
+      {ghost && <span class="inkfig-ghost" aria-hidden="true"></span>}
+      <span class="inkfig-key" aria-hidden="true"></span>
+    </div>
+    {cap && <figcaption class="cap">{cap}</figcaption>}
+  </figure>
+)}

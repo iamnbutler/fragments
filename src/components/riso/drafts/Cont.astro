@@ -1,0 +1,9 @@
+---
+/** Where a draft's text goes next: the next page with text, or its own page. */
+import type { Spread } from '../../../lib/zine';
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; class?: string; }
+const { spread, class: cls } = Astro.props;
+---
+{spread.jump
+  ? <a class:list={['cont', cls]} href={`#p-${spread.jump}`}>Continued on page {spread.jump}</a>
+  : spread.blocks.length > 0 && <a class:list={['cont', 'cont-single', cls]} href={spread.draft.href}>Read on its own page</a>}

@@ -9,12 +9,15 @@ import BulletinSpread from '../components/riso/BulletinSpread.astro';
 import ClippingsSpread from '../components/riso/ClippingsSpread.astro';
 import SectionSpread from '../components/riso/SectionSpread.astro';
 import JumpSpread from '../components/riso/JumpSpread.astro';
+import DraftSpread from '../components/riso/drafts/DraftSpread.astro';
+import { loadDrafts } from '../lib/drafts';
 import { loadStream } from '../lib/stream';
 import { impose } from '../lib/zine';
 import { measureAll } from '../lib/tone';
 
 const stream = await loadStream();
-const spreads = impose(stream);
+const drafts = loadDrafts();
+const spreads = impose(stream, drafts);
 // Check every plate's tone so dark images can be separated as negatives.
 await measureAll(stream.flatMap((i) => {
   if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
@@ -38,6 +41,7 @@ const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'n
         case 'clippings': return <ClippingsSpread spread={s} />;
         case 'section': return <SectionSpread spread={s} />;
         case 'jump': return <JumpSpread spread={s} />;
+        case 'draft': return <DraftSpread spread={s} />;
       }
     })}
     <footer class="colophon-end">

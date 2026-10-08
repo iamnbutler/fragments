@@ -1,0 +1,11 @@
+---
+/** The rubber stamp every draft spread carries: not yet published. */
+interface Props { date: string; class?: string; }
+const { date, class: cls } = Astro.props;
+const d = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+<p class:list={['proof-stamp', cls]}>
+  <span class="ps-word">Proof</span>
+  <span class="ps-line">Draft, not yet published</span>
+  <span class="ps-date">{d}</span>
+</p>

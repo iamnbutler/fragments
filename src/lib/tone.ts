@@ -65,3 +65,8 @@ export function isInky(src: string): boolean {
   const v = known.get(src);
   return v !== undefined && v < 0.14;
 }
+
+/** Record a tone measured some other way (local draft assets aren't JPEGs on the CDN). */
+export function markTone(src: string, v: number): void {
+  known.set(src, v);
+}

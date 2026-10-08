@@ -1,0 +1,128 @@
+---
+/**
+ * Telephone as a manual exchange: an operator, a jack field, patch cords.
+ * Pink is anything live, blue the Codex side, orange the Claude side, black
+ * the line art and the fine print. The payphone ASCII art is Joan Stark's
+ * and the homepage palette David Aerne's; their credit travels with the art.
+ */
+import Reg from '../Reg.astro';
+import Plate from '../Plate.astro';
+import InkFig from './InkFig.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { img } from '../../../lib/drafts';
+import { split, media } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, part, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const home = media(img(d, 'homepage.png'), 0.9);
+const notes = media(img(d, 'homepage-notes.png'), 0.9);
+const fig1 = img(d, 'fig1-switchboard.svg');
+const fig2 = img(d, 'fig2-window.svg');
+const q = d.pullquotes;
+const CREDIT = 'Payphone ASCII art by Joan Stark; palette by David Aerne.';
+const [a, b] = split(blocks, 0.5);
+---
+{part === 0 && (
+  <Fragment>
+    <div class="tel-board" aria-hidden="true">
+      <InkFig image={fig1} ink="lt" fit="cover" caption={false} />
+    </div>
+    <Reg as="h2" text={d.title} class="t-tower tel-title" style="--lt:var(--pink);--dk:var(--black)" />
+    <div class="tel-ticket" role="group" aria-label="Operator's ticket">
+      <p class="tel-ticket-head"><span>Operator’s ticket</span><span>No. 0914</span></p>
+      <p class="dr-kicker">{d.kicker}</p>
+      <p class="dr-dek">{d.dek}</p>
+      <p class="tel-ticket-row"><span>Calling</span><span class="c-codex">codex</span></p>
+      <p class="tel-ticket-row"><span>Called</span><span class="c-claude">claude</span></p>
+    </div>
+    <div class="pg pg-r tel-open">
+      <Prose flow={d.key} blocks={blocks} cols={2} dropcap end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 1 && (
+  <Fragment>
+    <div class="tel-patch">
+      <InkFig image={fig1} ink="black" ghost="lt" caption={false} />
+      <p class="tel-patch-h"><span class="reg-label">How a message finds its way</span></p>
+      <ol class="tel-jacks" aria-label="Route selection, first match wins">
+        <li><span class="jack" aria-hidden="true"></span>Sender asked for the inbox: <b>inbox</b></li>
+        <li><span class="jack" aria-hidden="true"></span>Recipient has fresh polling evidence: <b>inbox</b></li>
+        <li><span class="jack" aria-hidden="true"></span>Otherwise native: <b class="c-claude">Claude’s socket</b> or <b class="c-codex">Codex’s queue</b></li>
+      </ol>
+      <p class="cap tel-patch-cap">{fig1?.caption}</p>
+    </div>
+    <div class="tel-side">
+      <Prose flow={d.key} blocks={blocks} cols={1} end={end} />
+      <Cont spread={spread} />
+    </div>
+    <aside class="tel-spec" aria-label="Specifications">
+      <span class="screw s1" aria-hidden="true"></span><span class="screw s2" aria-hidden="true"></span>
+      <span class="screw s3" aria-hidden="true"></span><span class="screw s4" aria-hidden="true"></span>
+      <p class="tel-spec-head">Telephone. Rated for one machine, one user.</p>
+      <dl>{d.facts.map((f) => <Fragment><dt>{f.label}</dt><dd>{f.value}</dd></Fragment>)}</dl>
+    </aside>
+  </Fragment>
+)}
+{part === 2 && (
+  <Fragment>
+    <div class="pg pg-l tel-log">
+      <p class="tel-log-head"><span>Radio log</span><span>14 Sept 2026</span><span>Exchange: telephone-demo</span></p>
+      <ol class="tel-lines">
+        <li><span class="from c-codex">codex:⟨thread⟩</span><span class="arrow">→</span><span class="to c-claude">claude:24207</span><span class="kind">request</span><span class="note">via Claude’s socket. Arrives as a new turn.</span></li>
+        <li><span class="from c-claude">claude:24207</span><span class="arrow">·</span><span class="to">list_agents</span><span class="kind">check</span><span class="note">Checks its own identity.</span></li>
+        <li><span class="from c-claude">claude:24207</span><span class="arrow">→</span><span class="to c-codex">codex:⟨thread⟩</span><span class="kind">reply</span><span class="note">reply_to the request’s ID, via Codex’s queue. Shows up when the original turn ends.</span></li>
+        <li class="body"><span class="label">Body</span><q>Verified: I am claude:24207. Nonce: <mark class="nonce">switchboard-914-r2</mark>. Two agents traded careful signals and finished together.</q></li>
+        <li class="end"><span class="label">Found</span><span class="note">Two bugs: a sandboxed probe hid live Claude sessions; Claude’s MCP process inherited the Codex thread ID, so its first reply was rejected as a self-send. Both fixed.</span></li>
+      </ol>
+      <p class="cap">Set from the account of the first call. Timestamps left out.</p>
+    </div>
+    <div class="pg pg-r tel-text">
+      <Prose flow={d.key} blocks={blocks} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+    <div class="tel-tape">
+      <InkFig image={fig2} ink="lt" fit="contain" />
+    </div>
+  </Fragment>
+)}
+{part === 3 && (
+  <Fragment>
+    <div class="pg pg-l tel-fine">
+      {notes && (
+        <figure class="tel-notes">
+          <span class="tape tape-a" aria-hidden="true"></span>
+          <span class="tape tape-b" aria-hidden="true"></span>
+          <Plate media={notes} inks={['pink', 'black']} mode="key" fit="contain" />
+          <figcaption class="cap">{img(d, 'homepage-notes.png')?.caption}</figcaption>
+        </figure>
+      )}
+      <p class="tel-q">{q[0]}</p>
+      {home && (
+        <figure class="tel-phone">
+          <div class="tel-phone-crop"><Plate media={home} inks={['pink', 'black']} mode="key" fit="cover" /></div>
+          <figcaption class="cap">The homepage at nate.rip/telephone. {CREDIT}</figcaption>
+        </figure>
+      )}
+    </div>
+    <div class="pg pg-r tel-end">
+      <Prose flow={d.key} blocks={blocks} cols={2} end={end} />
+      <Cont spread={spread} />
+      <div class="tel-order" role="group" aria-label="Work order: what's left">
+        <p class="tel-order-head"><span>Work order</span><span>Copy 2 of 3</span></p>
+        <ol>
+          <li>Authenticated senders and per-agent authorization</li>
+          <li>Confirmed receipts and safe retries</li>
+          <li>Retention and rate limits</li>
+        </ol>
+        <p class="tel-order-foot">Until the first one exists, keep Telephone off the network.</p>
+      </div>
+      <ul class="dr-links">{d.links.map((l) => <li><a href={l.url} target="_blank" rel="noopener">{l.label}</a></li>)}</ul>
+    </div>
+  </Fragment>
+)}

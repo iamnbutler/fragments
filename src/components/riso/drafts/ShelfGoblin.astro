@@ -1,0 +1,130 @@
+---
+/**
+ * Shelf Goblin, as the goblin's own ledger: a wall of covers, a specimen
+ * card for verdicts, a library due-date card, and the refresh as a patent.
+ * Pink and black open; blue is for unknowns; orange for clocks and windows.
+ */
+import Reg from '../Reg.astro';
+import Plate from '../Plate.astro';
+import InkFig from './InkFig.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { img } from '../../../lib/drafts';
+import { split, media } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, part, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const home = media(img(d, 'home.jpg'), 0.62);
+const series = media(img(d, 'series.jpg'), 0.87);
+const inspector = media(img(d, 'inspector.jpg'), 0.12);
+const fig = img(d, 'fig1-refresh.svg');
+const q = d.pullquotes;
+const fact = (label: string) => d.facts.find((f) => f.label === label)?.value;
+// the snapshot the due dates count from
+const snap = new Date('2026-10-08T12:00:00Z');
+const due = (days: number) => new Date(snap.getTime() + days * 864e5).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+const [a, b] = split(blocks, 0.5);
+---
+{part === 0 && (
+  <Fragment>
+    <div class="sg-wall" aria-hidden="true">
+      {home && <Plate media={home} inks={['pink', 'black']} alt="" eager />}
+    </div>
+    <div class="sg-band">
+      <Reg as="h2" text={d.title} class="t-tower sg-title" />
+    </div>
+    <div class="sg-seal" aria-hidden="true">
+      <svg viewBox="0 0 200 200"><defs><path id="sg-ring" d="M100 100 m-72 0 a72 72 0 1 1 144 0 a72 72 0 1 1 -144 0" /></defs>
+        <text><textPath href="#sg-ring">KEEPER OF SHELVES · SHELFGOBL.IN · KEEPER OF SHELVES · SHELFGOBL.IN ·</textPath></text>
+      </svg>
+      <span>SG</span>
+    </div>
+    <aside class="sg-deck">
+      <p class="dr-kicker">{d.kicker}</p>
+      <p class="dr-dek">{d.dek}</p>
+      <p class="cap">{img(d, 'home.jpg')?.caption}</p>
+      <p class="cap">Continued on page {spread.page + 2}</p>
+    </aside>
+  </Fragment>
+)}
+{part === 1 && (
+  <Fragment>
+    <div class="pg pg-l sg-unknowns">
+      <Reg as="h3" text="Unknown is a real answer" class="t-tower sg-h" />
+      <div class="sg-chips" role="group" aria-label="Content verdicts, as a specimen card">
+        <p class="sg-chip-head">Content verdicts <span>Each judged separately, each with a confidence</span></p>
+        <div class="sg-chip chip-present"><span class="chip-sw"></span><span class="chip-name">Present</span><span class="chip-bar" style="--c:0.92"></span></div>
+        <div class="sg-chip chip-absent"><span class="chip-sw"></span><span class="chip-name">Absent</span><span class="chip-bar" style="--c:0.78"></span></div>
+        <div class="sg-chip chip-unknown"><span class="chip-sw"></span><span class="chip-name">Unknown</span><span class="chip-bar" style="--c:0"></span><span class="chip-note">Not enough source information to assess.</span></div>
+        <p class="sg-chip-foot">Sexualized marketing · explicit scenes · harem · AI narration · disclosed AI writing · listing quality</p>
+      </div>
+      <div class="sg-card" role="group" aria-label="Audio coverage, as a library due-date card">
+        <p class="sg-card-head">Audio coverage <span>Date due</span></p>
+        <p class="sg-card-q">{q[1]}</p>
+        <table>
+          <thead><tr><th>Series</th><th>Trusted for</th><th>Due</th></tr></thead>
+          <tbody>
+            <tr><td>Active</td><td>7 days</td><td><span class="due-stamp">{due(7)}</span></td></tr>
+            <tr><td>Reviewed, fully released</td><td>180 days</td><td><span class="due-stamp">{due(180)}</span></td></tr>
+            <tr><td colspan="3" class="sg-card-after">After that, the app stops claiming it knows.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      {series && (
+        <figure class="sg-series">
+          <div class="sg-series-paper">
+            <span class="tape tape-a" aria-hidden="true"></span>
+            <Plate media={series} inks={['blue', 'black']} fit="contain" />
+            <svg class="sg-circle" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M3 56.5C3 52 16.5 51 17.2 56.2 17.8 61.5 4 62.4 2.8 57.6 2.2 54.6 7.5 52.6 11 53" /></svg>
+          </div>
+          <figcaption class="cap">{img(d, 'series.jpg')?.caption}</figcaption>
+        </figure>
+      )}
+    </div>
+    <div class="pg pg-r sg-text">
+      <Prose flow={d.key} blocks={blocks} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 2 && (
+  <Fragment>
+    <div class="pg pg-l sg-machine">
+      <InkFig image={fig} ink="black" ghost="lt" class="sg-fig" />
+      <figure class="sg-clock" aria-label="The refresh clock: runs at 08:17 UTC, never deploys between 22:00 and 02:00 UTC">
+        <svg viewBox="-60 -60 120 120" aria-hidden="true">
+          <circle r="54" class="ck-face" />
+          <path class="ck-dead" d="M0 0 L-27 -46.77 A54 54 0 0 1 27 -46.77 Z" />
+          {Array.from({ length: 24 }, (_, h) => <line class="ck-tick" x1="0" y1="-54" x2="0" y2={h % 6 ? -50 : -45} transform={`rotate(${h * 15})`} />)}
+          <line class="ck-hand" x1="0" y1="0" x2="0" y2="-40" transform={`rotate(${(8 + 17 / 60) * 15})`} />
+          <circle r="2.4" class="ck-pin" />
+          <text y="-30" class="ck-lbl">22–02</text>
+          <text y="26" class="ck-lbl">08:17</text>
+        </svg>
+        <figcaption class="cap">A 24-hour dial. The refresh runs at 08:17 UTC; nothing deploys in the shaded hours.</figcaption>
+      </figure>
+      {inspector && (
+        <figure class="sg-insp">
+          <span class="tape tape-a" aria-hidden="true"></span>
+          <Plate media={inspector} inks={['blue', 'black']} fit="cover" />
+          <figcaption class="cap">{img(d, 'inspector.jpg')?.caption}</figcaption>
+        </figure>
+      )}
+    </div>
+    <div class="pg pg-r sg-text2">
+      <Prose flow={d.key} blocks={blocks} cols={2} end={end} />
+      <Cont spread={spread} />
+      <aside class="sg-label" aria-label="Specifications">
+        <p class="sg-label-head"><span>Shelf label</span><span>No. {d.slug}</span></p>
+        <dl>
+          {d.facts.map((f) => <Fragment><dt>{f.label}</dt><dd>{f.value}</dd></Fragment>)}
+        </dl>
+        <ul class="dr-links">{d.links.map((l) => <li><a href={l.url} target="_blank" rel="noopener">{l.label}</a></li>)}</ul>
+        <p class="sg-label-foot">{q[2]}</p>
+      </aside>
+    </div>
+  </Fragment>
+)}

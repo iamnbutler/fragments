@@ -1,0 +1,27 @@
+---
+/**
+ * One spread of a local draft. Each draft has its own art-directed design;
+ * this picks it and adds what every proof carries: the PROOF stamp and a
+ * running head that says it isn't published yet.
+ */
+import Sheet from '../Sheet.astro';
+import ProofStamp from './ProofStamp.astro';
+import ShelfGoblin from './ShelfGoblin.astro';
+import Ace from './Ace.astro';
+import DesktopTools from './DesktopTools.astro';
+import Gpuikit from './Gpuikit.astro';
+import Telephone from './Telephone.astro';
+import Generic from './Generic.astro';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft, part, parts } = spread;
+const DESIGNS: Record<string, any> = { shelfgoblin: ShelfGoblin, ace2: Ace, 'desktop-tools': DesktopTools, gpuikit: Gpuikit, telephone: Telephone };
+const Design = DESIGNS[draft.slug] ?? Generic;
+const label = part === 0 ? `${draft.title}, a draft feature` : `${draft.title}, part ${part + 1} of ${parts}`;
+---
+<Sheet spread={spread} label={label} layout={`dr dr-${draft.slug} dr-${draft.slug}-${part}`} running={`Proof: ${draft.kicker}, ${part + 1} of ${parts}`}>
+  <Design spread={spread} />
+  <ProofStamp date={draft.date} class={`ps-${draft.slug}-${part}`} />
+</Sheet>

@@ -1,0 +1,84 @@
+---
+/**
+ * Did the click land? Orange and blue on off-white, no pink, so it reads as
+ * Ace's sibling rather than its next chapter. Black is only for the patent
+ * line work and the three outcome words.
+ */
+import Reg from '../Reg.astro';
+import InkFig from './InkFig.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { img } from '../../../lib/drafts';
+import { split } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, part, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const q = d.pullquotes;
+const [a, b] = split(blocks, part === 0 ? 0.42 : 0.5);
+const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
+---
+{part === 0 && (
+  <Fragment>
+    <div class="pg pg-l dt-open">
+      <div class="dt-window" aria-hidden="true">
+        <span class="dt-lights"><i></i><i></i><i></i></span>
+        <span class="dt-screen"></span>
+        <span class="dt-cursor"></span>
+      </div>
+      <Reg as="h2" text="Did the click land?" class="t-tower dt-title" style="--lt:var(--blue);--dk:var(--orange)" />
+      <div class="dt-deck">
+        <p class="dr-kicker">{d.kicker}</p>
+        <p class="dr-dek">{d.dek}</p>
+        {spread.companion && (
+          <a class="dr-companion" href={`#p-${spread.companion.page}`}>
+            <span>Companion piece</span>
+            <strong>{spread.companion.title}</strong>
+            <span>page {spread.companion.page}</span>
+          </a>
+        )}
+      </div>
+      <Prose flow={d.key} blocks={a} cols={2} dropcap />
+    </div>
+    <div class="pg pg-r dt-manual">
+      <InkFig image={img(d, 'fig-1-boundary.svg')} ink="dk" ghost="lt" class="dt-fig1" />
+      <div class="dt-hook" role="group" aria-label="The three macOS grants, held by the app">
+        <span class="dt-hook-bar" aria-hidden="true"></span>
+        {keys.map((k, i) => (
+          <span class="dt-key" style={`--i:${i}`}>
+            <svg viewBox="0 0 60 24" aria-hidden="true"><circle cx="11" cy="12" r="8" /><circle cx="11" cy="12" r="3" /><path d="M19 12h38M44 12v7M51 12v5" /></svg>
+            <span>{k}</span>
+          </span>
+        ))}
+      </div>
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 1 && (
+  <Fragment>
+    <div class="dt-strip">
+      <InkFig image={img(d, 'fig-2-loop.svg')} ink="black" ghost="lt" caption={false} />
+    </div>
+    <div class="dt-stamps" role="group" aria-label="The three outcomes">
+      <span class="dt-out out-done">Completed</span>
+      <span class="dt-out out-refused">Refused</span>
+      <span class="dt-out out-unknown" data-text="Unknown">Unknown</span>
+    </div>
+    <div class="dt-body">
+      <p class="cap">{`${img(d, 'fig-2-loop.svg')?.caption ?? ''} ${img(d, 'fig-3-patch-stack.svg')?.caption ?? ''}`.trim()}</p>
+      <Prose flow={d.key} blocks={blocks} cols={3} end={end} />
+      <Cont spread={spread} />
+    </div>
+    <div class="dt-stack">
+      <InkFig image={img(d, 'fig-3-patch-stack.svg')} ink="dk" ghost="lt" caption={false} />
+      <div class="dt-war">
+        <p class="dt-war-note"><span class="dt-war-no">Sheet 02, insert</span>Typing a newline into a web composer would press Return and send it.</p>
+        <p class="dt-war-note"><span class="dt-war-no">Sheet 04, quit</span>A normal quit can leave an app waiting on an unsaved-changes dialog. Now it’s one dispatched operation, outcome unknown, unsafe to retry.</p>
+      </div>
+    </div>
+  </Fragment>
+)}

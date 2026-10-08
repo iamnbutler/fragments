@@ -1,0 +1,100 @@
+---
+/**
+ * Ace, on our own machines: the house that is also the office. Pink and
+ * black open on the icon's dither; the system drawing prints in blue; orange
+ * is held back for the security notice.
+ */
+import Reg from '../Reg.astro';
+import Plate from '../Plate.astro';
+import InkFig from './InkFig.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { img } from '../../../lib/drafts';
+import { split, media } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, part, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const canary = media(img(d, 'icon-canary.png'), 0.24);
+const q = d.pullquotes;
+const [a, b] = split(blocks, 0.5);
+---
+{part === 0 && (
+  <Fragment>
+    <div class="pg pg-l ace-cover">
+      <div class="ace-dither" aria-hidden="true"></div>
+      <p class="ace-word" aria-hidden="true">ACE</p>
+      {canary && (
+        <figure class="ace-stamp">
+          <div class="ace-perf"><Plate media={canary} inks={['pink', 'black']} fit="cover" /></div>
+          <figcaption class="cap">{img(d, 'icon-canary.png')?.caption}</figcaption>
+        </figure>
+      )}
+    </div>
+    <div class="pg pg-r ace-open">
+      <p class="dr-kicker">{d.kicker}</p>
+      <Reg as="h2" text={d.title} class="t-tower ace-title" />
+      <p class="dr-dek">{d.dek}</p>
+      <Prose flow={d.key} blocks={blocks} cols={2} end={end} dropcap />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 1 && (
+  <Fragment>
+    <div class="ace-plate">
+      <InkFig image={img(d, 'fig-1-system.svg')} ink="lt" ghost="dk" class="ace-fig" caption={false} />
+      <p class="ace-q">{q[2]}</p>
+    </div>
+    <div class="ace-legend">
+      <p class="cap">{img(d, 'fig-1-system.svg')?.caption}</p>
+      <Prose flow={d.key} blocks={blocks} cols={1} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 2 && (
+  <Fragment>
+    <div class="pg pg-l ace-text">
+      <p class="ace-run">Ace, on our own machines, continued</p>
+      <Prose flow={d.key} blocks={blocks} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+    <div class="ace-tally">
+      <InkFig image={img(d, 'fig-2-tally.svg')} ink="black" ghost="lt" caption={false} />
+    </div>
+    <div class="pg pg-r ace-ledger">
+      <div class="ace-form" role="group" aria-label="The Built in Ace section every PR carries">
+        <p class="ace-form-head">## Built in Ace</p>
+        <p class="ace-form-row"><span>Used outside Ace</span><span class="ace-blank"></span></p>
+        <p class="ace-form-row"><span>Why</span><span class="ace-blank"></span></p>
+        <p class="ace-form-row"><span>Issue for the gap</span><span class="ace-blank">#</span></p>
+        <p class="ace-form-q">{q[3]}</p>
+      </div>
+      <div class="ace-notice" role="note">
+        <p class="ace-notice-head">Notice</p>
+        <p>Agents run with the privileges of whoever runs the host. They can run shell commands and touch files outside the project. Channels and lanes are not sandboxes. Sharing a channel means letting teammates run commands on your machine.</p>
+        <p class="ace-notice-foot">Only share Ace with people you’d hand your laptop to.</p>
+      </div>
+      <div class="ace-manifest">
+        <p class="ace-manifest-head">Manifest: not yet built</p>
+        <ol>
+          <li>Lobbies, for presence and notifications</li>
+          <li>Attachments</li>
+          <li>Claude Code or Codex as harnesses inside a channel</li>
+          <li>Hosted channels messaging other channels</li>
+        </ol>
+      </div>
+      <p class="cap ace-tally-cap">{img(d, 'fig-2-tally.svg')?.caption}</p>
+      {spread.companion && (
+        <a class="dr-companion" href={`#p-${spread.companion.page}`}>
+          <span>Companion piece</span>
+          <strong>{spread.companion.title}</strong>
+          <span>page {spread.companion.page}</span>
+        </a>
+      )}
+    </div>
+  </Fragment>
+)}

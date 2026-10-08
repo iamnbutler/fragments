@@ -11,8 +11,9 @@ const KIND: Record<string, string> = {
   list: 'Index',
   bulletin: 'Dispatch',
   clippings: 'Clippings',
+  draft: 'Proof',
 };
-const entries = spreads.filter((s) => s.kind !== 'cover' && s.kind !== 'contents' && s.kind !== 'jump');
+const entries = spreads.filter((s) => s.kind !== 'cover' && s.kind !== 'contents' && s.kind !== 'jump' && !(s.kind === 'draft' && s.part > 0));
 ---
 <Sheet spread={spread} label="Contents" running={`Issue ${issue}`}>
   <div class="contents-head">

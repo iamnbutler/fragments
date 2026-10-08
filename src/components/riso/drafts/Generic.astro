@@ -1,0 +1,24 @@
+---
+/** A draft with no design of its own yet: title, dek, facts and text. */
+import Reg from '../Reg.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { split } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const [a, b] = split(blocks, 0.4);
+---
+<div class="pg pg-l gen-open">
+  <p class="dr-kicker">{d.kicker}</p>
+  <Reg as="h2" text={d.title} class="t-tower gen-title" />
+  <p class="dr-dek">{d.dek}</p>
+  <Prose flow={d.key} blocks={a} cols={1} dropcap />
+</div>
+<div class="pg pg-r">
+  <Prose flow={d.key} blocks={b} cols={2} end={end} />
+  <Cont spread={spread} />
+</div>
