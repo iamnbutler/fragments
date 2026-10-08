@@ -7,6 +7,8 @@ import ShotSpread from '../components/riso/ShotSpread.astro';
 import ListSpread from '../components/riso/ListSpread.astro';
 import BulletinSpread from '../components/riso/BulletinSpread.astro';
 import ClippingsSpread from '../components/riso/ClippingsSpread.astro';
+import SectionSpread from '../components/riso/SectionSpread.astro';
+import JumpSpread from '../components/riso/JumpSpread.astro';
 import { loadStream } from '../lib/stream';
 import { impose } from '../lib/zine';
 import { measureAll } from '../lib/tone';
@@ -34,6 +36,8 @@ const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'n
         case 'list': return <ListSpread spread={s} />;
         case 'bulletin': return <BulletinSpread spread={s} />;
         case 'clippings': return <ClippingsSpread spread={s} />;
+        case 'section': return <SectionSpread spread={s} />;
+        case 'jump': return <JumpSpread spread={s} />;
       }
     })}
     <footer class="colophon-end">

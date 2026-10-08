@@ -1,7 +1,7 @@
 ---
 import Sheet from './Sheet.astro';
 import Reg from './Reg.astro';
-import { spreadTitle, type Spread } from '../../lib/zine';
+import { SECTIONS, spreadTitle, type Spread } from '../../lib/zine';
 
 interface Props { spread: Spread; spreads: Spread[]; issue: number; }
 const { spread, spreads, issue } = Astro.props;
@@ -9,10 +9,10 @@ const KIND: Record<string, string> = {
   post: 'Essay',
   shot: 'Plate',
   list: 'Index',
-  bulletin: 'Notices',
+  bulletin: 'Dispatch',
   clippings: 'Clippings',
 };
-const entries = spreads.filter((s) => s.kind !== 'cover' && s.kind !== 'contents');
+const entries = spreads.filter((s) => s.kind !== 'cover' && s.kind !== 'contents' && s.kind !== 'jump');
 ---
 <Sheet spread={spread} label="Contents" running={`Issue ${issue}`}>
   <div class="contents-head">
@@ -21,12 +21,19 @@ const entries = spreads.filter((s) => s.kind !== 'cover' && s.kind !== 'contents
       Printed in fluorescent pink, orange, blue and black on newsprint,
       from whatever Nate published to his AT Protocol repository.
       Set in Archivo, Source Serif 4 and Gochi Hand.
-      Use the arrow keys, or J and K, to turn the pages.
+      Use the arrow keys, or J and K, to turn the pages, and F to see every spread at once.
     </p>
   </div>
   <nav class="contents-list" aria-label="Contents">
     <ol>
-      {entries.map((s) => (
+      {entries.map((s) => s.kind === 'section' ? (
+        <li class="ck-section">
+          <a href={`#p-${s.page}`}>
+            <span class="ct-page">{SECTIONS[s.key].no}</span>
+            <span class="ct-sec">{SECTIONS[s.key].title}</span>
+          </a>
+        </li>
+      ) : (
         <li class={`ck-${s.kind}`}>
           <a href={`#p-${s.page}`}>
             <span class="ct-page">{s.page}</span>

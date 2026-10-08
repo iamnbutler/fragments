@@ -35,7 +35,7 @@ const titleSize = Math.min(9, Math.max(4, 80 / Math.pow(item.title.length, 0.7))
             <span class="ix-where">{e.href ? domain(e.href) : e.note ?? ''}</span>
           </li>
         ))}
-        {rest > 0 && <li class="ix-more"><a href={item.href}>{rest} more entries on page {item.id}</a></li>}
+        {rest > 0 && <li class="ix-more"><a href={item.href}>{rest} more entries on its own page</a></li>}
       </ol>
     </Fragment>
   )}
@@ -58,7 +58,7 @@ const titleSize = Math.min(9, Math.max(4, 80 / Math.pow(item.title.length, 0.7))
               </tr>
             ))}
             {c === 1 && rest > 0 && (
-              <tr class="lg-more"><th scope="row"></th><td colspan="2"><a href={item.href}>{rest} more on page {item.id}</a></td></tr>
+              <tr class="lg-more"><th scope="row"></th><td colspan="2"><a href={item.href}>{rest} more on its own page</a></td></tr>
             )}
           </tbody>
         </table>

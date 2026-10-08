@@ -5,7 +5,7 @@
  */
 import Sheet from './Sheet.astro';
 import Plate from './Plate.astro';
-import { domain, inline, printDate, type Spread } from '../../lib/zine';
+import { domain, inline, paragraphs, printDate, type Spread } from '../../lib/zine';
 import type { FragmentItem, NoteItem } from '../../lib/stream';
 
 interface Props { spread: Extract<Spread, { kind: 'bulletin' }>; }
@@ -14,7 +14,7 @@ const { items } = spread;
 const count = items.length;
 const tilts = [-1.6, 1.1, -0.6, 2];
 ---
-<Sheet spread={spread} label={`Notices: ${count} item${count > 1 ? 's' : ''}`} layout={`n${count}`} running="Notices">
+<Sheet spread={spread} label={`Notices: ${count} item${count > 1 ? 's' : ''}`} layout={`n${count}`} running="Dispatches">
   {items.map((it, i) => {
     const slot = `slot-${i}`;
     if (it.kind === 'note') {
@@ -32,6 +32,17 @@ const tilts = [-1.6, 1.1, -0.6, 2];
       );
     }
     const l = it as FragmentItem;
+    if (l.kind === 'post') {
+      const paras = paragraphs(l.text, l.title);
+      return (
+        <article class:list={['notice', 'short', slot]}>
+          <p class="dispatch-head"><span class="dispatch-word">Short</span> <time datetime={l.date}>{printDate(l.date)}</time></p>
+          <h2 class="short-title"><a href={l.href}>{l.title}</a></h2>
+          <div class="short-text">{paras.map((p) => <p>{p}</p>)}</div>
+          <a class="dispatch-src" href={l.href}>Its own page</a>
+        </article>
+      );
+    }
     const d = domain(l.url);
     const blurb = inline(l.text);
     return (
@@ -43,7 +54,7 @@ const tilts = [-1.6, 1.1, -0.6, 2];
           {blurb && <p class="coupon-blurb">{blurb}</p>}
           <p class="coupon-foot">
             <span class="coupon-domain">{d}</span>
-            <a class="coupon-local" href={l.href}>Page {l.id}</a>
+            <a class="coupon-local" href={l.href}>Its own page</a>
           </p>
         </div>
       </article>

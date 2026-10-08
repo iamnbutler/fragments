@@ -1,12 +1,18 @@
 ---
 import type { Block } from '../../lib/zine';
-interface Props { blocks: Block[]; }
-const { blocks } = Astro.props;
+interface Props { blocks: Block[]; refs?: boolean; end?: boolean; }
+const { blocks, refs = false, end = false } = Astro.props;
+// Split text on reference markers: odd parts are reference numbers.
+const parts = (text: string) => text.split(/\u0001(\d+)\u0001/);
+const last = blocks.length - 1;
 ---
-{blocks.map((b) =>
-  b.t === 'h' ? <p class="b-h">{b.text}</p>
-  : b.t === 'li' ? <p class="b-li">{b.text}</p>
-  : b.t === 'code' ? <pre class="b-code">{b.text}</pre>
-  : b.t === 'quote' ? <p class="b-q">{b.text}</p>
-  : <p>{b.text}</p>
-)}
+{blocks.map((b, bi) => {
+  const p = parts(b.text);
+  const body = p.map((t, i) => (i % 2 ? (refs ? <sup class="ref"><span class="sr">note </span>{t}</sup> : null) : t));
+  const tail = end && bi === last ? <span class="end-mark" aria-hidden="true"></span> : null;
+  return b.t === 'h' ? <p class="b-h">{body}</p>
+    : b.t === 'li' ? <p class="b-li">{body}{tail}</p>
+    : b.t === 'code' ? <pre class="b-code">{b.text}</pre>
+    : b.t === 'quote' ? <p class="b-q">{body}{tail}</p>
+    : <p>{body}{tail}</p>;
+})}
