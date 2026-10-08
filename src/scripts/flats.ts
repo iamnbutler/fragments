@@ -385,6 +385,7 @@ function cloneSheet(sheet: HTMLElement): HTMLElement {
   c.setAttribute('inert', '');
   c.setAttribute('aria-hidden', 'true');
   for (const el of c.querySelectorAll('[id]')) el.removeAttribute('id');
+  for (const el of c.querySelectorAll('[data-flow]')) el.removeAttribute('data-flow');
   for (const el of c.querySelectorAll('canvas, script, iframe')) el.remove();
   for (const el of c.querySelectorAll('video')) {
     const ph = document.createElement('div');
