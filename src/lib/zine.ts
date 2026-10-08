@@ -105,11 +105,6 @@ export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
     paper: ['newsprint', 'newsprint', 'bone'],
     companion: 'desktop-tools',
   },
-  shelfgoblin: {
-    caps: [0, 2300, 2000],
-    inks: [['pink', 'black'], ['blue', 'black'], ['red', 'blue']],
-    paper: ['newsprint', 'cream', 'bone'],
-  },
   telephone: {
     caps: [1500, 1300, 1700, 1500],
     inks: [['pink', 'black'], ['pink', 'blue'], ['red', 'blue'], ['pink', 'black']],

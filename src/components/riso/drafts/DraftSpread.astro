@@ -6,7 +6,6 @@
  */
 import Sheet from '../Sheet.astro';
 import ProofStamp from './ProofStamp.astro';
-import ShelfGoblin from './ShelfGoblin.astro';
 import Ace from './Ace.astro';
 import DesktopTools from './DesktopTools.astro';
 import Gpuikit from './Gpuikit.astro';
@@ -17,7 +16,7 @@ import type { Spread } from '../../../lib/zine';
 interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
 const { spread } = Astro.props;
 const { draft, part, parts } = spread;
-const DESIGNS: Record<string, any> = { shelfgoblin: ShelfGoblin, ace2: Ace, 'desktop-tools': DesktopTools, gpuikit: Gpuikit, telephone: Telephone };
+const DESIGNS: Record<string, any> = { ace2: Ace, 'desktop-tools': DesktopTools, gpuikit: Gpuikit, telephone: Telephone };
 const Design = DESIGNS[draft.slug] ?? Generic;
 const label = part === 0 ? `${draft.title}, a draft feature` : `${draft.title}, part ${part + 1} of ${parts}`;
 ---
