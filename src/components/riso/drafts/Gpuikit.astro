@@ -2,7 +2,7 @@
 /**
  * gpuikit as a mail-order parts catalog, "Catalog No. 0.9": a cover, a
  * specimen sheet of all 44 element modules, and the rules page. Blue and
- * black for engineering, orange for rules and breakage, pink for one stamp.
+ * black for engineering, red for rules and breakage, pink for one stamp.
  */
 import Reg from '../Reg.astro';
 import Plate from '../Plate.astro';
@@ -89,7 +89,7 @@ h_stack()
       {sizes && (
         <figure class="gk-sizes">
           <span class="tape tape-a" aria-hidden="true"></span>
-          <Plate media={sizes} inks={['orange', 'black']} fit="contain" />
+          <Plate media={sizes} inks={['red', 'black']} fit="contain" />
           <svg class="gk-ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M4 78C4 72.5 19 71.5 19.6 77.4 20.2 83.4 5 84.4 3.8 79.2 3.2 76.2 8 74.2 12 74.6" /></svg>
           <figcaption class="cap">{img(d, 'showcase-control-sizes.png')?.caption}</figcaption>
         </figure>

@@ -1,5 +1,6 @@
 import type { StreamItem, FragmentItem, NoteItem, ReshareItem } from './stream';
 import type { Draft } from './drafts';
+import { SPOT, PAPERS } from './spectrum';
 
 /**
  * PRESS RUN: the stream, imposed as a printed zine.
@@ -10,8 +11,8 @@ import type { Draft } from './drafts';
  * neighbouring spreads share a composition.
  */
 
-export type Ink = 'pink' | 'orange' | 'blue' | 'black';
-export type Paper = 'newsprint' | 'blush' | 'bone' | 'toner';
+export type Ink = 'pink' | 'red' | 'blue' | 'black';
+export type Paper = 'newsprint' | 'cream' | 'bone' | 'toner';
 
 interface SpreadBase {
   n: number; // spread index in the issue
@@ -94,29 +95,29 @@ export interface DraftDesign {
 export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
   'desktop-tools': {
     caps: [1500, 2300],
-    inks: [['orange', 'blue'], ['blue', 'orange']],
+    inks: [['red', 'blue'], ['blue', 'red']],
     paper: ['newsprint', 'bone'],
     companion: 'ace2',
   },
   ace2: {
     caps: [2000, 700, 1900],
-    inks: [['pink', 'black'], ['blue', 'black'], ['orange', 'black']],
+    inks: [['pink', 'black'], ['blue', 'black'], ['red', 'black']],
     paper: ['newsprint', 'newsprint', 'bone'],
     companion: 'desktop-tools',
   },
   shelfgoblin: {
     caps: [0, 2300, 2000],
-    inks: [['pink', 'black'], ['blue', 'black'], ['orange', 'blue']],
-    paper: ['newsprint', 'blush', 'bone'],
+    inks: [['pink', 'black'], ['blue', 'black'], ['red', 'blue']],
+    paper: ['newsprint', 'cream', 'bone'],
   },
   telephone: {
     caps: [1500, 1300, 1700, 1500],
-    inks: [['pink', 'black'], ['pink', 'blue'], ['orange', 'blue'], ['pink', 'black']],
+    inks: [['pink', 'black'], ['pink', 'blue'], ['red', 'blue'], ['pink', 'black']],
     paper: ['newsprint', 'bone', 'toner', 'newsprint'],
   },
   gpuikit: {
     caps: [0, 1500, 1300],
-    inks: [['blue', 'black'], ['blue', 'black'], ['orange', 'blue']],
+    inks: [['blue', 'black'], ['blue', 'black'], ['red', 'blue']],
     paper: ['bone', 'newsprint', 'newsprint'],
   },
 };
@@ -174,10 +175,9 @@ export function rng(seed: number) {
 
 const INK_PAIRS: [Ink, Ink][] = [
   ['pink', 'black'],
-  ['orange', 'black'],
+  ['red', 'black'],
   ['pink', 'blue'],
-  ['orange', 'blue'],
-  ['pink', 'orange'],
+  ['red', 'blue'],
 ];
 
 // --- imposition --------------------------------------------------------------
@@ -215,7 +215,7 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
     let pi = Math.floor(r.next() * INK_PAIRS.length);
     if (pi === lastPair) pi = (pi + 1) % INK_PAIRS.length;
     lastPair = pi;
-    const paper: Paper = opts.paper ?? r.pick(['newsprint', 'newsprint', 'bone', 'blush'] as const);
+    const paper: Paper = opts.paper ?? r.pick(['newsprint', 'newsprint', 'bone', 'cream'] as const);
     const base: SpreadBase = { n: spreads.length, page: spreads.length * 2, seed, inks: INK_PAIRS[pi], paper, section };
     const s = make(r, base);
     spreads.push(s);
@@ -233,8 +233,8 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
   };
   const mark = (layout: string) => history.push(layout);
 
-  push('cover', (_r, b) => ({ ...b, kind: 'cover', inks: ['pink', 'orange'], paper: 'newsprint' }));
-  push('contents', (_r, b) => ({ ...b, kind: 'contents', inks: ['orange', 'black'], paper: 'bone' }));
+  push('cover', (_r, b) => ({ ...b, kind: 'cover', inks: ['pink', 'red'], paper: 'newsprint' }));
+  push('contents', (_r, b) => ({ ...b, kind: 'contents', inks: ['red', 'black'], paper: 'bone' }));
 
   // --- sort the stream into departments, each newest first ---
   const features = stream.filter((x): x is FragmentItem => x.kind === 'post' && words(x.text) >= SHORT_WORDS);
@@ -284,7 +284,7 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
       kind: 'clippings',
       layout,
       items,
-      paper: layout === 'wall' ? r2.pick(['toner', 'blush'] as const) : r2.chance(0.18) ? 'toner' : b.paper,
+      paper: layout === 'wall' ? r2.pick(['toner', 'cream'] as const) : r2.chance(0.18) ? 'toner' : b.paper,
     }));
   };
 
@@ -317,7 +317,7 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
         from,
         part,
         last: next >= bs.length,
-        paper: b.paper === 'blush' ? 'newsprint' : b.paper,
+        paper: b.paper === 'cream' ? 'newsprint' : b.paper,
       })) as Extract<Spread, { kind: 'jump' }>;
       mark('jump');
       prev.jump = j.page;
@@ -684,13 +684,7 @@ export function plateSrc(src: string, size: 'feed_fullsize' | 'feed_thumbnail' =
   return m ? `https://cdn.bsky.app/img/${size}/plain/${m[1]}/${m[2]}@jpeg` : src;
 }
 
-export const INK_HEX: Record<Ink | 'paper', string> = {
-  pink: '#ff48b0',
-  orange: '#ff6c2f',
-  blue: '#0078bf',
-  black: '#000000',
-  paper: '#ecE9e1',
-};
+export const INK_HEX: Record<Ink | 'paper', string> = { ...SPOT, paper: PAPERS.newsprint };
 
 export interface Block {
   t: 'p' | 'h' | 'li' | 'code' | 'quote';

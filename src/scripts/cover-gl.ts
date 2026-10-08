@@ -1,11 +1,19 @@
 /**
  * The cover, printed by a shader. The art is drawn once into the three
- * channels of a texture (R = pink plate, G = orange plate, B = key plate);
+ * channels of a texture (R = pink plate, G = red plate, B = key plate);
  * the fragment shader then prints each plate in turn: a roller wipes it on,
- * it lands out of register and springs toward rest, the orange plate is
+ * it lands out of register and springs toward rest, the red plate is
  * screened to halftone, solids get mottled ink and dropout specks, and the
  * pointer knocks the plates apart.
  */
+
+import { SPOT, PAPERS } from '../lib/spectrum';
+
+/** A hex ink as a GLSL vec3, so the shader prints in the same inks as the CSS. */
+const v3 = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `vec3(${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => (c / 255).toFixed(3)).join(', ')})`;
+};
 
 const VERT = `
 attribute vec2 a;
@@ -63,10 +71,10 @@ void main() {
   float orngInk = screen(orng, px, 0.26, 6.5 * u_dpr) * drop1 * 0.96;
   float keyInk  = smoothstep(0.35, 0.65, key) * mottle2 * drop2;
 
-  vec3 paper = vec3(0.925, 0.914, 0.882) * (0.975 + 0.025 * hash(floor(px / u_dpr)));
+  vec3 paper = ${v3(PAPERS.newsprint)} * (0.975 + 0.025 * hash(floor(px / u_dpr)));
   vec3 col = paper;
-  col *= mix(vec3(1.0), vec3(1.0, 0.282, 0.69), pinkInk);
-  col *= mix(vec3(1.0), vec3(1.0, 0.424, 0.184), orngInk);
+  col *= mix(vec3(1.0), ${v3(SPOT.pink)}, pinkInk);
+  col *= mix(vec3(1.0), ${v3(SPOT.red)}, orngInk);
   col *= mix(vec3(1.0), vec3(0.06, 0.055, 0.06), keyInk);
   gl_FragColor = vec4(col, 1.0);
 }
@@ -143,8 +151,8 @@ export async function printCover(sheet: HTMLElement) {
       c.fillStyle = 'rgb(255,0,0)';
       c.fillRect(pb.x, pb.y, pb.w, pb.h);
     }
-    // orange plate: a sun, screened from a gradient
-    const ob = rel(sheet.querySelector('.cp-orange'));
+    // red plate: a sun, screened from a gradient
+    const ob = rel(sheet.querySelector('.cp-red'));
     if (ob) {
       const cx = ob.x + ob.w * 0.5, cy = ob.y + ob.h * 0.5, R = ob.w * 0.5;
       const g = c.createRadialGradient(cx - R * 0.2, cy - R * 0.24, R * 0.05, cx, cy, R);

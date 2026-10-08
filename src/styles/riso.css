@@ -1,18 +1,20 @@
 /* PRESS RUN — nate.rip as a risograph zine.
-   Spot inks only: fluorescent pink, orange, blue and black, on newsprint.
+   Spot inks only: pink, red, blue and black from the Printmaking Challenge
+   spectrum (src/lib/spectrum.ts), on warm newsprint.
    Everything inside a spread is sized in container units, so a spread
    composes the same way at every desktop size, like a printed page would. */
 
 :root {
-  --pink: #ff48b0;
-  --orange: #ff6c2f;
-  --blue: #0078bf;
+  --pink: #ffa0c8;
+  --red: #ff5846;
+  --blue: #4f77d6;
   --black: #000;
+  --blue-lit: #6a7dd4; /* blue for type on toner */
 
-  --newsprint: #ece9e1;
-  --bone: #e2ded3;
-  --blush: #f2e3e0;
-  --toner: #171615;
+  --newsprint: #ece9e3;
+  --bone: #f1e9dd;
+  --cream: #f2e5cb;
+  --toner: #1a1a1a;
   --copy: #f5f4ef;
 
   --desk: #bdb9b0;
@@ -82,7 +84,7 @@ html:has(body.issue) { scroll-snap-type: y proximity; }
   perspective: 1800px;
 }
 .paper-bone { --sheet: var(--bone); }
-.paper-blush { --sheet: var(--blush); }
+.paper-cream { --sheet: var(--cream); }
 .paper-toner { --sheet: var(--toner); --text: var(--newsprint); }
 
 .spread {
@@ -353,9 +355,9 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .cover-plates { position: absolute; inset: 0; z-index: 0; }
 .cp { position: absolute; mix-blend-mode: multiply; }
 .cp-pink { left: 0; top: 0; width: 41%; height: 64%; background: var(--pink); }
-.cp-orange {
+.cp-red {
   right: 6%; top: 10%; width: 40cqw; aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle at 40% 38%, var(--orange) 0 35%, color-mix(in srgb, var(--orange) 55%, transparent) 70%, transparent 71%);
+  background: radial-gradient(circle at 40% 38%, var(--red) 0 35%, color-mix(in srgb, var(--red) 55%, transparent) 70%, transparent 71%);
 }
 .masthead {
   position: absolute; z-index: 2; left: 3.2cqw; right: 2cqw; bottom: 10.5cqw;
@@ -386,7 +388,7 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .cover-turn {
   position: absolute; z-index: 3; right: 3.6cqw; bottom: 3.4cqw;
   font: 700 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.06em;
-  text-decoration: none; border-bottom: 0.25em solid var(--orange);
+  text-decoration: none; border-bottom: 0.25em solid var(--red);
 }
 
 /* ─── contents ───────────────────────────────────────────────────────── */
@@ -417,7 +419,7 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .contents-list a:hover .ct-title { text-decoration: underline; text-decoration-color: var(--lt); text-decoration-thickness: 0.3em; text-underline-offset: -0.05em; text-decoration-skip-ink: none; }
 .ct-page { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--dk); }
 .ct-kind { opacity: 0.6; }
-.ck-post .ct-kind, .ck-clippings .ct-kind { opacity: 1; color: var(--orange); mix-blend-mode: multiply; }
+.ck-post .ct-kind, .ck-clippings .ct-kind { opacity: 1; color: var(--red); mix-blend-mode: multiply; }
 .ct-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ─── essay: tower ───────────────────────────────────────────────────── */
@@ -792,7 +794,7 @@ table.ledger.pg-r { margin-left: 4.5cqw; margin-right: 4cqw; }
   position: absolute; z-index: 4; top: -2.2cqw; right: -2.4cqw;
   display: flex; flex-direction: column; align-items: center; gap: 0.25cqw;
   padding: 0.55cqw 1.1cqw 0.6cqw;
-  color: var(--lt);
+  color: var(--red); /* clipping stamps always print in red, whatever the spread's inks */
   border: 0.32cqw solid currentColor;
   outline: 0.14cqw solid currentColor; outline-offset: 0.26cqw;
   rotate: var(--stamp-rot);
@@ -815,7 +817,7 @@ table.ledger.pg-r { margin-left: 4.5cqw; margin-right: 4cqw; }
   rotate: -2.5deg;
   filter: url(#marker);
 }
-.paper-toner .annot { color: #4aa9ff; }
+.paper-toner .annot { color: var(--blue-lit); }
 .annot p { margin: 0; overflow-wrap: anywhere; }
 .annot-arrow { width: 6cqw; height: 3.6cqw; margin: 0 0 0.2cqw -1cqw; overflow: visible; }
 .annot-arrow path { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
@@ -876,7 +878,7 @@ table.ledger.pg-r { margin-left: 4.5cqw; margin-right: 4cqw; }
   /* cover */
   .zine .spread-cover { min-height: 128vw; }
   .zine .cp-pink { width: 56%; height: 58%; }
-  .zine .cp-orange { width: 62cqw; right: -8%; top: 16%; }
+  .zine .cp-red { width: 62cqw; right: -8%; top: 16%; }
   .zine .masthead { font-size: 15.6cqw; bottom: 42cqw; left: 3cqw; right: 1cqw; }
   .zine .solid { width: 46cqw; height: 46cqw; right: 4cqw; top: 22cqw; }
   .zine .cover-issue { left: 5cqw; top: 5cqw; }
@@ -1189,7 +1191,7 @@ table.ledger.pg-r { margin-left: 4.5cqw; margin-right: 4cqw; }
 .mn-head { margin: 0 0 1cqw; font-weight: 800; text-transform: uppercase; letter-spacing: 0.24em; color: var(--dk); }
 .margin-notes ol { margin: 0; padding: 0 0 0 1.9em; display: flex; flex-direction: column; gap: 0.9cqw; }
 .margin-notes li::marker { font-weight: 850; color: var(--lt); }
-.paper-newsprint .margin-notes li::marker, .paper-bone .margin-notes li::marker, .paper-blush .margin-notes li::marker { color: color-mix(in srgb, var(--lt) 80%, #000); }
+.paper-newsprint .margin-notes li::marker, .paper-bone .margin-notes li::marker, .paper-cream .margin-notes li::marker { color: color-mix(in srgb, var(--lt) 80%, #000); }
 .margin-notes a { display: block; font-weight: 650; text-decoration: none; overflow-wrap: anywhere; }
 .margin-notes a:hover { text-decoration: underline; text-decoration-color: var(--lt); text-decoration-thickness: 0.25em; }
 .mn-where { display: block; opacity: 0.6; overflow-wrap: anywhere; }
@@ -1257,7 +1259,7 @@ sup.ref {
 }
 .flats-toggle svg { width: 18px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.2; }
 .flats-toggle:hover, .flats-toggle:focus-visible { background: var(--blue); }
-.flats-toggle:focus-visible, .flats-back:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.flats-toggle:focus-visible, .flats-back:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 html.flats-open .flats-toggle { visibility: hidden; }
 
 .flats {
@@ -1377,3 +1379,6 @@ html:not(.flats-rest) .flats-back { pointer-events: none; }
   .flats-back kbd { display: none; }
 }
 @media print { .flats, .flats-toggle { display: none !important; } }
+
+/* pink is too pale to set small figures in; pink spreads number in the key ink */
+.sheet[data-lt='pink'] .ledger th { color: var(--dk); mix-blend-mode: normal; }

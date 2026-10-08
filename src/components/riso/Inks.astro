@@ -59,7 +59,7 @@ const curve = (role: Role) =>
 const neg = (r: Role): Role => ({ ...r, invert: !r.invert });
 
 const filters: { id: string; role: Role; color: string }[] = [];
-for (const ink of ['pink', 'orange', 'blue', 'black'] as const) {
+for (const ink of ['pink', 'red', 'blue', 'black'] as const) {
   filters.push({ id: `ht-lt-${ink}`, role: ROLES.lt, color: INK_HEX[ink] });
   filters.push({ id: `ht-dk-${ink}`, role: ROLES.dk, color: INK_HEX[ink] });
   // negatives, for dark images
@@ -73,8 +73,8 @@ for (const ink of ['pink', 'orange', 'blue', 'black'] as const) {
   filters.push({ id: `ht-dkh-${ink}`, role: { ...ROLES.dk, exponent: 3.2, offset: 0 }, color: INK_HEX[ink] });
 }
 filters.push({ id: 'ht-av-black', role: ROLES.av, color: INK_HEX.black });
-filters.push({ id: 'ht-rev-paper', role: ROLES.rev, color: '#ece9e1' });
-filters.push({ id: 'ht-revi-paper', role: neg(ROLES.rev), color: '#ece9e1' });
+filters.push({ id: 'ht-rev-paper', role: ROLES.rev, color: INK_HEX.paper });
+filters.push({ id: 'ht-revi-paper', role: neg(ROLES.rev), color: INK_HEX.paper });
 ---
 <svg class="inks" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
   <defs>
