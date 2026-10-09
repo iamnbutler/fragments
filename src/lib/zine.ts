@@ -1,4 +1,5 @@
 import type { Draft } from './drafts';
+import type { Post } from './posts';
 import { SPOT, PAPERS } from './spectrum';
 
 /**
@@ -6,12 +7,13 @@ import { SPOT, PAPERS } from './spectrum';
  *
  * The cover and the bio open every issue; each feature follows as its own
  * art-directed spreads, then plain jump spreads for any text the design has
- * no room for. Every spread gets an ink pair, a paper and a seed for its
+ * no room for. Essays come last, newest first, each on a stock opener. Every spread gets an ink pair, a paper and a seed for its
  * misregistration, so the same content always prints the same way.
  */
 
 export type Ink = 'yellow' | 'blue' | 'teal' | 'black';
-export type Paper = 'newsprint' | 'bone';
+export type Paper = 'newsprint' | 'bone' | 'toner';
+export type PostLayout = 'tower' | 'banner' | 'toner';
 
 interface SpreadBase {
   n: number; // spread index in the issue
@@ -72,6 +74,7 @@ export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAF
 export type Spread =
   | (SpreadBase & { kind: 'cover' })
   | (SpreadBase & { kind: 'bio' })
+  | (SpreadBase & { kind: 'post'; layout: PostLayout; item: Post; blocks: Block[]; jump?: number; archive: boolean })
   | (SpreadBase & { kind: 'jump'; item: JumpItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean })
   | (SpreadBase & {
       kind: 'draft';
@@ -122,8 +125,19 @@ export const INK_PAIRS: [Ink, Ink][] = [
 
 const JUMP_CHARS = 4400;
 const MAX_JUMPS = 4;
+/** Each note in a jump's margin takes about this much room from the text. */
+const NOTE_CHARS = 150;
+/** A remainder this small rides along rather than open a near-empty spread. */
+const MIN_TAIL = 300;
 
-export function impose(drafts: Draft[] = []): Spread[] {
+/** How much set text each essay opener holds. */
+const OPENER_CHARS: Record<PostLayout, number> = { tower: 1900, banner: 2900, toner: 1050 };
+/** Less than this left over isn't worth a jump; pick a roomier opener. */
+const MIN_JUMP = 1000;
+/** Essays older than this wear a "from the archive" mark. */
+const ARCHIVE_MS = 3 * 365 * 24 * 3600 * 1000;
+
+export function impose(drafts: Draft[] = [], posts: Post[] = [], now = Date.now()): Spread[] {
   const spreads: Spread[] = [];
   const base = (seedKey: string, inks: [Ink, Ink], paper: Paper, group?: SpreadBase['group']): SpreadBase => ({
     n: spreads.length,
@@ -164,15 +178,54 @@ export function impose(drafts: Draft[] = []): Spread[] {
       if (prev && cut.blocks.length) prev.jump = s.page;
       if (cut.blocks.length) { prev = s; from = s.page; }
     }
+    jumps(d, bs, next, prev, from, design.inks[design.inks.length - 1], group);
+  }
+
+  // Essays: a stock opener each, never the same layout or ink pair twice running.
+  let lastLayout: PostLayout | undefined;
+  let lastInks = -1;
+  for (const p of posts) {
+    const group = { key: p.slug, title: p.title };
+    const bs = blocks(p.text, p.title, { refs: true });
+    const total = bs.reduce((n, b) => n + size(b), 0);
+    const r = rng(hash(p.key));
+    const all: PostLayout[] = ['tower', 'banner', 'toner'];
+    const fits = all.filter((l) => l !== lastLayout && (OPENER_CHARS[l] >= total || total - OPENER_CHARS[l] > MIN_JUMP));
+    const layout = r.pick(fits.length ? fits : all.filter((l) => l !== lastLayout));
+    let pi = Math.floor(r.next() * INK_PAIRS.length);
+    if (pi === lastInks) pi = (pi + 1) % INK_PAIRS.length;
+    lastLayout = layout;
+    lastInks = pi;
+    const cut = takeBlocks(bs, OPENER_CHARS[layout]);
+    const paper: Paper = layout === 'toner' ? 'toner' : r.pick(['newsprint', 'newsprint', 'bone'] as const);
+    const s: Extract<Spread, { kind: 'post' }> = {
+      ...base(p.key, INK_PAIRS[pi], paper, group),
+      kind: 'post',
+      layout,
+      item: p,
+      blocks: cut.blocks,
+      archive: now - Date.parse(p.date) > ARCHIVE_MS,
+    };
+    spreads.push(s);
+    jumps(p, bs, cut.next, s, s.page, INK_PAIRS[pi], group);
+  }
+  return spreads;
+
+  /** Plain jump spreads for whatever text a piece's opening spreads left over. */
+  function jumps(item: JumpItem, bs: Block[], next: number, prev: { jump?: number } | null, from: number, inks: [Ink, Ink], group: SpreadBase['group']) {
     for (let part = 1; part <= MAX_JUMPS && next < bs.length; part++) {
-      const cut = takeBlocks(bs, JUMP_CHARS, next);
+      let cut = takeBlocks(bs, JUMP_CHARS, next);
+      const notes = collectRefs(cut.blocks, item.text).length;
+      if (notes) cut = takeBlocks(bs, JUMP_CHARS - notes * NOTE_CHARS, next);
+      const rest = bs.slice(cut.next).reduce((n, b) => n + size(b), 0);
+      if (rest && rest < MIN_TAIL) cut = { blocks: bs.slice(next), next: bs.length };
       next = cut.next;
       const j: Extract<Spread, { kind: 'jump' }> = {
-        ...base(`${d.key}-jump-${part}`, design.inks[design.inks.length - 1], 'newsprint', group),
+        ...base(`${item.key}-jump-${part}`, inks, 'newsprint', group),
         kind: 'jump',
-        item: d,
+        item,
         blocks: cut.blocks,
-        refs: collectRefs(cut.blocks, d.text),
+        refs: collectRefs(cut.blocks, item.text),
         from,
         part,
         last: next >= bs.length,
@@ -183,7 +236,6 @@ export function impose(drafts: Draft[] = []): Spread[] {
       from = j.page;
     }
   }
-  return spreads;
 }
 
 /** Numbered references used in a run of blocks, in order. */
@@ -264,6 +316,8 @@ export function spreadTitle(s: Spread): string {
       return `${s.item.title} (continued)`;
     case 'draft':
       return s.part === 0 ? s.draft.title : `${s.draft.title} (continued)`;
+    case 'post':
+      return s.item.title;
   }
 }
 
@@ -313,6 +367,30 @@ export function blocks(md: string, title = '', opts: { refs?: boolean } = {}): B
   return out;
 }
 
+const size = (b: Block) => (b.t === 'code' ? b.text.split('\n').length * 40 : b.text.length);
+
+/** Body paragraphs of an essay, without headings, code, images or lists. */
+export function paragraphs(md: string, title = ''): string[] {
+  const out: string[] = [];
+  for (const raw of md.replace(/```[\s\S]*?```/g, '').split(/\n\s*\n/)) {
+    const b = raw.trim();
+    if (!b || /^#{1,6}\s/.test(b) || /^!\[/.test(b) || /^[-*+]\s|^\d+\.\s|^>|^\|/.test(b)) continue;
+    const t = inline(b.replace(/\n/g, ' '));
+    if (t && t !== title && t.length > 2) out.push(t);
+  }
+  return out;
+}
+
+/** A sentence from past the first paragraph, short enough to pull out. */
+export function pullQuote(paras: string[], seed: number): string | null {
+  const sentences = paras
+    .slice(1)
+    .flatMap((p) => p.match(/[^.!?]+[.!?]/g) ?? [])
+    .map((s) => s.trim())
+    .filter((s) => s.length > 50 && s.length < 150 && !/https?:|\(|\)/.test(s));
+  return sentences.length ? sentences[seed % sentences.length] : null;
+}
+
 /** Take blocks until roughly `chars` characters have been set. */
 export function takeBlocks(bs: Block[], chars: number, from = 0): { blocks: Block[]; next: number } {
   const out: Block[] = [];
@@ -320,7 +398,7 @@ export function takeBlocks(bs: Block[], chars: number, from = 0): { blocks: Bloc
   let i = from;
   for (; i < bs.length && used < chars; i++) {
     out.push(bs[i]);
-    used += bs[i].t === 'code' ? bs[i].text.split('\n').length * 40 : bs[i].text.length;
+    used += size(bs[i]);
   }
   // A heading goes with the text under it, never at the foot of a frame.
   while (i < bs.length && out.length > 1 && out[out.length - 1].t === 'h') { out.pop(); i--; }

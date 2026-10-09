@@ -1,0 +1,103 @@
+---
+/**
+ * An essay's opening spread, on one of three stock layouts: tower (a tall
+ * title page facing the text), banner (a rule-width title over both pages)
+ * or toner (a photocopied black spread with the text on a taped slip).
+ */
+import Sheet from './Sheet.astro';
+import Reg from './Reg.astro';
+import Blocks from './Blocks.astro';
+import { paragraphs, pullQuote, printDate, readingMinutes, type Spread } from '../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'post' }>; }
+const { spread } = Astro.props;
+const { item, layout } = spread;
+const paras = paragraphs(item.text, item.title);
+const mins = readingMinutes(item.text);
+const date = printDate(item.date);
+const year = new Date(item.date).getUTCFullYear();
+const len = item.title.length;
+
+// Title sizes in container-width units, fitted to the title's length.
+// The tower's longest word has to clear its page; the banner stays within two lines.
+const word = Math.max(...item.title.split(/\s+/).map((w) => w.length));
+const towerSize = Math.min(12, 80 / word, Math.max(4.4, 112 / Math.pow(len, 0.72)));
+const bannerSize = Math.min(5.6, Math.max(2.3, 120 / len));
+const tonerSize = Math.min(9, Math.max(3.6, 70 / Math.pow(len, 0.62)));
+
+const bs = spread.blocks;
+const done = !spread.jump;
+// banner sets the first ~60% of its text on the left page
+let acc = 0;
+const total = bs.reduce((n, b) => n + b.text.length, 0);
+const split = Math.max(1, bs.findIndex((b) => (acc += b.text.length) > total * 0.6) + 1 || bs.length);
+const bannerA = bs.slice(0, split);
+const bannerB = bs.slice(split);
+const quote = pullQuote(paras, spread.seed);
+const tilt = ((spread.seed % 30) / 10 - 1.5).toFixed(2);
+const slipTop = 8 + (spread.seed % 18);
+---
+<Sheet spread={spread} label={`Essay: ${item.title}`} layout={layout} running={`Essay, ${mins} min`}>
+  {spread.archive && (
+    <p class="archive-mark" aria-label={`From the archive: first printed ${year}`}><span>From the archive</span><span class="archive-year">{year}</span></p>
+  )}
+  {layout === 'tower' && (
+    <Fragment>
+      <div class="pg pg-l tower-title">
+        <Reg as="h2" text={item.title} href={item.href} class="t-tower" style={`--fs:${towerSize.toFixed(2)}cqw`} />
+        {quote && <blockquote class="pull pull-tower"><p>{quote}</p></blockquote>}
+        <p class="cap">{date}. About {mins} minute{mins > 1 ? 's' : ''} to read.</p>
+      </div>
+      <div class="pg pg-r tower-body">
+        <div class="prose-cols cols-2 dropcap" data-flow={item.key}>
+          <Blocks blocks={bs} end={done} />
+        </div>
+        {spread.jump
+          ? <a class="cont" href={`#p-${spread.jump}`}>Continued on page {spread.jump}</a>
+          : <a class="cont cont-single" href={item.href}>Read on its own page</a>}
+      </div>
+    </Fragment>
+  )}
+
+  {layout === 'banner' && (
+    <Fragment>
+      <header class="banner-head">
+        <Reg as="h2" text={item.title} href={item.href} class="t-spaced" style={`--fs:${bannerSize.toFixed(2)}cqw`} />
+        <p class="cap">{date}, {mins} min.</p>
+      </header>
+      <div class="pg pg-l banner-a prose-cols cols-2 dropcap" data-flow={item.key}>
+        <Blocks blocks={bannerA} end={done && !bannerB.length} />
+      </div>
+      <div class="pg pg-r banner-b">
+        {quote && <blockquote class="pull"><p>{quote}</p></blockquote>}
+        <div class="prose-cols cols-2" data-flow={item.key}>
+          <Blocks blocks={bannerB} end={done} />
+        </div>
+        {spread.jump
+          ? <a class="cont" href={`#p-${spread.jump}`}>Continued on page {spread.jump}</a>
+          : <a class="cont cont-single" href={item.href}>Read on its own page</a>}
+      </div>
+    </Fragment>
+  )}
+
+  {layout === 'toner' && (
+    <Fragment>
+      <div class="pg pg-l toner-title">
+        <span class="toner-no" aria-hidden="true">{String(year).slice(2)}</span>
+        <h2 class="t-reverse" style={`--fs:${tonerSize.toFixed(2)}cqw`}><a href={item.href}>{item.title}</a></h2>
+        <p class="cap">{date}, {mins} min read</p>
+      </div>
+      <div class="pg pg-r toner-slip-wrap">
+        <div class="slip" style={`--tilt:${tilt}deg;--top:${slipTop}%`}>
+          <span class="tape" aria-hidden="true"></span>
+          <div class="slip-body" data-flow={item.key}>
+            <Blocks blocks={bs} end={done} />
+          </div>
+          {spread.jump
+            ? <a class="cont" href={`#p-${spread.jump}`}>Continued on page {spread.jump}</a>
+            : <a class="cont cont-single" href={item.href}>Read on its own page</a>}
+        </div>
+      </div>
+    </Fragment>
+  )}
+</Sheet>

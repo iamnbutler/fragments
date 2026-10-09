@@ -4,11 +4,13 @@ import Cover from '../components/riso/Cover.astro';
 import Bio from '../components/riso/Bio.astro';
 import JumpSpread from '../components/riso/JumpSpread.astro';
 import DraftSpread from '../components/riso/drafts/DraftSpread.astro';
+import PostSpread from '../components/riso/PostSpread.astro';
 import { loadDrafts } from '../lib/drafts';
+import { loadPosts } from '../lib/posts';
 import { impose } from '../lib/zine';
 import { ISSUE } from '../lib/issue';
 
-const spreads = impose(loadDrafts());
+const spreads = impose(loadDrafts(), loadPosts());
 ---
 <Base description={`_fragments, issue ${ISSUE.number}, ${ISSUE.season}: work and writing from Nate Butler.`} bodyClass="issue">
   <main class="zine">
@@ -18,6 +20,7 @@ const spreads = impose(loadDrafts());
         case 'bio': return <Bio spread={s} />;
         case 'jump': return <JumpSpread spread={s} />;
         case 'draft': return <DraftSpread spread={s} />;
+        case 'post': return <PostSpread spread={s} />;
       }
     })}
     <footer class="colophon-end">
