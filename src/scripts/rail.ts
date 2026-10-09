@@ -9,6 +9,8 @@ const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** Room the rail needs to the right of the spread, in CSS pixels. */
 const MIN_GAP = 64;
+/** Room it needs to show labels beside the ticks without covering the spread. */
+const LABEL_GAP = 250;
 /** How far, in pixels, a tick's swell reaches toward the pointer. */
 const REACH = 44;
 
@@ -57,6 +59,7 @@ export function pageRail(sheets: HTMLElement[]) {
   const fit = () => {
     const gap = innerWidth - spread.getBoundingClientRect().right;
     nav.classList.toggle('is-on', gap >= MIN_GAP && innerWidth > 760);
+    nav.classList.toggle('is-bare', gap < LABEL_GAP);
     nav.style.setProperty('--gap', `${Math.round(gap)}px`);
   };
 
@@ -74,7 +77,6 @@ export function pageRail(sheets: HTMLElement[]) {
     if (now >= 0) items[now].a.removeAttribute('aria-current');
     items[best].a.setAttribute('aria-current', 'page');
     now = best;
-    nav.style.setProperty('--p', `${((best + 0.5) / items.length) * 100}%`);
   };
 
   let raf = 0;
