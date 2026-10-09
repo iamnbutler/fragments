@@ -10,7 +10,6 @@ import Plate from '../components/riso/Plate.astro';
 import Clipping from '../components/riso/Clipping.astro';
 import ProofStamp from '../components/riso/drafts/ProofStamp.astro';
 import Cover from '../components/riso/Cover.astro';
-import Print from '../components/riso/Print.astro';
 import Contents from '../components/riso/Contents.astro';
 import PostSpread from '../components/riso/PostSpread.astro';
 import ShotSpread from '../components/riso/ShotSpread.astro';
@@ -25,7 +24,8 @@ import { loadDrafts } from '../lib/drafts';
 import { loadStream, type FragmentItem, type ReshareItem } from '../lib/stream';
 import { impose, blocks, takeBlocks, OPENER_CHARS, INK_PAIRS, INK_HEX, SECTIONS, type Spread, type Ink } from '../lib/zine';
 import { measureAll, isDark } from '../lib/tone';
-import { RAMP, MID, MAIN, SPOT, PAPERS, contrast, type PrintMotif, type PrintPalette } from '../lib/spectrum';
+import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
+import { COVER_MAPS, COVER_WORKS } from '../lib/covers';
 
 const stream = await loadStream();
 const drafts = loadDrafts();
@@ -37,16 +37,6 @@ await measureAll(stream.flatMap((i) => {
 const issue = stream.filter((i) => i.kind !== 'note' && i.kind !== 'reshare').length;
 const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
-// ── prints: the gradient motifs, as the cover and openers use them ──
-const PRINT_SPECIMENS: { motif: PrintMotif; palette: PrintPalette; paper: keyof typeof PAPERS; name: string; use: string }[] = [
-  { motif: 'rings', palette: 'loop', paper: 'toner', name: 'Rings', use: 'The cover and the Plates opener.' },
-  { motif: 'steps', palette: 'spectrum', paper: 'newsprint', name: 'Steps', use: 'The cover and the Library opener.' },
-  { motif: 'stair', palette: 'dawn', paper: 'newsprint', name: 'Stair', use: 'The Features opener.' },
-  { motif: 'woven', palette: 'spectrum', paper: 'newsprint', name: 'Woven', use: 'The Dispatches opener.' },
-  { motif: 'drop', palette: 'bands', paper: 'bone', name: 'Drop', use: 'Flat bands, no blend.' },
-  { motif: 'rays', palette: 'cool', paper: 'newsprint', name: 'Rays', use: 'Line screens over floods.' },
-  { motif: 'sweep', palette: 'spectrum', paper: 'newsprint', name: 'Sweep', use: 'The whole ramp, unbroken.' },
-];
 
 // ── specimens: one of every spread, found in the issue or set specially ──
 type S = Spread;
@@ -392,13 +382,13 @@ const SCREENS = [
     <section class="sb-part" id="print" aria-labelledby="print-h">
       <header class="sb-part-head"><span class="sb-part-no">D</span><h2 id="print-h" class="sb-h">Print</h2></header>
       <div class="sb-board paper-newsprint">
-        <h3 class="sb-sub">Prints</h3>
-        <p class="sb-note">Gradients are printed, never applied: the ramp is dithered by jittering each pixel's place on it, so blends stipple like ink through a screen, and stepped prints quantise it into swatches. They're art in their own right, on the cover and the openers. Type and controls never get a gradient. Drawn by one shared WebGL context in <code>scripts/prints.ts</code>; the CSS gradient underneath is the fallback.</p>
-        <ul class="sb-prints">
-          {PRINT_SPECIMENS.map((p, i) => (
+        <h3 class="sb-sub">Cover proofs</h3>
+        <p class="sb-note">The cover pulls one of Nate's 2017 renders as a gradient-map proof: its luminance is cut into flat steps of one of these maps, and grain decides every pixel at a step's edge. The pointer sets the step count across the plate; a click pulls another render. Gradients belong to images like this, never to type or controls. In <code>scripts/cover-press.ts</code>, with the works in <code>lib/covers.ts</code>.</p>
+        <ul class="sb-maps">
+          {Object.entries(COVER_MAPS).map(([name, stops]) => (
             <li>
-              <Print motif={p.motif} palette={p.palette} paper={p.paper} seed={11 + i * 7} />
-              <span class="cap"><b>{p.name}.</b> {p.use}</span>
+              <span class="sb-map" aria-hidden="true">{stops.map((h) => <i style={`--c:${h}`}></i>)}</span>
+              <span class="cap"><b>{name[0].toUpperCase() + name.slice(1)}.</b> {COVER_WORKS.filter((w) => w.map === name).length} renders</span>
             </li>
           ))}
         </ul>

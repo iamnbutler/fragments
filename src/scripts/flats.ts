@@ -11,8 +11,6 @@
  * and the whole pasteboard moves as one transformed layer.
  */
 
-import { paint } from './prints';
-
 const DESIGN = 1280; // px width the clones are laid out at
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const narrow = () => matchMedia('(max-width: 760px)').matches;
@@ -119,7 +117,6 @@ export function flats(sheets: HTMLElement[]) {
     cancelAnimationFrame(raf);
     raf = 0;
     target = i;
-    inkPrints(sheets, u.cells);
     if (from === 'feed') {
       origin = i;
       u.cells.forEach((c, j) => c.classList.toggle('is-origin', j === i));
@@ -378,23 +375,6 @@ function sizeCells(ui: Board) {
   ui.board.style.setProperty('--flat-s', (w / DESIGN).toFixed(5));
 }
 
-/** Copy each spread's prints onto its flat, painting any not yet inked. */
-function inkPrints(sheets: HTMLElement[], cells: HTMLElement[]) {
-  sheets.forEach((sheet, i) => {
-    const flats = cells[i].querySelectorAll<HTMLCanvasElement>('canvas.gp');
-    sheet.querySelectorAll<HTMLCanvasElement>('canvas.gp').forEach((src, j) => {
-      const dst = flats[j];
-      if (!dst) return;
-      if (!src.dataset.painted && !paint(src)) return;
-      if (dst.dataset.painted === src.dataset.painted) return;
-      dst.width = src.width;
-      dst.height = src.height;
-      dst.getContext('2d')?.drawImage(src, 0, 0);
-      dst.dataset.painted = src.dataset.painted;
-    });
-  });
-}
-
 /** A copy of a spread for the pasteboard: inert, printed, cheap to draw. */
 function cloneSheet(sheet: HTMLElement): HTMLElement {
   const c = sheet.cloneNode(true) as HTMLElement;
@@ -405,8 +385,9 @@ function cloneSheet(sheet: HTMLElement): HTMLElement {
   c.setAttribute('aria-hidden', 'true');
   for (const el of c.querySelectorAll('[id]')) el.removeAttribute('id');
   for (const el of c.querySelectorAll('[data-flow]')) el.removeAttribute('data-flow');
-  // prints stay (inked when the board opens); other canvases go
-  for (const el of c.querySelectorAll('canvas:not(.gp), script, iframe')) el.remove();
+  // the cover's live proof can't be cloned: its flat shows the render
+  c.querySelector('.cv')?.classList.remove('is-live');
+  for (const el of c.querySelectorAll('canvas, script, iframe')) el.remove();
   for (const el of c.querySelectorAll('video')) {
     const ph = document.createElement('div');
     ph.className = 'flat-video';

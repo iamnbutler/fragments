@@ -1,24 +1,15 @@
 ---
 /**
- * A department opener: the left page is a print, each section its own motif,
- * with the section's name knocked out of it in paper; the right page says what the section is
+ * A department opener: the left page is a flood of the light ink with the
+ * section numeral knocked out of it; the right page says what the section is
  * for and lists what's in it, with page numbers.
  */
 import Sheet from './Sheet.astro';
-import Print from './Print.astro';
 import { SECTIONS, type Spread } from '../../lib/zine';
-import type { PrintMotif, PrintPalette } from '../../lib/spectrum';
 
 interface Props { spread: Extract<Spread, { kind: 'section' }>; }
 const { spread } = Astro.props;
 const sec = SECTIONS[spread.key];
-const PRINTS: Record<string, [PrintMotif, PrintPalette]> = {
-  features: ['stair', 'dawn'],
-  plates: ['rings', 'loop'],
-  dispatches: ['woven', 'spectrum'],
-  library: ['steps', 'spectrum'],
-};
-const [motif, palette] = PRINTS[spread.key] ?? ['sweep', 'spectrum'];
 const MAX = 22;
 const len = sec.title.length;
 const fs = Math.min(22, 60 / (len * 0.5));
@@ -29,8 +20,10 @@ const last = spread.entries[spread.entries.length - 1]?.page ?? spread.page;
 ---
 <Sheet spread={spread} label={`Section ${sec.no}: ${sec.title}`} running={`Section ${sec.no}`}>
   <div class="pg pg-l sec-flood" aria-hidden="true">
-    <Print motif={motif} palette={palette} seed={spread.seed} paper={spread.paper} class="sec-print" />
-    <span class="sec-word" style={`--sec-fs:${fs.toFixed(2)}cqw;--sec-fs-m:${fsm.toFixed(2)}vw`}>{sec.title}</span>
+    <span class="flood"></span>
+    <span class="flood-screen"></span>
+    <span class="sec-no">{sec.no}</span>
+    <span class="sec-word reg" style={`--sec-fs:${fs.toFixed(2)}cqw;--sec-fs-m:${fsm.toFixed(2)}vw`}><span class="reg-in" data-text={sec.title}>{sec.title}</span></span>
   </div>
   <div class="pg pg-r sec-body">
     <h2 class="sec-head"><span class="sec-head-no">Section {sec.no}</span> <span class="sec-head-title">{sec.title}</span></h2>

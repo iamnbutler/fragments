@@ -93,8 +93,9 @@ export function pressRun() {
   // ── flats: every spread at once ───────────────────────────────────────
   import('./flats').then((m) => m.flats(sheets));
 
-  // ── prints: the grainy gradients on the cover and openers ────────────
-  import('./prints').then((m) => m.prints()).catch(() => {});
+  // ── cover: a proof of one of Nate's renders ───────────────────────────
+  const cover = document.querySelector<HTMLElement>('.sheet[data-kind="cover"]');
+  if (cover) import('./cover-press').then((m) => m.coverPress(cover)).catch(() => {});
 }
 
 function dragClip(clip: HTMLElement) {

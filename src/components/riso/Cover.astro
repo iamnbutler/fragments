@@ -1,25 +1,32 @@
 ---
 /**
- * The cover of _fragments: a ring print on toner for the left page; the name,
- * the issue and a stepped swatch print for the right. The prints are the art,
- * so the type stays plain black on paper.
+ * The cover of _fragments: one of Nate's own renders, pulled as a stepped,
+ * grainy gradient-map proof across the whole spread, with a margin under it
+ * signed in pencil like an edition print. Click the plate for another proof.
+ * Without WebGL the render shows as it is.
  */
 import Sheet from './Sheet.astro';
-import Print from './Print.astro';
 import type { Spread } from '../../lib/zine';
+import { COVER_WORKS, COVER_MAPS } from '../../lib/covers';
 
 interface Props { spread: Spread; issue: number; printed: string; }
 const { spread, issue, printed } = Astro.props;
+const first = COVER_WORKS[0];
+const n = COVER_WORKS.length;
 ---
 <Sheet spread={spread} label="Cover" folio={false}>
-  <div class="pg pg-l cover-art" aria-hidden="true">
-    <Print motif="rings" palette="loop" paper="toner" seed={spread.seed} class="cover-rings" />
-  </div>
-  <div class="pg pg-r cover-face">
-    <p class="cover-issue"><span>Issue {issue}</span> <span>{printed}</span></p>
+  <div class="cv" data-works={JSON.stringify(COVER_WORKS)} data-maps={JSON.stringify(COVER_MAPS)}>
+    <button class="cv-plate" type="button" aria-label="Pull a proof of another render">
+      <img class="cv-img" src={`/covers/${first.id}.jpg`} alt="" style={`object-position:${first.focus[0] * 100}% ${first.focus[1] * 100}%`} />
+      <canvas class="cv-gl" aria-hidden="true"></canvas>
+    </button>
+    <p class="cv-pencil" aria-live="polite">
+      <span class="cv-ed">1/{n}</span>
+      <span class="cv-title">Untitled, {first.date}</span>
+      <span class="cv-sig">Nate Butler</span>
+    </p>
     <h1 class="masthead">_fragments</h1>
-    <p class="cover-dek">Work, writing and clippings from Nate Butler, designer at Zed, with the posts from other people he couldn't stop thinking about.</p>
+    <p class="cv-issue"><span>Issue {issue}</span> <span>{printed}</span></p>
     <a class="cover-turn" href="#p-2">Turn the page</a>
-    <Print motif="steps" palette="spectrum" paper="newsprint" seed={spread.seed + 7} class="cover-steps" />
   </div>
 </Sheet>
