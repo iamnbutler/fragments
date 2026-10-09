@@ -103,7 +103,12 @@ function fill(frames: HTMLElement[]) {
     if (!overflows(frame)) continue;
     b.remove();
     const rest = fi === frames.length - 1 ? b : splitInto(frame, b);
-    if (rest) queue.unshift(rest);
+    // a heading goes on with its text rather than end the frame
+    const h = frame.lastElementChild as HTMLElement | null;
+    if (rest === b && fi < frames.length - 1 && frame.childElementCount > 1 && h?.classList.contains('b-h')) {
+      h.remove();
+      queue.unshift(h, b);
+    } else if (rest) queue.unshift(rest);
     fi++;
   }
   // whatever doesn't fit stays in the last frame, hidden; say where it went

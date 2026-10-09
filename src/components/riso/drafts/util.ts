@@ -9,6 +9,8 @@ export function split(bs: Block[], ratio: number): [Block[], Block[]] {
   let acc = 0;
   let i = 0;
   while (i < bs.length && acc + size(bs[i]) / 2 < total * ratio) acc += size(bs[i++]);
+  // A heading goes with the text under it.
+  while (i > 1 && i < bs.length && bs[i - 1].t === 'h') i--;
   return [bs.slice(0, i), bs.slice(i)];
 }
 

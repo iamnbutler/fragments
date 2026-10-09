@@ -9,7 +9,7 @@ import { domain, readingMinutes, type Block, type Spread } from '../../lib/zine'
 
 interface Props { spread: Extract<Spread, { kind: 'jump' }>; }
 const { spread } = Astro.props;
-const { item, blocks: bs, refs, from, jump, last, proof } = spread;
+const { item, blocks: bs, refs, from, jump, last } = spread;
 const hasNotes = refs.length > 0;
 // Fill the left page first: roughly half the text, split on a block boundary.
 const total = bs.reduce((n, b) => n + (b.t === 'code' ? b.text.split('\n').length * 40 : b.text.length), 0);
@@ -20,12 +20,11 @@ const left: Block[] = bs.slice(0, split + 1);
 const right: Block[] = bs.slice(split + 1);
 const mins = readingMinutes(item.text);
 ---
-<Sheet spread={spread} label={`${item.title}, continued`} layout={hasNotes ? 'notes' : 'plain'} running={proof ? 'Proof, continued' : `Essay, ${mins} min`}>
+<Sheet spread={spread} label={`${item.title}, continued`} layout={hasNotes ? 'notes' : 'plain'} running={`Essay, ${mins} min`}>
   <div class="pg pg-l jump-a">
     <p class="jump-from">
       <a href={`#p-${from}`}>Continued from page {from}</a>
       <span class="jump-slug">{item.title}</span>
-      {proof && <span class="jump-proof">Proof</span>}
     </p>
     <div class="prose-cols cols-2" data-flow={item.key}>
       <Blocks blocks={left} refs end={last && !right.length} />

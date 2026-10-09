@@ -8,7 +8,6 @@ import Base from '../layouts/Base.astro';
 import Reg from '../components/riso/Reg.astro';
 import Plate from '../components/riso/Plate.astro';
 import Blocks from '../components/riso/Blocks.astro';
-import ProofStamp from '../components/riso/drafts/ProofStamp.astro';
 import Cover from '../components/riso/Cover.astro';
 import Bio from '../components/riso/Bio.astro';
 import JumpSpread from '../components/riso/JumpSpread.astro';
@@ -355,10 +354,6 @@ const SCREENS = [
     <section class="sb-part" id="parts" aria-labelledby="parts-h">
       <header class="sb-part-head"><span class="sb-part-no">F</span><h2 id="parts-h" class="sb-h">Parts</h2></header>
       <div class="sb-board paper-newsprint sb-parts">
-        <figure class="sb-part-cell">
-          <div class="sb-part-stage"><ProofStamp date={drafts[0]?.date ?? '2026-10-08'} class="sb-static" /></div>
-          <figcaption class="cap"><b>PROOF stamp.</b> On the opening spread of each draft feature. <code>ProofStamp.astro</code></figcaption>
-        </figure>
         <figure class="sb-part-cell">
           <div class="sb-part-stage sb-stage-text">
             <p class="jump-from"><a href="#parts">Continued from page 6</a><span class="jump-slug">{drafts[0]?.title ?? 'A feature'}</span></p>

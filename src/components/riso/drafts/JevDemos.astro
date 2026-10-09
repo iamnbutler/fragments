@@ -1,0 +1,57 @@
+---
+/**
+ * jev-demos, "What does fast get us?". Yellow and black, then yellow and
+ * teal: a signal ink for a piece about speed. The figures carry the
+ * explanation; a millisecond rule across the opening is the only ornament.
+ */
+import Reg from '../Reg.astro';
+import Linked from '../Linked.astro';
+import InkFig from './InkFig.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { img } from '../../../lib/drafts';
+import { split } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, part, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const [a, b] = split(blocks, 0.5);
+const ticks = [0, 100, 200, 300, 400, 500];
+---
+{part === 0 && (
+  <Fragment>
+    <div class="pg pg-l jv-open">
+      <div class="jv-ms" aria-hidden="true">
+        <span class="jv-ms-band"></span>
+        {ticks.map((t) => <span class="jv-ms-tick" style={`--t:${t / 500}`}>{t}</span>)}
+        <span class="jv-ms-unit">ms</span>
+      </div>
+      <Reg as="h2" text={d.title} class="t-tower jv-title" />
+      <div class="jv-deck">
+        {d.kicker && <p class="dr-kicker">{d.kicker}</p>}
+        <p class="dr-dek"><Linked parts={d.dekParts} /></p>
+      </div>
+      <InkFig image={img(d, 'fig-1-call')} ink="dk" ghost="lt" class="jv-fig" />
+    </div>
+    <div class="pg pg-r">
+      <Prose flow={d.key} blocks={blocks} cols={2} dropcap end={end} />
+      <InkFig image={img(d, 'fig-2-modes')} ink="dk" ghost="lt" class="jv-fig" />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 1 && (
+  <Fragment>
+    <div class="pg pg-l">
+      <InkFig image={img(d, 'fig-3-budget')} ink="dk" ghost="lt" class="jv-fig" />
+      <Prose flow={d.key} blocks={a} cols={2} />
+    </div>
+    <div class="pg pg-r">
+      <InkFig image={img(d, 'fig-4-pairs')} ink="dk" ghost="lt" class="jv-fig" />
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}

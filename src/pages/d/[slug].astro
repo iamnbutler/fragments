@@ -1,14 +1,12 @@
 ---
 /**
  * A local draft on its own page: the whole text, its figures and facts.
- * While it's a proof it's stamped as one and not indexed.
  */
 import Base from '../../layouts/Base.astro';
 import Reg from '../../components/riso/Reg.astro';
 import Linked from '../../components/riso/Linked.astro';
 import Plate from '../../components/riso/Plate.astro';
 import InkFig from '../../components/riso/drafts/InkFig.astro';
-import ProofStamp from '../../components/riso/drafts/ProofStamp.astro';
 import { loadDrafts, type Draft } from '../../lib/drafts';
 import { renderMarkdownWithHeadings } from '../../lib/markdown';
 import { draftDesign, printDate, readingMinutes, hash, rng } from '../../lib/zine';
@@ -31,20 +29,18 @@ const per = Math.max(1, Math.ceil(figs.length / Math.max(1, parts.length - 1)));
 const sections = parts.map((h, i) => ({ html: h, figs: i === 0 ? [] : figs.slice((i - 1) * per, i * per) }));
 const leftover = figs.slice((parts.length - 1) * per);
 ---
-<Base title={d.proof ? `${d.title} (proof)` : d.title} description={d.dek} bodyClass="single" noindex={d.proof} preloadSerif>
+<Base title={d.title} description={d.dek} bodyClass="single" preloadSerif>
   <main
     class="single-page single-post single-draft"
     style={`--lt:var(--${lt});--dk:var(--${dk});--mx:${r.range(-2.4, 2.4).toFixed(2)}px;--my:${r.range(-1.8, 1.8).toFixed(2)}px;--lx:0px;--ly:0px`}
   >
     <nav class="single-nav" aria-label="Issue">
       <a href="/">_fragments, issue {ISSUE.number}</a>
-      {d.proof && <span>Proof, not yet published</span>}
     </nav>
     <article class="sheet single-sheet paper-newsprint" data-kind="draft">
       <div class="single-paper">
-        {d.proof && <ProofStamp date={d.date} class="ps-single" />}
         <header class="single-head">
-          {(d.kicker || d.proof) && <p class="single-kind">{[d.kicker, d.proof && 'in proof'].filter(Boolean).join(', ')}</p>}
+          {d.kicker && <p class="single-kind">{d.kicker}</p>}
           <Reg as="h1" text={d.title} class="t-tower single-title" style={`--fs:clamp(44px, ${Math.min(13, Math.max(6, 110 / Math.pow(d.title.length, 0.7))).toFixed(2)}vw, 150px)`} />
           <p class="draft-dek"><Linked parts={d.dekParts} /></p>
           <p class="cap single-meta">
