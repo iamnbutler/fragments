@@ -1,0 +1,55 @@
+---
+/** An essay on its own page: the whole text, with its pictures. */
+import Base from '../../layouts/Base.astro';
+import Reg from '../../components/riso/Reg.astro';
+import { loadPosts, type Post } from '../../lib/posts';
+import { renderMarkdownWithHeadings } from '../../lib/markdown';
+import { INK_PAIRS, printDate, readingMinutes, hash, rng } from '../../lib/zine';
+import { ISSUE } from '../../lib/issue';
+
+export function getStaticPaths() {
+  return loadPosts().map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
+}
+
+const { post: p } = Astro.props as { post: Post };
+const { html, headings } = await renderMarkdownWithHeadings(p.text);
+const r = rng(hash(p.key));
+const [lt, dk] = r.pick(INK_PAIRS);
+const mins = readingMinutes(p.text);
+const description = p.text.replace(/```[\s\S]*?```|!\[[^\]]*\]\([^)]*\)|[#*_`>]/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/\s+/g, ' ').trim().slice(0, 160);
+---
+<Base title={p.title} description={description} bodyClass="single" preloadSerif>
+  <main
+    class="single-page single-post"
+    style={`--lt:var(--${lt});--dk:var(--${dk});--mx:${r.range(-2.4, 2.4).toFixed(2)}px;--my:${r.range(-1.8, 1.8).toFixed(2)}px;--lx:0px;--ly:0px`}
+  >
+    <nav class="single-nav" aria-label="Issue">
+      <a href="/">_fragments, issue {ISSUE.number}</a>
+    </nav>
+    <article class="sheet single-sheet paper-newsprint" data-kind="post">
+      <div class="single-paper">
+        <header class="single-head">
+          <p class="single-kind">Essay</p>
+          <Reg as="h1" text={p.title} class="t-tower single-title" style={`--fs:clamp(44px, ${Math.min(13, Math.max(6, 110 / Math.pow(p.title.length, 0.7))).toFixed(2)}vw, 150px)`} />
+          <p class="cap single-meta">
+            <time datetime={p.date}>{printDate(p.date)}</time>
+            <span>{mins} minute read</span>
+          </p>
+        </header>
+        <div class:list={['single-body', headings.length > 1 && 'has-toc']}>
+          {headings.length > 1 && (
+            <nav class="margin-toc" aria-label="In this piece">
+              <p class="cap">In this piece</p>
+              <ol>{headings.map((h) => <li class={`toc-${h.level}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+            </nav>
+          )}
+          <div class="prose-article dropcap-article" set:html={html} />
+        </div>
+      </div>
+    </article>
+  </main>
+  <script>
+    import { pressSingle } from '../../scripts/single';
+    pressSingle();
+  </script>
+</Base>
