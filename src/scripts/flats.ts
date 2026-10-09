@@ -11,6 +11,8 @@
  * and the whole pasteboard moves as one transformed layer.
  */
 
+import { paint } from './prints';
+
 const DESIGN = 1280; // px width the clones are laid out at
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const narrow = () => matchMedia('(max-width: 760px)').matches;
@@ -117,6 +119,7 @@ export function flats(sheets: HTMLElement[]) {
     cancelAnimationFrame(raf);
     raf = 0;
     target = i;
+    inkPrints(sheets, u.cells);
     if (from === 'feed') {
       origin = i;
       u.cells.forEach((c, j) => c.classList.toggle('is-origin', j === i));
@@ -289,14 +292,14 @@ function buildBoard(sheets: HTMLElement[], open: (i: number) => void, back: () =
   const board = document.createElement('div');
   board.className = 'flats-board';
 
-  const issue = document.querySelector('.issue-n')?.textContent?.trim() ?? '';
+  const issue = document.querySelector('.cover-issue')?.textContent?.match(/\d+/)?.[0] ?? '';
   const pages = sheets.length * 2;
   const slug = document.createElement('header');
   slug.className = 'flats-slug';
   const inks = ['pink', 'red', 'blue', 'black'];
   const bars = inks.flatMap((ink) => [100, 70, 40, 15].map((t) => `<span style="--c:var(--${ink});--t:${t / 100}"></span>`)).join('');
   const reg = '<svg class="reg-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><path d="M12 0v24M0 12h24"/></svg>';
-  slug.innerHTML = `${reg}<p class="slug-text"><span>nate.rip</span><span>Issue ${issue}</span><span>${sheets.length} spreads, ${pages} pages</span><span>Flats</span></p><div class="bars" aria-hidden="true">${bars}</div>${reg}`;
+  slug.innerHTML = `${reg}<p class="slug-text"><span>_fragments</span><span>Issue ${issue}</span><span>${sheets.length} spreads, ${pages} pages</span><span>Flats</span></p><div class="bars" aria-hidden="true">${bars}</div>${reg}`;
   board.append(slug);
 
   const cells: HTMLButtonElement[] = [];
@@ -375,18 +378,35 @@ function sizeCells(ui: Board) {
   ui.board.style.setProperty('--flat-s', (w / DESIGN).toFixed(5));
 }
 
+/** Copy each spread's prints onto its flat, painting any not yet inked. */
+function inkPrints(sheets: HTMLElement[], cells: HTMLElement[]) {
+  sheets.forEach((sheet, i) => {
+    const flats = cells[i].querySelectorAll<HTMLCanvasElement>('canvas.gp');
+    sheet.querySelectorAll<HTMLCanvasElement>('canvas.gp').forEach((src, j) => {
+      const dst = flats[j];
+      if (!dst) return;
+      if (!src.dataset.painted && !paint(src)) return;
+      if (dst.dataset.painted === src.dataset.painted) return;
+      dst.width = src.width;
+      dst.height = src.height;
+      dst.getContext('2d')?.drawImage(src, 0, 0);
+      dst.dataset.painted = src.dataset.painted;
+    });
+  });
+}
+
 /** A copy of a spread for the pasteboard: inert, printed, cheap to draw. */
 function cloneSheet(sheet: HTMLElement): HTMLElement {
   const c = sheet.cloneNode(true) as HTMLElement;
   c.removeAttribute('id');
   c.removeAttribute('aria-label');
   c.classList.add('is-printed');
-  c.classList.remove('gl-on');
   c.setAttribute('inert', '');
   c.setAttribute('aria-hidden', 'true');
   for (const el of c.querySelectorAll('[id]')) el.removeAttribute('id');
   for (const el of c.querySelectorAll('[data-flow]')) el.removeAttribute('data-flow');
-  for (const el of c.querySelectorAll('canvas, script, iframe')) el.remove();
+  // prints stay (inked when the board opens); other canvases go
+  for (const el of c.querySelectorAll('canvas:not(.gp), script, iframe')) el.remove();
   for (const el of c.querySelectorAll('video')) {
     const ph = document.createElement('div');
     ph.className = 'flat-video';

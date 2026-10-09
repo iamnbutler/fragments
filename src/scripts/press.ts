@@ -93,12 +93,8 @@ export function pressRun() {
   // ── flats: every spread at once ───────────────────────────────────────
   import('./flats').then((m) => m.flats(sheets));
 
-  // ── cover ──────────────────────────────────────────────────────────────
-  const cover = document.querySelector<HTMLElement>('.sheet[data-kind="cover"]');
-  if (cover) {
-    import('./solid').then((m) => m.spinSolid(cover));
-    import('./cover-gl').then((m) => m.printCover(cover)).catch(() => {});
-  }
+  // ── prints: the grainy gradients on the cover and openers ────────────
+  import('./prints').then((m) => m.prints()).catch(() => {});
 }
 
 function dragClip(clip: HTMLElement) {

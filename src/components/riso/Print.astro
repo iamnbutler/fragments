@@ -1,0 +1,31 @@
+---
+/**
+ * A print: a grainy printmaking gradient (rings, stepped swatches, woven
+ * bars, a stairway, a drop, ray fields) painted by `scripts/prints.ts`.
+ * Prints are images in their own right, so they carry no text; the CSS
+ * gradient underneath is what shows before the shader paints, or without it.
+ */
+import { printFallback, PAPERS, type PrintMotif, type PrintPalette } from '../../lib/spectrum';
+
+interface Props {
+  motif: PrintMotif;
+  palette?: PrintPalette;
+  seed?: number;
+  paper?: keyof typeof PAPERS;
+  grain?: number;
+  class?: string;
+  style?: string;
+}
+const { motif, palette = 'spectrum', seed = 1, paper = 'newsprint', grain = 1, class: cls, style } = Astro.props;
+const fallbackAngle = motif === 'stair' || motif === 'steps' || motif === 'sweep' ? 90 : 135;
+---
+<canvas
+  class:list={['gp', `gp-${motif}`, cls]}
+  data-motif={motif}
+  data-palette={palette}
+  data-seed={seed}
+  data-paper={PAPERS[paper]}
+  data-grain={grain}
+  aria-hidden="true"
+  style={`background:${printFallback(palette, fallbackAngle)};${style ?? ''}`}
+></canvas>

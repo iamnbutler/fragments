@@ -58,3 +58,32 @@ export function contrast(a: string, b: string): number {
   const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
   return (x + 0.05) / (y + 0.05);
 }
+
+/**
+ * Gradient palettes for the prints (see `Print.astro`): runs of the ramp a
+ * motif sweeps through. Grainy gradients are a printmaking material here,
+ * used for whole images — never on type or controls.
+ */
+export const PRINT_PALETTES = {
+  /** cream → yellow → red → pink → blue → teal → deep green → black */
+  spectrum: ['#F1E9DD', '#FCC135', '#FF5846', '#FFA0C8', '#4F77D6', '#005555', '#003C1E', '#000000'],
+  /** the ring loop: wraps from deep green back to cream */
+  loop: ['#F3DEB1', '#FCC135', '#FF5846', '#FFA0C8', '#4F77D6', '#005555', '#003C1E', '#F3DEB1'],
+  /** stairway at dawn */
+  dawn: ['#F1E9DD', '#FFA0C8', '#4F77D6', '#1268DB', '#000000'],
+  /** warm half */
+  warm: ['#F3DEB1', '#FCC135', '#FF8600', '#FF5846', '#FFA0C8'],
+  /** cool half */
+  cool: ['#FFA0C8', '#9587D0', '#4F77D6', '#005555', '#003C1E'],
+  /** flat inks for banded motifs, in print order */
+  bands: ['#FCC135', '#FF5846', '#FFA0C8', '#4F77D6', '#000000'],
+} as const;
+export type PrintPalette = keyof typeof PRINT_PALETTES;
+export const PRINT_MOTIFS = ['sweep', 'steps', 'rings', 'woven', 'stair', 'drop', 'rays'] as const;
+export type PrintMotif = (typeof PRINT_MOTIFS)[number];
+
+/** CSS stand-in for a print before (or without) WebGL. */
+export function printFallback(palette: PrintPalette, angle = 90): string {
+  const stops = PRINT_PALETTES[palette];
+  return `linear-gradient(${angle}deg, ${stops.join(', ')})`;
+}

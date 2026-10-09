@@ -197,6 +197,12 @@ body.styleguide .grain { opacity: var(--grain, 0.11); }
 
 /* D. print */
 .sb-plates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2cqw; margin-bottom: 2cqw; }
+.sb-prints { list-style: none; margin: 0 0 3cqw; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2cqw 1.6cqw; }
+.sb-prints li { display: flex; flex-direction: column; gap: 0.7em; }
+.sb-prints li:first-child { grid-column: span 2; grid-row: span 2; }
+.sb-prints .gp { aspect-ratio: 4 / 3; height: auto; }
+.sb-prints li:first-child .gp { aspect-ratio: auto; flex: 1; min-height: 0; }
+@media (max-width: 700px) { .sb-prints { grid-template-columns: 1fr 1fr; gap: 16px 12px; } }
 .sb-plate { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .sb-plate > :first-child { aspect-ratio: 1.45; width: 100%; height: auto; }
 .sb-plate figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; }

@@ -10,6 +10,7 @@ import Plate from '../components/riso/Plate.astro';
 import Clipping from '../components/riso/Clipping.astro';
 import ProofStamp from '../components/riso/drafts/ProofStamp.astro';
 import Cover from '../components/riso/Cover.astro';
+import Print from '../components/riso/Print.astro';
 import Contents from '../components/riso/Contents.astro';
 import PostSpread from '../components/riso/PostSpread.astro';
 import ShotSpread from '../components/riso/ShotSpread.astro';
@@ -24,7 +25,7 @@ import { loadDrafts } from '../lib/drafts';
 import { loadStream, type FragmentItem, type ReshareItem } from '../lib/stream';
 import { impose, blocks, takeBlocks, OPENER_CHARS, INK_PAIRS, INK_HEX, SECTIONS, type Spread, type Ink } from '../lib/zine';
 import { measureAll, isDark } from '../lib/tone';
-import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
+import { RAMP, MID, MAIN, SPOT, PAPERS, contrast, type PrintMotif, type PrintPalette } from '../lib/spectrum';
 
 const stream = await loadStream();
 const drafts = loadDrafts();
@@ -33,10 +34,19 @@ await measureAll(stream.flatMap((i) => {
   if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
   return i.media.filter((m) => !m.video || m.video.endsWith('.m3u8')).map((m) => m.src);
 }));
-const counts: Record<string, number> = {};
-for (const i of stream) counts[i.kind] = (counts[i.kind] ?? 0) + 1;
 const issue = stream.filter((i) => i.kind !== 'note' && i.kind !== 'reshare').length;
 const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+// ── prints: the gradient motifs, as the cover and openers use them ──
+const PRINT_SPECIMENS: { motif: PrintMotif; palette: PrintPalette; paper: keyof typeof PAPERS; name: string; use: string }[] = [
+  { motif: 'rings', palette: 'loop', paper: 'toner', name: 'Rings', use: 'The cover and the Plates opener.' },
+  { motif: 'steps', palette: 'spectrum', paper: 'newsprint', name: 'Steps', use: 'The cover and the Library opener.' },
+  { motif: 'stair', palette: 'dawn', paper: 'newsprint', name: 'Stair', use: 'The Features opener.' },
+  { motif: 'woven', palette: 'spectrum', paper: 'newsprint', name: 'Woven', use: 'The Dispatches opener.' },
+  { motif: 'drop', palette: 'bands', paper: 'bone', name: 'Drop', use: 'Flat bands, no blend.' },
+  { motif: 'rays', palette: 'cool', paper: 'newsprint', name: 'Rays', use: 'Line screens over floods.' },
+  { motif: 'sweep', palette: 'spectrum', paper: 'newsprint', name: 'Sweep', use: 'The whole ramp, unbroken.' },
+];
 
 // ── specimens: one of every spread, found in the issue or set specially ──
 type S = Spread;
@@ -94,12 +104,12 @@ const groups: { key: string; no: string; title: string; dek: string; specs: Spec
   {
     key: 'front', no: 'G1', title: 'Front matter', dek: 'The two spreads every issue opens on.',
     specs: [
-      ...spec('cover', 'Cover', 'Cover.astro + scripts/cover-gl.ts', 'Always spread 0. A WebGL press prints the pink block, the screened red sun and the masthead, then lets the pointer knock them out of register; the CSS plates underneath are the fallback.', find((s) => s.kind === 'cover')),
+      ...spec('cover', 'Cover', 'Cover.astro + Print.astro', 'Always spread 0. A ring print on toner faces the name, the issue and a stepped swatch print. The prints are the art; the type stays plain.', find((s) => s.kind === 'cover')),
       ...spec('contents', 'Contents', 'Contents.astro', 'Always spread 1. Lists every department and every spread a reader can land on, with the colophon.', find((s) => s.kind === 'contents')),
     ],
   },
   {
-    key: 'sections', no: 'G2', title: 'Section openers', dek: 'Each department opens on a flood of its light ink with the name run up the page.',
+    key: 'sections', no: 'G2', title: 'Section openers', dek: 'Each department opens on its own print, with the name knocked out of it up the page.',
     specs: [
       ...spec('section-features', 'Opener on newsprint', 'SectionSpread.astro', 'Features, Dispatches and Library open on the issue’s paper.', find((s) => s.kind === 'section' && s.key === 'features')),
       ...spec('section-plates', 'Opener on toner', 'SectionSpread.astro', 'Plates always opens on toner.', find((s) => s.kind === 'section' && s.key === 'plates')),
@@ -194,15 +204,15 @@ const SCREENS = [
   ['Avatar', 'av', '4px cell, 45°', 'Small portraits in clippings.'],
 ];
 ---
-<Base title="Specimen book" description="PRESS RUN, the house style of nate.rip: inks, papers, type, grid, print effects, motion and every spread layout." bodyClass="styleguide" noindex>
+<Base title="Specimen book" description="The house style of _fragments: inks, papers, type, grid, print effects, motion and every spread layout." bodyClass="styleguide" noindex>
   <main class="sb" style="--lt:var(--pink);--dk:var(--black);--mx:1.6px;--my:-1.1px;--lx:0px;--ly:0px">
     <nav class="single-nav sb-nav" aria-label="Site">
-      <a href="/">nate.rip, issue {issue}</a>
+      <a href="/">_fragments, issue {issue}</a>
       <span>Specimen book</span>
     </nav>
 
     <header class="sb-board sb-title paper-newsprint">
-      <p class="cap sb-kicker">PRESS RUN, the house style of nate.rip</p>
+      <p class="cap sb-kicker">The house style of _fragments</p>
       <Reg as="h1" text="Specimen book" class="t-tower" style="--fs:13cqw" />
       <div class="sb-title-foot">
         <p class="sb-lede">Every ink, paper, typeface, screen and spread the zine prints with, set from the live issue. The colourway is the Printmaking Challenge spectrum: four spot inks cut from one ramp, on warm newsprint, with near-black toner for contrast.</p>
@@ -382,6 +392,17 @@ const SCREENS = [
     <section class="sb-part" id="print" aria-labelledby="print-h">
       <header class="sb-part-head"><span class="sb-part-no">D</span><h2 id="print-h" class="sb-h">Print</h2></header>
       <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Prints</h3>
+        <p class="sb-note">Gradients are printed, never applied: the ramp is dithered by jittering each pixel's place on it, so blends stipple like ink through a screen, and stepped prints quantise it into swatches. They're art in their own right, on the cover and the openers. Type and controls never get a gradient. Drawn by one shared WebGL context in <code>scripts/prints.ts</code>; the CSS gradient underneath is the fallback.</p>
+        <ul class="sb-prints">
+          {PRINT_SPECIMENS.map((p, i) => (
+            <li>
+              <Print motif={p.motif} palette={p.palette} paper={p.paper} seed={11 + i * 7} />
+              <span class="cap"><b>{p.name}.</b> {p.use}</span>
+            </li>
+          ))}
+        </ul>
+
         <h3 class="sb-sub">Plates</h3>
         <p class="sb-note">Photos are separated at build time by SVG filters in <code>Inks.astro</code>: each plate is a halftone of one ink on transparent, stacked and multiplied, and knocked out of register by the spread’s <code>--mx</code>/<code>--my</code> and the pointer. Dark screenshots print as negatives so their light lines take the ink.</p>
         <div class="sb-plates">
@@ -528,7 +549,7 @@ const SCREENS = [
                     <span class="sb-ticket-when">{sp.when}</span>
                     <span class="sb-ticket-file"><code>{sp.file}</code>, inks {s.inks[0]} + {s.inks[1]}, {s.paper}</span>
                   </p>
-                  {s.kind === 'cover' ? <Cover spread={s} issue={issue} counts={counts} printed={printed} />
+                  {s.kind === 'cover' ? <Cover spread={s} issue={issue} printed={printed} />
                     : s.kind === 'contents' ? <Contents spread={s} spreads={spreads} issue={issue} />
                     : s.kind === 'post' ? <PostSpread spread={s} />
                     : s.kind === 'shot' ? <ShotSpread spread={s} />

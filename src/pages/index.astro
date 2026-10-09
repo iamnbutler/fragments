@@ -17,22 +17,30 @@ import { measureAll } from '../lib/tone';
 
 const stream = await loadStream();
 const drafts = loadDrafts();
-const spreads = impose(stream, drafts);
+// While the style settles, the issue stops after the gpuikit feature: enough
+// spreads to judge the look without printing the whole back catalogue.
+// FULL_ISSUE=1 prints everything (the build smoke test needs it).
+const STOP_AFTER = process.env.FULL_ISSUE ? '' : 'gpuikit';
+const all = impose(stream, drafts);
+const isStop = (s: (typeof all)[number]) =>
+  (s.kind === 'draft' && s.draft.slug === STOP_AFTER) || (s.kind === 'jump' && 'slug' in s.item && s.item.slug === STOP_AFTER);
+const end = all.findLastIndex(isStop);
+const spreads = end < 0 ? all : all.slice(0, end + 1);
+const lastPage = spreads[spreads.length - 1].page + 1;
+for (const s of spreads) if (s.kind === 'section') s.entries = s.entries.filter((e) => e.page <= lastPage);
 // Check every plate's tone so dark images can be separated as negatives.
 await measureAll(stream.flatMap((i) => {
   if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
   return i.media.filter((m) => !m.video || m.video.endsWith('.m3u8')).map((m) => m.src);
 }));
-const counts: Record<string, number> = {};
-for (const i of stream) counts[i.kind] = (counts[i.kind] ?? 0) + 1;
 const issue = stream.filter((i) => i.kind !== 'note' && i.kind !== 'reshare').length;
 const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
-<Base description={`nate.rip, issue ${issue}: work, writing and clippings from Nate Butler.`} bodyClass="issue">
+<Base description={`_fragments, issue ${issue}: work, writing and clippings from Nate Butler.`} bodyClass="issue">
   <main class="zine">
     {spreads.map((s) => {
       switch (s.kind) {
-        case 'cover': return <Cover spread={s} issue={issue} counts={counts} printed={printed} />;
+        case 'cover': return <Cover spread={s} issue={issue} printed={printed} />;
         case 'contents': return <Contents spread={s} spreads={spreads} issue={issue} />;
         case 'post': return <PostSpread spread={s} />;
         case 'shot': return <ShotSpread spread={s} />;

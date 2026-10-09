@@ -9,7 +9,7 @@
     "preview": "astro preview",
     "test": "node --import tsx --test tests/*.test.ts",
     "check:content": "tsx scripts/check-content.ts",
-    "test:build": "node --import ./tests/fixtures/content.mjs ./node_modules/astro/astro.js build && node tests/build-smoke.mjs",
+    "test:build": "FULL_ISSUE=1 node --import ./tests/fixtures/content.mjs ./node_modules/astro/astro.js build && node tests/build-smoke.mjs",
     "check:core": "tsc -p tsconfig.core.json"
   },
   "dependencies": {
