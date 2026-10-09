@@ -2,7 +2,7 @@
 title: "What does fast get us?"
 slug: jev-demos
 date: 2026-10-08
-dek: "Notes from a few weeks of playing with Jev, a model that answers instead of writes, around three ideas: compression, tagging and ranking."
+dek: "Notes from the first few days of playing with Jev, a model that answers instead of writes, around three ideas: compression, tagging and ranking."
 draft: true
 repo: https://github.com/iamnbutler/jev-demos
 links:
@@ -32,7 +32,7 @@ images:
 
 [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) doesn't write anything. You give it some state and a list of narrow questions, and it gives back numbers. TypeSafe puts its response time at 70–500 ms, and most of my calls came back in under half a second.
 
-I wanted to know what that speed is good for. If a judgment costs about as much as a network request, where does it go? I spent a few weeks [playing around](https://github.com/iamnbutler/jev-demos), and the same three things kept turning up: compression, tagging and ranking.
+I wanted to know what that speed is good for. If a judgment costs about as much as a network request, where does it go? I spent the first few days [playing around](https://github.com/iamnbutler/jev-demos), and the same three things kept turning up: compression, tagging and ranking.
 
 ## Three ways to ask
 
