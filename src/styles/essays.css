@@ -1,0 +1,131 @@
+/* ESSAYS — stock openers for finished pieces: tower, banner and toner,
+   plus the toner paper and the "from the archive" mark. */
+
+/* ─── toner paper (photocopied black) ───────────────────────────────── */
+
+.paper-toner { --sheet: var(--toner); --text: var(--newsprint); }
+.paper-toner .spread {
+  background-image:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.018) 0 2px, transparent 2px 7px),
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6 .05' numOctaves='2' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 .93 0 0 0 0 .91 0 0 0 0 .88 0 0 0 7 -5.4'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+.paper-toner .gutter { mix-blend-mode: normal; opacity: 0.8; }
+.paper-toner sup.ref { color: var(--lt); }
+.paper-toner .end-mark { background: var(--lt); }
+
+/* ─── shared ─────────────────────────────────────────────────────────── */
+
+.t-spaced {
+  font: 300 var(--fs)/1.12 var(--f-display);
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: 0.34em;
+  margin: 0 -0.34em 0 0;
+}
+.tape {
+  position: absolute; z-index: 3;
+  width: 7cqw; height: 1.9cqw;
+  background: color-mix(in srgb, var(--lt) 30%, rgb(240 236 224 / 0.7));
+  mix-blend-mode: multiply;
+  clip-path: polygon(2% 0, 98% 4%, 100% 30%, 97% 52%, 100% 78%, 97% 100%, 3% 96%, 0 70%, 3% 48%, 0 22%);
+  pointer-events: none;
+}
+.pull {
+  margin: 0 0 2cqw;
+  font: 400 italic clamp(17px, 2.25cqw, 34px)/1.12 var(--f-serif);
+  font-variation-settings: 'opsz' 60;
+  color: var(--dk);
+  padding: 1.3cqw 0 0;
+  border-top: 0.9cqw solid var(--lt);
+  text-wrap: balance;
+}
+.pull p { margin: 0; }
+.pull p::before { content: '\201C'; color: var(--lt); margin-left: -0.45em; }
+.prose-cols p.split-tail, .slip-body p.split-tail { text-indent: 0; }
+.dropcap > p.split-tail:first-child::first-letter { all: unset; }
+
+/* ─── tower ──────────────────────────────────────────────────────────── */
+
+.tower-title { display: flex; flex-direction: column; gap: 2cqw; }
+.tower-title .t-tower { margin-top: -0.5cqw; }
+.pull-tower { margin: auto 0 1.4cqw; font-size: clamp(16px, 2cqw, 30px); max-width: 30ch; }
+.tower-body { display: flex; flex-direction: column; }
+.tower-body .prose-cols { flex: 1; min-height: 0; overflow: hidden; }
+
+/* ─── banner ─────────────────────────────────────────────────────────── */
+
+.banner-head {
+  grid-column: 1 / 13; grid-row: 1 / 3;
+  margin: 0 4cqw; padding: 4.4cqw 0 1.4cqw;
+  border-bottom: 0.35cqw solid var(--dk);
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 1cqw;
+}
+.banner-a { grid-row: 3 / 9; padding-top: 2.4cqw; overflow: hidden; }
+.banner-b { grid-row: 3 / 9; padding-top: 2.4cqw; display: flex; flex-direction: column; }
+.banner-b .prose-cols { flex: 1; min-height: 0; overflow: hidden; }
+
+/* ─── toner ──────────────────────────────────────────────────────────── */
+
+.toner-title { display: flex; flex-direction: column; justify-content: flex-end; gap: 1.4cqw; }
+.toner-no {
+  position: absolute; top: 3.4cqw; left: 3.6cqw;
+  font: 900 26cqw/0.78 var(--f-display); font-variation-settings: 'wdth' 62;
+  color: var(--lt); letter-spacing: -0.04em;
+}
+.t-reverse {
+  position: relative; margin: 0;
+  font: 820 var(--fs)/0.92 var(--f-display); font-variation-settings: 'wdth' 92;
+  letter-spacing: -0.025em; color: var(--newsprint); text-wrap: balance;
+  text-shadow: calc(var(--mx) * 2) calc(var(--my) * 2 + 2px) 0 var(--lt);
+}
+.t-reverse a { color: inherit; text-decoration: none; }
+.toner-slip-wrap { position: relative; }
+.slip {
+  position: absolute; top: var(--top, 12%); left: 9%; right: 7%;
+  background: var(--copy); color: #000;
+  padding: 2.4cqw 2.6cqw 2cqw;
+  transform: rotate(var(--tilt));
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.5), 0 10px 26px -10px rgb(0 0 0 / 0.8);
+  font: 400 var(--fs-body)/1.5 var(--f-serif);
+}
+.slip .tape { top: -0.9cqw; left: 40%; rotate: -3deg; }
+.slip-body { max-height: 30cqw; overflow: hidden; }
+.slip-body p { margin: 0; }
+.slip-body p + p { text-indent: 1.3em; }
+.slip .b-code {
+  margin: 0.6em 0; padding: 0.7em 0.8em; background: var(--toner); color: var(--newsprint);
+  font: 500 0.72em/1.45 ui-monospace, 'SF Mono', Menlo, monospace; white-space: pre; overflow: hidden;
+}
+
+/* ─── from the archive ───────────────────────────────────────────────── */
+
+.archive-mark {
+  position: absolute; z-index: 4; left: 2.6cqw; top: 1.3cqw; margin: 0;
+  display: flex; gap: 0.6em; align-items: baseline;
+  padding: 0.35cqw 0.8cqw;
+  border: 0.22cqw solid currentColor;
+  color: var(--lt); rotate: -2.5deg;
+  font: 800 clamp(9px, 0.74cqw, 12px)/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.24em;
+  mix-blend-mode: multiply; filter: url(#rubber);
+}
+.paper-toner .archive-mark { mix-blend-mode: normal; }
+.archive-year { font-weight: 900; letter-spacing: 0.06em; font-size: 1.3em; }
+
+/* ─── phones ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .zine .paper-toner .pg-r { border-color: rgb(255 255 255 / 0.2); }
+  .zine .t-spaced { letter-spacing: 0.2em; margin-right: -0.2em; }
+  .zine .tower-title { min-height: 70vw; }
+  .zine .tower-title .t-tower { font-size: max(var(--fs) * 2.1, 44px); }
+  .zine .banner-head { margin: 0 20px; padding: 44px 0 12px; border-bottom-width: 3px; }
+  .zine .banner-a { padding-bottom: 0; }
+  .zine .banner-b { border-top: 0; }
+  .zine .toner-no { font-size: 46vw; top: 14px; left: 14px; }
+  .zine .toner-title { min-height: 90vw; }
+  .zine .t-reverse { font-size: max(var(--fs) * 2.2, 36px); }
+  .zine .slip { position: relative; top: auto; left: auto; right: auto; margin: 10px 0; padding: 20px; }
+  .zine .slip .tape { width: 70px; height: 18px; top: -8px; }
+  .zine .slip-body { max-height: none; }
+  .zine .archive-mark { left: 16px; top: 12px; font-size: 10px; padding: 4px 8px; border-width: 2px; }
+}

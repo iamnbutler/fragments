@@ -181,5 +181,138 @@
     "key": "fonts/source-serif-4-italic.011e0ca2bd.woff2",
     "type": "font/woff2",
     "bytes": 129940
+  },
+  "posts/design-docs-v2/1": {
+    "key": "posts/design-docs-v2/1.0f31606508.webp",
+    "type": "image/webp",
+    "bytes": 103396,
+    "width": 1600,
+    "height": 1068
+  },
+  "posts/design-workshop/1": {
+    "key": "posts/design-workshop/1.035d1d872c.webp",
+    "type": "image/webp",
+    "bytes": 67568,
+    "width": 1600,
+    "height": 800
+  },
+  "posts/design-workshop/2": {
+    "key": "posts/design-workshop/2.c4381886e1.webp",
+    "type": "image/webp",
+    "bytes": 81610,
+    "width": 1600,
+    "height": 613
+  },
+  "posts/design-workshop/3": {
+    "key": "posts/design-workshop/3.8f89420e49.webp",
+    "type": "image/webp",
+    "bytes": 87916,
+    "width": 1600,
+    "height": 1619
+  },
+  "posts/design-workshop/4": {
+    "key": "posts/design-workshop/4.5749b1263c.webp",
+    "type": "image/webp",
+    "bytes": 58282,
+    "width": 1600,
+    "height": 805
+  },
+  "posts/design-workshop/5": {
+    "key": "posts/design-workshop/5.9523f45ab1.webp",
+    "type": "image/webp",
+    "bytes": 147602,
+    "width": 1600,
+    "height": 1475
+  },
+  "posts/design-workshop/6": {
+    "key": "posts/design-workshop/6.36d6dc1d64.webp",
+    "type": "image/webp",
+    "bytes": 76378,
+    "width": 1600,
+    "height": 880
+  },
+  "posts/fig-gen/1": {
+    "key": "posts/fig-gen/1.59b99ac792.webp",
+    "type": "image/webp",
+    "bytes": 28786,
+    "width": 1000,
+    "height": 563
+  },
+  "posts/fig-gen/2": {
+    "key": "posts/fig-gen/2.9450325ddf.webp",
+    "type": "image/webp",
+    "bytes": 55598,
+    "width": 1000,
+    "height": 563
+  },
+  "posts/fig-gen/3": {
+    "key": "posts/fig-gen/3.b540aedbbe.webp",
+    "type": "image/webp",
+    "bytes": 37162,
+    "width": 1600,
+    "height": 798
+  },
+  "posts/fig-gen/4": {
+    "key": "posts/fig-gen/4.2a1a38a101.webp",
+    "type": "image/webp",
+    "bytes": 6640,
+    "width": 1024,
+    "height": 1024
+  },
+  "posts/fig-gen/5": {
+    "key": "posts/fig-gen/5.f4f1bc0537.webp",
+    "type": "image/webp",
+    "bytes": 8036,
+    "width": 1600,
+    "height": 1600
+  },
+  "posts/fig-gen/6": {
+    "key": "posts/fig-gen/6.d8bac3bedb.webp",
+    "type": "image/webp",
+    "bytes": 10226,
+    "width": 1600,
+    "height": 1600
+  },
+  "posts/fig-gen/7": {
+    "key": "posts/fig-gen/7.883baa88b4.webp",
+    "type": "image/webp",
+    "bytes": 6282,
+    "width": 1600,
+    "height": 1600
+  },
+  "posts/fig-gen/8": {
+    "key": "posts/fig-gen/8.52a26a1623.webp",
+    "type": "image/webp",
+    "bytes": 8822,
+    "width": 1600,
+    "height": 1600
+  },
+  "posts/fig-gen/9": {
+    "key": "posts/fig-gen/9.661adc4f40.webp",
+    "type": "image/webp",
+    "bytes": 8202,
+    "width": 1600,
+    "height": 1600
+  },
+  "posts/spool/1": {
+    "key": "posts/spool/1.bf979047ea.webp",
+    "type": "image/webp",
+    "bytes": 47800,
+    "width": 1540,
+    "height": 760
+  },
+  "posts/spool/2": {
+    "key": "posts/spool/2.024e8f4084.webp",
+    "type": "image/webp",
+    "bytes": 70648,
+    "width": 1536,
+    "height": 758
+  },
+  "posts/spool/3": {
+    "key": "posts/spool/3.55440776fd.webp",
+    "type": "image/webp",
+    "bytes": 207834,
+    "width": 1546,
+    "height": 1246
   }
 }

@@ -12,15 +12,17 @@ import Cover from '../components/riso/Cover.astro';
 import Bio from '../components/riso/Bio.astro';
 import JumpSpread from '../components/riso/JumpSpread.astro';
 import DraftSpread from '../components/riso/drafts/DraftSpread.astro';
+import PostSpread from '../components/riso/PostSpread.astro';
 import '../styles/styleguide.css';
 import { loadDrafts } from '../lib/drafts';
+import { loadPosts } from '../lib/posts';
 import { impose, blocks, INK_PAIRS, type Spread, type Ink, type Block } from '../lib/zine';
 import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
 import { COVER_MAPS, COVER_WORKS } from '../lib/covers';
 import { ISSUE } from '../lib/issue';
 
 const drafts = loadDrafts();
-const spreads = impose(drafts);
+const spreads = impose(drafts, loadPosts());
 
 // ── specimens: one of every spread in the issue ──
 type S = Spread;
@@ -28,7 +30,7 @@ type S = Spread;
 const own = (s: S): S => {
   const tag = `~sg${s.page}`;
   if (s.kind === 'draft') return { ...s, draft: { ...s.draft, key: s.draft.key + tag } };
-  if (s.kind === 'jump') return { ...s, item: { ...s.item, key: s.item.key + tag } };
+  if (s.kind === 'jump' || s.kind === 'post') return { ...s, item: { ...s.item, key: s.item.key + tag } } as S;
   return s;
 };
 const find = (pred: (s: S) => boolean) => spreads.find(pred);
@@ -40,7 +42,7 @@ const spec = (id: string, name: string, file: string, when: string, s: S | undef
   used.add(s.page);
   return [{ id, name, when, file, spread: own(s) }];
 };
-const DESIGN_FILE: Record<string, string> = { 'desktop-tools': 'DesktopTools' };
+const DESIGN_FILE: Record<string, string> = { 'desktop-tools': 'DesktopTools', 'jev-demos': 'JevDemos' };
 
 const groups: { key: string; no: string; title: string; dek: string; specs: Spec[] }[] = [
   {
@@ -51,12 +53,20 @@ const groups: { key: string; no: string; title: string; dek: string; specs: Spec
     ],
   },
   {
-    key: 'features', no: 'G2', title: 'Features', dek: 'Each piece prints as its own art-directed spreads with an ink pair from the ramp, then plain jumps for the text the design has no room for. Drafts are stamped PROOF on their opening spread.',
+    key: 'features', no: 'G2', title: 'Features', dek: 'Each piece prints as its own art-directed spreads with an ink pair from the ramp, then plain jumps for the text the design has no room for.',
     specs: [
       ...drafts.flatMap((d) => spec(`draft-${d.slug}`, `${d.title}, opening`, `drafts/${DESIGN_FILE[d.slug] ?? 'Generic'}.astro`, `${d.kicker ? `${d.kicker}. ` : ''}Inks: ${(spreads.find((s) => s.kind === 'draft' && s.draft.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'draft' && s.draft.slug === d.slug && s.part === 0))),
-      ...spec('draft-later', 'A later spread of a feature', 'drafts/DesktopTools.astro', 'Later spreads keep the quiet “Proof” running head and lose the stamp.', find((s) => s.kind === 'draft' && s.part === 1)),
+      ...spec('draft-later', 'A later spread of a feature', 'drafts/DesktopTools.astro', 'Later spreads carry the same design further, under a running head with the part number.', find((s) => s.kind === 'draft' && s.part === 1)),
       ...spec('jump-plain', 'Jump', 'JumpSpread.astro', 'Where a feature continues. Four columns, a link back to where it came from.', find((s) => s.kind === 'jump' && !s.refs.length)),
       ...spec('jump-notes', 'Jump with margin notes', 'JumpSpread.astro', 'When the text links out, the links are numbered in the copy and listed in the outer margin.', find((s) => s.kind === 'jump' && s.refs.length > 0)),
+    ],
+  },
+  {
+    key: 'essays', no: 'G3', title: 'Essays', dek: 'Finished pieces from content/posts, newest first, after the features. Each opens on a stock layout, never the same one twice running, then jumps. Essays over three years old wear a “from the archive” mark.',
+    specs: [
+      ...spec('post-tower', 'Tower', 'PostSpread.astro', 'A tall title page with a pull quote, facing two columns of text.', find((s) => s.kind === 'post' && s.layout === 'tower')),
+      ...spec('post-banner', 'Banner', 'PostSpread.astro', 'A spaced title across both pages over a rule, text in four columns with a pull quote.', find((s) => s.kind === 'post' && s.layout === 'banner')),
+      ...spec('post-toner', 'Toner', 'PostSpread.astro', 'A photocopied black spread: the year huge in the light ink, the opening on a taped slip.', find((s) => s.kind === 'post' && s.layout === 'toner')),
     ],
   },
 ];
@@ -399,6 +409,7 @@ const SCREENS = [
                     : s.kind === 'bio' ? <Bio spread={s} />
                     : s.kind === 'jump' ? <JumpSpread spread={s} />
                     : s.kind === 'draft' ? <DraftSpread spread={s} />
+                    : s.kind === 'post' ? <PostSpread spread={s} />
                     : null}
                 </article>
               );
