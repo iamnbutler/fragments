@@ -111,6 +111,40 @@
 .jv-deck { display: flex; flex-direction: column; gap: 0.8cqw; max-width: 88%; }
 .jv-fig { flex: none; }
 
+/* ─── tasks ──────────────────────────────────────────────────────────── */
+
+/* a task's states across the head of the left page; one stage further each spread */
+.tk-rail {
+  position: absolute; z-index: 3; top: 2.2cqw; left: 4.4cqw; width: 39cqw;
+  display: flex; margin: 0; padding: 0; list-style: none;
+}
+.tk-state {
+  position: relative; flex: 1 1 0; padding-top: 0.9cqw;
+  border-top: 0.16cqw solid var(--dk);
+  font: 700 clamp(8px, 0.62cqw, 11px)/1 var(--f-display); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--dk); opacity: 0.5;
+}
+.tk-state:last-child { flex: 0 0 0; border-top-color: transparent; }
+.tk-state span { display: block; max-width: 4.6cqw; line-height: 1.15; translate: -0.35cqw 0; }
+.tk-state::before {
+  content: ''; position: absolute; left: 0; top: 0; width: 0.7cqw; height: 0.7cqw; translate: -50% calc(-50% - 0.08cqw);
+  border: 0.16cqw solid var(--dk); border-radius: 50%; background: var(--sheet); box-sizing: border-box;
+}
+.tk-state.past { opacity: 1; }
+.tk-state.past::before { background: var(--dk); }
+.tk-state.now { opacity: 1; font-weight: 900; }
+.tk-state.now::before { width: 1.3cqw; height: 1.3cqw; background: var(--lt); mix-blend-mode: multiply; }
+.tk-open { justify-content: space-between; gap: 1.6cqw; }
+.tk-head { display: flex; flex-direction: column; gap: 1cqw; }
+.tk-title { --fs: 8cqw; position: relative; z-index: 2; }
+.tk-fig { flex: none; }
+.tk-body { gap: 1.4cqw; }
+.tk-pull {
+  flex: none; margin: 0; padding-top: 0.8cqw; border-top: 0.35cqw solid var(--lt);
+  font: italic 400 clamp(18px, 2.5cqw, 40px)/1.08 var(--f-serif); color: var(--dk); text-wrap: balance;
+}
+.tk-pull span { display: block; }
+
 /* ─── a draft with no design of its own ──────────────────────────────── */
 
 .gen-title { --fs: 6cqw; }
@@ -137,6 +171,7 @@
 
 @media (max-width: 760px) {
   .zine .layout-dr .pg { display: flex !important; gap: 14px; }
+  .zine .tk-rail { display: none; }
   .zine .dr-prose { flex: none; overflow: visible; max-height: none !important; }
   .zine .layout-dr .cap { font-size: 12px; }
   .zine .dr-kicker { font-size: 11px; }

@@ -1,0 +1,81 @@
+---
+/**
+ * tasks, "Serial by Design". Blue and black, with teal for the stretch about
+ * the orchestrator. A task's states run across the head of every spread and
+ * advance one stage per spread, so the feature reads like a task moving
+ * through the pipeline it describes.
+ */
+import Reg from '../Reg.astro';
+import Linked from '../Linked.astro';
+import InkFig from './InkFig.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { img } from '../../../lib/drafts';
+import { split } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, part, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const [a, b] = split(blocks, part === 0 ? 0 : 0.5);
+const states = ['backlog', 'queued', 'scouting', 'in review', 'ready to build', 'building', 'awaiting merge', 'done'];
+const at = [1, 3, 5, 7][part] ?? 7;
+---
+<ol class="tk-rail" aria-label={`Task state: ${states[at]}`}>
+  {states.map((s, i) => <li class:list={['tk-state', i < at && 'past', i === at && 'now']}><span>{s}</span></li>)}
+</ol>
+{part === 0 && (
+  <Fragment>
+    <div class="pg pg-l tk-open">
+      <div class="tk-head">
+        {d.kicker && <p class="dr-kicker">{d.kicker}</p>}
+        <Reg as="h2" text={d.title} class="t-tower tk-title" />
+        <p class="dr-dek"><Linked parts={d.dekParts} /></p>
+      </div>
+      <InkFig image={img(d, 'fig-1-shapes')} ink="dk" ghost="lt" class="tk-fig" />
+    </div>
+    <div class="pg pg-r tk-body">
+      <Prose flow={d.key} blocks={blocks} cols={2} dropcap end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 1 && (
+  <Fragment>
+    <div class="pg pg-l tk-body">
+      <InkFig image={img(d, 'fig-2-barrier')} ink="dk" ghost="lt" class="tk-fig" />
+      <Prose flow={d.key} blocks={a} cols={2} />
+    </div>
+    <div class="pg pg-r tk-body">
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 2 && (
+  <Fragment>
+    <div class="pg pg-l tk-body">
+      <InkFig image={img(d, 'fig-3-tick')} ink="dk" ghost="lt" class="tk-fig" />
+      <Prose flow={d.key} blocks={a} cols={2} />
+    </div>
+    <div class="pg pg-r tk-body">
+      <p class="tk-pull" aria-hidden="true"><span>Accumulated context</span> <span>is the product.</span></p>
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 3 && (
+  <Fragment>
+    <div class="pg pg-l tk-body">
+      <InkFig image={img(d, 'fig-4-charter')} ink="dk" ghost="lt" class="tk-fig" />
+      <Prose flow={d.key} blocks={a} cols={2} />
+    </div>
+    <div class="pg pg-r tk-body">
+      <InkFig image={img(d, 'fig-5-merged')} ink="dk" ghost="lt" class="tk-fig" />
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}

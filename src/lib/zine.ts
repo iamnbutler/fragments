@@ -65,6 +65,11 @@ export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
     inks: [['yellow', 'black'], ['yellow', 'teal']],
     paper: ['newsprint', 'newsprint'],
   },
+  tasks: {
+    caps: [1300, 2600, 2400, 2000],
+    inks: [['blue', 'black'], ['blue', 'black'], ['teal', 'black'], ['blue', 'black']],
+    paper: ['newsprint', 'bone', 'newsprint', 'bone'],
+  },
 };
 const GENERIC_DRAFT: DraftDesign = { caps: [2600], inks: [['yellow', 'black']], paper: ['newsprint'] };
 export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAFT;
@@ -227,9 +232,18 @@ export function inline(md: string): string {
     .replace(/u2013/g, '–')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/`([^`]*)`/g, '$1')
-    .replace(/(\*\*|__)(.*?)\1/g, '$2')
-    .replace(/(\*|_)(.*?)\1/g, '$2')
+    // code spans keep their underscores and asterisks
+    .split(/(`[^`]*`)/g)
+    .map((part) =>
+      part.startsWith('`')
+        ? part.slice(1, -1)
+        : part
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            // underscores inside a word, as in snake_case, aren't emphasis
+            .replace(/(^|[^\w])__?(?=\S)(.*?\S)__?(?!\w)/g, '$1$2'),
+    )
+    .join('')
     .replace(/<[^>]+>/g, '')
     .trim();
 }

@@ -167,6 +167,41 @@
     "width": 960,
     "height": 640
   },
+  "drafts/tasks/fig-1-shapes": {
+    "key": "drafts/tasks/fig-1-shapes.f9f47878bc.svg",
+    "type": "image/svg+xml",
+    "bytes": 5402,
+    "width": 960,
+    "height": 600
+  },
+  "drafts/tasks/fig-2-barrier": {
+    "key": "drafts/tasks/fig-2-barrier.31603b8f4e.svg",
+    "type": "image/svg+xml",
+    "bytes": 4875,
+    "width": 960,
+    "height": 610
+  },
+  "drafts/tasks/fig-3-tick": {
+    "key": "drafts/tasks/fig-3-tick.ea3268310a.svg",
+    "type": "image/svg+xml",
+    "bytes": 4466,
+    "width": 960,
+    "height": 610
+  },
+  "drafts/tasks/fig-4-charter": {
+    "key": "drafts/tasks/fig-4-charter.aa7bee3098.svg",
+    "type": "image/svg+xml",
+    "bytes": 5473,
+    "width": 960,
+    "height": 640
+  },
+  "drafts/tasks/fig-5-merged": {
+    "key": "drafts/tasks/fig-5-merged.e7f9854288.svg",
+    "type": "image/svg+xml",
+    "bytes": 2775,
+    "width": 960,
+    "height": 510
+  },
   "fonts/archivo": {
     "key": "fonts/archivo.4c98b9d490.woff2",
     "type": "font/woff2",
