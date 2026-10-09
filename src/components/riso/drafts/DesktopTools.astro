@@ -17,7 +17,6 @@ interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
 const { spread } = Astro.props;
 const { draft: d, part, blocks } = spread;
 const end = !spread.jump && blocks.length > 0;
-const q = d.pullquotes;
 const [a, b] = split(blocks, part === 0 ? 0.42 : 0.5);
 const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
 ---

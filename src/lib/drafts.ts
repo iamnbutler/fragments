@@ -54,9 +54,7 @@ export interface Draft {
   repo?: string;
   links: { label: string; url: string }[];
   facts: { label: string; value: string }[];
-  pullquotes: string[];
   images: DraftImage[];
-  art: string;
   /** markdown body */
   text: string;
   href: string;
@@ -94,7 +92,6 @@ export function loadDrafts(): Draft[] {
       repo: data.repo ? str(data.repo) : undefined,
       links: (data.links ?? []).map((l: any) => ({ label: str(l.label), url: str(l.url) })),
       facts: (data.facts ?? []).map((l: any) => ({ label: str(l.label), value: str(l.value) })),
-      pullquotes: (data.pullquotes ?? []).map(str),
       images: (data.images ?? []).map((im: any) => {
         const name = str(im.src);
         const m = media(name);
@@ -107,7 +104,6 @@ export function loadDrafts(): Draft[] {
           figure: m.type === 'image/svg+xml',
         };
       }),
-      art: str(data.art),
       text: content.trim(),
       href: `/d/${slug}/`,
     });
