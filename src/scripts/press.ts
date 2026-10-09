@@ -7,12 +7,14 @@ const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = () => matchMedia('(pointer: fine)').matches;
 
 import { copyfit } from './flow';
+import { pageRail } from './rail';
 
 export function pressRun() {
   const root = document.documentElement;
   const sheets = [...document.querySelectorAll<HTMLElement>('.sheet')];
   if (!sheets.length) return;
   copyfit();
+  pageRail(sheets);
 
   // ── print-in ────────────────────────────────────────────────────────────
   if (!reduced() && 'IntersectionObserver' in window) {
