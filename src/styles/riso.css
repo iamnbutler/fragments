@@ -41,7 +41,7 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html { background: var(--desk); -webkit-text-size-adjust: 100%; }
+html { background: var(--desk); -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
 body {
   margin: 0;
   background: var(--desk);
@@ -619,7 +619,7 @@ html.flats-open .flats-toggle { visibility: hidden; }
 html.flats-open .flats { visibility: visible; pointer-events: auto; }
 html.flats-open, html.flats-open body { overflow: hidden; }
 html.flats-rest .zine { visibility: hidden; }
-.flats-scroll { position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain; touch-action: pan-x pan-y; }
+.flats-scroll { position: absolute; inset: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; touch-action: pan-x pan-y; }
 html.flats-moving .flats-scroll { overflow: hidden; }
 .flats-board {
   --flat-s: 0.2;

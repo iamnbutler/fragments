@@ -39,6 +39,7 @@ export function flats(sheets: HTMLElement[]) {
   let p = 0; // 0: reading the feed, 1: flats
   let v = 0;
   let raf = 0;
+  let anim: Animation | null = null;
   let mode: 'feed' | 'flats' = 'feed';
   let target = 0; // spread index the current move is about
   let origin = 0; // spread index flats was opened from
@@ -96,27 +97,45 @@ export function flats(sheets: HTMLElement[]) {
     };
   };
 
-  const apply = () => {
-    if (!ui || !geo) return;
-    const g = geo;
-    const s = Math.pow(g.k, 1 - p);
+  /** The pasteboard's transform at progress `at`. */
+  const transformAt = (at: number) => {
+    const g = geo!;
+    const s = Math.pow(g.k, 1 - at);
     // Move the cell's centre in step with the scale, so the zoom feels
     // anchored on the spread rather than sliding past it.
-    const w = Math.abs(g.k - 1) < 1e-3 ? p : (g.k - s) / (g.k - 1);
+    const w = Math.abs(g.k - 1) < 1e-3 ? at : (g.k - s) / (g.k - 1);
     const tcx = lerp(g.rx, g.cx, w);
     const tcy = lerp(g.ry, g.cy, w);
     const tx = tcx - g.bx - (g.cx - g.bx) * s;
     const ty = tcy - g.by - (g.cy - g.by) * s;
-    ui.board.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale(${s.toFixed(5)})`;
-    ui.layer.style.setProperty('--fade', clamp(p / 0.14).toFixed(3));
-    ui.layer.style.setProperty('--chrome', clamp((p - 0.55) / 0.45).toFixed(3));
+    return `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale(${s.toFixed(5)})`;
+  };
+
+  const fades = () => {
+    ui!.layer.style.setProperty('--fade', clamp(p / 0.14).toFixed(3));
+    ui!.layer.style.setProperty('--chrome', clamp((p - 0.55) / 0.45).toFixed(3));
+  };
+
+  const apply = () => {
+    if (!ui || !geo) return;
+    ui.board.style.transform = transformAt(p);
+    fades();
+  };
+
+  /** Stop a running move where it is. */
+  const halt = () => {
+    cancelAnimationFrame(raf);
+    raf = 0;
+    if (!anim) return;
+    anim.cancel();
+    anim = null;
+    apply();
   };
 
   /** Begin a move from rest. */
   const start = (from: 'feed' | 'flats', i: number) => {
     const u = build();
-    cancelAnimationFrame(raf);
-    raf = 0;
+    halt();
     target = i;
     if (from === 'feed') {
       origin = i;
@@ -157,18 +176,35 @@ export function flats(sheets: HTMLElement[]) {
   };
 
   /** Spring the move to rest at `to`, from wherever it is now. */
+  //
+  // The spring is worked out up front and handed to the compositor as a
+  // transform animation. Scaling the pasteboard from script makes Chrome
+  // re-raster the whole layer at every new scale, and on a large retina
+  // screen that can't keep up: frames go out with the pasteboard blank.
+  // A compositor animation is rastered once for its whole run. Only the
+  // fades are stepped from script, and they don't touch the raster scale.
   const settle = (to: 0 | 1) => {
-    cancelAnimationFrame(raf);
-    if (reduced()) { finish(to); return; }
-    let last = performance.now();
+    halt();
+    if (reduced() || !ui || !geo) { finish(to); return; }
     const K = 64, C = 2 * Math.sqrt(K) * 0.9; // a touch underdamped: it lands, then settles
+    const FRAME = 1000 / 60;
+    const path: { p: number; v: number }[] = [{ p, v }];
+    let sp = p, sv = v;
+    while (!(Math.abs(to - sp) < 0.0015 && Math.abs(sv) < 0.01) && path.length < 600) {
+      for (let j = 0; j < 4; j++) { sv += (K * (to - sp) - C * sv) / 240; sp += sv / 240; }
+      path.push({ p: sp, v: sv });
+    }
+    const duration = (path.length - 1) * FRAME;
+    anim = ui.board.animate(path.map((q) => ({ transform: transformAt(q.p) })), { duration, easing: 'linear' });
+    const t0 = performance.now();
     const step = (now: number) => {
-      const dt = Math.min(0.032, (now - last) / 1000);
-      last = now;
-      v += (K * (to - p) - C * v) * dt;
-      p += v * dt;
-      apply();
-      if (Math.abs(to - p) < 0.0015 && Math.abs(v) < 0.01) { raf = 0; finish(to); return; }
+      const at = Math.max(0, now - t0) / FRAME;
+      const j = Math.min(path.length - 1, Math.floor(at));
+      const q = path[j], r = path[Math.min(path.length - 1, j + 1)];
+      p = lerp(q.p, r.p, at - j);
+      v = lerp(q.v, r.v, at - j);
+      fades();
+      if (j >= path.length - 1) { anim?.cancel(); anim = null; raf = 0; finish(to); return; }
       raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
@@ -221,8 +257,7 @@ export function flats(sheets: HTMLElement[]) {
         else return;
       }
       if (reduced()) { settle(d > 0 ? 1 : 0); return; }
-      cancelAnimationFrame(raf);
-      raf = 0;
+      halt();
       dir = d;
       p = clamp(p + d, -0.08, 1.08);
       apply();
