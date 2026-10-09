@@ -33,7 +33,7 @@ const at = [1, 3, 5, 7][part] ?? 7;
         <Reg as="h2" text={d.title} class="t-tower tk-title" />
         <p class="dr-dek"><Linked parts={d.dekParts} /></p>
       </div>
-      <InkFig image={img(d, 'fig-1-shapes')} ink="dk" ghost="lt" class="tk-fig" />
+      <InkFig image={img(d, 'fig-1-shapes')} ink="dk" class="tk-fig" />
     </div>
     <div class="pg pg-r tk-body">
       <Prose flow={d.key} blocks={blocks} cols={2} dropcap end={end} />
@@ -44,7 +44,7 @@ const at = [1, 3, 5, 7][part] ?? 7;
 {part === 1 && (
   <Fragment>
     <div class="pg pg-l tk-body">
-      <InkFig image={img(d, 'fig-2-barrier')} ink="dk" ghost="lt" class="tk-fig" />
+      <InkFig image={img(d, 'fig-2-barrier')} ink="dk" class="tk-fig" />
       <Prose flow={d.key} blocks={a} cols={2} />
     </div>
     <div class="pg pg-r tk-body">
@@ -56,7 +56,7 @@ const at = [1, 3, 5, 7][part] ?? 7;
 {part === 2 && (
   <Fragment>
     <div class="pg pg-l tk-body">
-      <InkFig image={img(d, 'fig-3-tick')} ink="dk" ghost="lt" class="tk-fig" />
+      <InkFig image={img(d, 'fig-3-tick')} ink="dk" class="tk-fig" />
       <Prose flow={d.key} blocks={a} cols={2} />
     </div>
     <div class="pg pg-r tk-body">
@@ -69,11 +69,11 @@ const at = [1, 3, 5, 7][part] ?? 7;
 {part === 3 && (
   <Fragment>
     <div class="pg pg-l tk-body">
-      <InkFig image={img(d, 'fig-4-charter')} ink="dk" ghost="lt" class="tk-fig" />
+      <InkFig image={img(d, 'fig-4-charter')} ink="dk" class="tk-fig" />
       <Prose flow={d.key} blocks={a} cols={2} />
     </div>
     <div class="pg pg-r tk-body">
-      <InkFig image={img(d, 'fig-5-merged')} ink="dk" ghost="lt" class="tk-fig" />
+      <InkFig image={img(d, 'fig-5-merged')} ink="dk" class="tk-fig" />
       <Prose flow={d.key} blocks={b} cols={2} end={end} />
       <Cont spread={spread} />
     </div>

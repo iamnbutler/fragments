@@ -33,11 +33,11 @@ const ticks = [0, 100, 200, 300, 400, 500];
         {d.kicker && <p class="dr-kicker">{d.kicker}</p>}
         <p class="dr-dek"><Linked parts={d.dekParts} /></p>
       </div>
-      <InkFig image={img(d, 'fig-1-call')} ink="dk" ghost="lt" class="jv-fig" />
+      <InkFig image={img(d, 'fig-1-call')} ink="dk" class="jv-fig" />
     </div>
     <div class="pg pg-r">
       <Prose flow={d.key} blocks={blocks} cols={2} dropcap end={end} />
-      <InkFig image={img(d, 'fig-2-modes')} ink="dk" ghost="lt" class="jv-fig" />
+      <InkFig image={img(d, 'fig-2-modes')} ink="dk" class="jv-fig" />
       <Cont spread={spread} />
     </div>
   </Fragment>
@@ -45,11 +45,11 @@ const ticks = [0, 100, 200, 300, 400, 500];
 {part === 1 && (
   <Fragment>
     <div class="pg pg-l">
-      <InkFig image={img(d, 'fig-3-budget')} ink="dk" ghost="lt" class="jv-fig" />
+      <InkFig image={img(d, 'fig-3-budget')} ink="dk" class="jv-fig" />
       <Prose flow={d.key} blocks={a} cols={2} />
     </div>
     <div class="pg pg-r">
-      <InkFig image={img(d, 'fig-4-pairs')} ink="dk" ghost="lt" class="jv-fig" />
+      <InkFig image={img(d, 'fig-4-pairs')} ink="dk" class="jv-fig" />
       <Prose flow={d.key} blocks={b} cols={2} end={end} />
       <Cont spread={spread} />
     </div>

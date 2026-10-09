@@ -61,7 +61,7 @@ const leftover = figs.slice((parts.length - 1) * per);
               <Fragment>
                 <Fragment set:html={s.html} />
                 {s.figs.map((im) => im.figure ? (
-                  <InkFig image={im} ink="dk" ghost="lt" class="draft-fig" />
+                  <InkFig image={im} ink="dk" class="draft-fig" />
                 ) : (
                   <figure class="draft-shot single-plate">
                     <Plate media={plateOf(im)!} inks={[lt, dk]} fit="contain" proof />
@@ -71,7 +71,7 @@ const leftover = figs.slice((parts.length - 1) * per);
               </Fragment>
             ))}
             {leftover.map((im) => im.figure
-              ? <InkFig image={im} ink="dk" ghost="lt" class="draft-fig" />
+              ? <InkFig image={im} ink="dk" class="draft-fig" />
               : <figure class="draft-shot single-plate"><Plate media={plateOf(im)!} inks={[lt, dk]} fit="contain" proof /><figcaption class="cap">{im.caption} <button class="proof-toggle" type="button" aria-pressed="false">Show original color</button></figcaption></figure>)}
           </div>
         </div>

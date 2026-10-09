@@ -36,7 +36,7 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
       <Prose flow={d.key} blocks={a} cols={2} dropcap />
     </div>
     <div class="pg pg-r dt-manual">
-      <InkFig image={img(d, 'fig-1-boundary')} ink="dk" ghost="lt" class="dt-fig1" />
+      <InkFig image={img(d, 'fig-1-boundary')} ink="dk" class="dt-fig1" />
       <div class="dt-hook" role="group" aria-label="The three macOS grants, held by the app">
         <span class="dt-hook-bar" aria-hidden="true"></span>
         {keys.map((k, i) => (
@@ -54,7 +54,7 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
 {part === 1 && (
   <Fragment>
     <div class="dt-strip">
-      <InkFig image={img(d, 'fig-2-loop')} ink="black" ghost="lt" caption={false} />
+      <InkFig image={img(d, 'fig-2-loop')} ink="black" caption={false} />
     </div>
     <div class="dt-stamps" role="group" aria-label="The three outcomes">
       <span class="dt-out out-done">Completed</span>
@@ -67,7 +67,7 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
       <Cont spread={spread} />
     </div>
     <div class="dt-stack">
-      <InkFig image={img(d, 'fig-3-patch-stack')} ink="dk" ghost="lt" caption={false} />
+      <InkFig image={img(d, 'fig-3-patch-stack')} ink="dk" caption={false} />
       <div class="dt-war">
         <p class="dt-war-note"><span class="dt-war-no">Sheet 02, insert</span>Typing a newline into a web composer would press Return and send it.</p>
         <p class="dt-war-note"><span class="dt-war-no">Sheet 04, quit</span>A normal quit can leave an app waiting on an unsaved-changes dialog. Now it’s one dispatched operation, outcome unknown, unsafe to retry.</p>
