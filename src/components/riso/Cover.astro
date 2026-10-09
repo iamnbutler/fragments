@@ -20,7 +20,7 @@ const n = COVER_WORKS.length;
 <Sheet spread={spread} label="Cover" folio={false}>
   <div class="cv" data-issue={ISSUE.number} data-start={at} data-works={JSON.stringify(COVER_WORKS)} data-maps={JSON.stringify(COVER_MAPS)}>
     <button class="cv-plate" type="button" aria-label="Pull a proof of another render">
-      <img class="cv-img" src={`/covers/${first.id}.jpg`} alt="" style={`object-position:${first.focus[0] * 100}% ${first.focus[1] * 100}%`} />
+      <img class="cv-img" src={first.still} srcset={`${first.small} 800w, ${first.still} 1600w`} sizes="(max-width: 760px) 100vw, 92vw" width={1600} height={Math.round(1600 / first.aspect)} alt="" fetchpriority="high" style={`object-position:${first.focus[0] * 100}% ${first.focus[1] * 100}%`} />
       <canvas class="cv-gl" aria-hidden="true"></canvas>
     </button>
     <p class="cv-pencil" aria-live="polite">

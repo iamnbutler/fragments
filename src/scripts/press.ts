@@ -1,7 +1,6 @@
 /**
  * The press: prints spreads as they come into view, lets the reader knock
- * plates out of register with the pointer, turns pages from the keyboard,
- * and lets clippings be picked up and moved.
+ * plates out of register with the pointer, and turns pages from the keyboard.
  */
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -85,56 +84,20 @@ export function pressRun() {
     sheets[i].scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
   });
 
-  // ── clippings can be picked up ──────────────────────────────────────────
-  if (finePointer()) {
-    for (const clip of document.querySelectorAll<HTMLElement>('[data-drag]')) dragClip(clip);
-  }
+  // Flats and the cover press wait until the page has loaded and gone idle:
+  // the cover's still is the largest paint, and the press only reprints it.
+  afterLoad(() => {
+    // ── flats: every spread at once ─────────────────────────────────────
+    import('./flats').then((m) => m.flats(sheets));
 
-  // ── flats: every spread at once ───────────────────────────────────────
-  import('./flats').then((m) => m.flats(sheets));
-
-  // ── cover: a proof of one of Nate's renders ───────────────────────────
-  const cover = document.querySelector<HTMLElement>('.sheet[data-kind="cover"]');
-  if (cover) import('./cover-press').then((m) => m.coverPress(cover)).catch(() => {});
+    // ── cover: a proof of one of Nate's renders ─────────────────────────
+    const cover = document.querySelector<HTMLElement>('.sheet[data-kind="cover"]');
+    if (cover) import('./cover-press').then((m) => m.coverPress(cover)).catch(() => {});
+  });
 }
 
-function dragClip(clip: HTMLElement) {
-  let sx = 0, sy = 0, ox = 0, oy = 0, dx = 0, dy = 0;
-  let swing = 0, vx = 0, lastX = 0, dragging = false, raf = 0, id = -1;
-
-  const settle = () => {
-    // a released clipping swings back to rest like paper on a pin
-    vx *= 0.82;
-    swing += (-swing) * 0.14 + vx * 0.02;
-    clip.style.setProperty('--swing', `${swing.toFixed(2)}deg`);
-    raf = dragging || Math.abs(swing) > 0.02 || Math.abs(vx) > 0.02 ? requestAnimationFrame(settle) : 0;
-  };
-
-  clip.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || (e.target as HTMLElement).closest('a, button, video, .clip-text')) return;
-    id = e.pointerId;
-    sx = e.clientX; sy = e.clientY; ox = dx; oy = dy; lastX = e.clientX;
-    dragging = true;
-    clip.setPointerCapture(id);
-    clip.classList.add('is-lifted');
-    if (!reduced() && !raf) raf = requestAnimationFrame(settle);
-  });
-  clip.addEventListener('pointermove', (e) => {
-    if (!dragging || e.pointerId !== id) return;
-    dx = ox + e.clientX - sx;
-    dy = oy + e.clientY - sy;
-    vx = e.clientX - lastX;
-    lastX = e.clientX;
-    clip.style.setProperty('--dx', `${dx}px`);
-    clip.style.setProperty('--dy', `${dy}px`);
-    if (!reduced()) swing = Math.max(-14, Math.min(14, swing + vx * 0.25));
-  });
-  const drop = (e: PointerEvent) => {
-    if (e.pointerId !== id) return;
-    dragging = false;
-    clip.classList.remove('is-lifted');
-    if (clip.hasPointerCapture(id)) clip.releasePointerCapture(id);
-  };
-  clip.addEventListener('pointerup', drop);
-  clip.addEventListener('pointercancel', drop);
+function afterLoad(f: () => void) {
+  const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 200));
+  if (document.readyState === 'complete') idle();
+  else addEventListener('load', idle, { once: true });
 }

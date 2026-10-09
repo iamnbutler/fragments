@@ -1,6 +1,6 @@
 ---
 /**
- * Did the click land? Blue and teal on off-white, no yellow, so it reads as
+ * desktop-tools. Blue and teal on off-white, no yellow, so it reads as
  * Ace's sibling rather than its next chapter. Black is only for the patent
  * line work and the three outcome words.
  */
@@ -29,15 +29,15 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
         <span class="dt-screen"></span>
         <span class="dt-cursor"></span>
       </div>
-      <Reg as="h2" text="Did the click land?" class="t-tower dt-title" style="--lt:var(--blue);--dk:var(--teal)" />
+      <Reg as="h2" text={d.title} class="t-tower dt-title" style="--lt:var(--blue);--dk:var(--teal)" />
       <div class="dt-deck">
-        <p class="dr-kicker">{d.kicker}</p>
+        {(d.kicker || d.proof) && <p class="dr-kicker">{d.kicker}{d.proof && <span class="dr-proof">{d.kicker && '  ·  '}in proof</span>}</p>}
         <p class="dr-dek"><Linked parts={d.dekParts} /></p>
       </div>
       <Prose flow={d.key} blocks={a} cols={2} dropcap />
     </div>
     <div class="pg pg-r dt-manual">
-      <InkFig image={img(d, 'fig-1-boundary.svg')} ink="dk" ghost="lt" class="dt-fig1" />
+      <InkFig image={img(d, 'fig-1-boundary')} ink="dk" ghost="lt" class="dt-fig1" />
       <div class="dt-hook" role="group" aria-label="The three macOS grants, held by the app">
         <span class="dt-hook-bar" aria-hidden="true"></span>
         {keys.map((k, i) => (
@@ -55,7 +55,7 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
 {part === 1 && (
   <Fragment>
     <div class="dt-strip">
-      <InkFig image={img(d, 'fig-2-loop.svg')} ink="black" ghost="lt" caption={false} />
+      <InkFig image={img(d, 'fig-2-loop')} ink="black" ghost="lt" caption={false} />
     </div>
     <div class="dt-stamps" role="group" aria-label="The three outcomes">
       <span class="dt-out out-done">Completed</span>
@@ -63,12 +63,12 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
       <span class="dt-out out-unknown" data-text="Unknown">Unknown</span>
     </div>
     <div class="dt-body">
-      <p class="cap">{`${img(d, 'fig-2-loop.svg')?.caption ?? ''} ${img(d, 'fig-3-patch-stack.svg')?.caption ?? ''}`.trim()}</p>
+      <p class="cap">{`${img(d, 'fig-2-loop')?.caption ?? ''} ${img(d, 'fig-3-patch-stack')?.caption ?? ''}`.trim()}</p>
       <Prose flow={d.key} blocks={blocks} cols={3} end={end} />
       <Cont spread={spread} />
     </div>
     <div class="dt-stack">
-      <InkFig image={img(d, 'fig-3-patch-stack.svg')} ink="dk" ghost="lt" caption={false} />
+      <InkFig image={img(d, 'fig-3-patch-stack')} ink="dk" ghost="lt" caption={false} />
       <div class="dt-war">
         <p class="dt-war-note"><span class="dt-war-no">Sheet 02, insert</span>Typing a newline into a web composer would press Return and send it.</p>
         <p class="dt-war-note"><span class="dt-war-no">Sheet 04, quit</span>A normal quit can leave an app waiting on an unsaved-changes dialog. Now it’s one dispatched operation, outcome unknown, unsafe to retry.</p>

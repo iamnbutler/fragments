@@ -39,8 +39,6 @@ export const SPOT = {
 export const PAPERS = {
   newsprint: '#ECE9E3',
   bone: '#F1E9DD',
-  cream: '#F2E5CB',
-  toner: '#1A1A1A',
 } as const;
 
 /** Relative luminance of a hex colour (WCAG). */
