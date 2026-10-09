@@ -42,7 +42,7 @@ const spec = (id: string, name: string, file: string, when: string, s: S | undef
   used.add(s.page);
   return [{ id, name, when, file, spread: own(s) }];
 };
-const DESIGN_FILE: Record<string, string> = { 'desktop-tools': 'DesktopTools', 'jev-demos': 'JevDemos' };
+const DESIGN_FILE: Record<string, string> = { 'desktop-tools': 'DesktopTools', 'jev-demos': 'JevDemos', tasks: 'Tasks' };
 
 const groups: { key: string; no: string; title: string; dek: string; specs: Spec[] }[] = [
   {
