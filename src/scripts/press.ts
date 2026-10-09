@@ -76,8 +76,9 @@ export function pressRun() {
   };
   addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || root.classList.contains('flats-open')) return;
-    const t = e.target as HTMLElement;
-    if (t.closest('input, textarea, select, [contenteditable], video')) return;
+    // composedPath sees into shadow roots, like the annotation toolbar's note field
+    const t = (e.composedPath()[0] ?? e.target) as HTMLElement;
+    if (t.closest?.('input, textarea, select, [contenteditable], video')) return;
     const next = e.key === 'j' || e.key === 'ArrowRight';
     const prev = e.key === 'k' || e.key === 'ArrowLeft';
     if (!next && !prev) return;

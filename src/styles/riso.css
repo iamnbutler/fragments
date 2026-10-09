@@ -603,6 +603,8 @@ html.flats-open .pagerail { display: none; }
   font: 600 12px/1 var(--f-display); letter-spacing: 0.06em; text-transform: uppercase;
   cursor: pointer; box-shadow: 0 6px 16px -8px rgb(0 0 0 / 0.6);
 }
+/* make room for the dev-only annotation toolbar */
+body:has(#agentation) .flats-toggle { right: 76px; }
 .flats-toggle svg { width: 18px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.2; }
 .flats-toggle:hover, .flats-toggle:focus-visible { background: var(--blue); }
 .flats-toggle:focus-visible, .flats-back:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
