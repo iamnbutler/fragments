@@ -1,0 +1,9 @@
+{
+  // The site: static pages from dist/, media from R2 at /m/ (see worker/).
+  "name": "fragments",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./dist", "binding": "ASSETS" },
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "fragments-media", "remote": true }],
+  "observability": { "enabled": true }
+}

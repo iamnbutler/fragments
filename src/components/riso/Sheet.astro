@@ -4,7 +4,7 @@
  * head. Every spread carries its own seeded misregistration (--mx/--my) and
  * ink pair, which the content inside picks up through CSS variables.
  */
-import { rng, spreadTitle, SECTIONS, type Spread } from '../../lib/zine';
+import { rng, spreadTitle, type Spread } from '../../lib/zine';
 
 interface Props {
   spread: Spread;
@@ -26,8 +26,8 @@ const [lt, dk] = spread.inks;
   class:list={['sheet', `paper-${spread.paper}`]}
   id={`p-${spread.page}`}
   data-kind={spread.kind}
-  data-section={spread.section ?? 'front'}
-  data-section-title={spread.section ? `${SECTIONS[spread.section].no}. ${SECTIONS[spread.section].title}` : 'Front matter'}
+  data-section={spread.group?.key ?? 'front'}
+  data-section-title={spread.group?.title ?? 'Front matter'}
   data-title={spreadTitle(spread)}
   aria-label={label}
   style={`--lt:var(--${lt});--dk:var(--${dk});--mx:${mx}px;--my:${my}px;--lx:${lx}px;--ly:${ly}px`}

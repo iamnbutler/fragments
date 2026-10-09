@@ -1,7 +1,5 @@
-import type { Block } from '../../../lib/zine';
-import type { Media } from '../../../lib/stream';
+import type { Block, PlateMedia } from '../../../lib/zine';
 import type { DraftImage } from '../../../lib/drafts';
-import { markTone } from '../../../lib/tone';
 
 const size = (b: Block) => (b.t === 'code' ? b.text.split('\n').length * 40 : b.text.length);
 
@@ -14,13 +12,7 @@ export function split(bs: Block[], ratio: number): [Block[], Block[]] {
   return [bs.slice(0, i), bs.slice(i)];
 }
 
-/**
- * A draft screenshot as plate media. `tone` is its average lightness (0–1),
- * judged by eye: it picks the separation the way the build's tone check does
- * for CDN images.
- */
-export function media(im: DraftImage | undefined, tone: number): Media | undefined {
-  if (!im) return undefined;
-  markTone(im.src, tone);
-  return { src: im.src, alt: im.alt, aspect: im.aspect };
+/** A draft screenshot as plate media. */
+export function plateOf(im: DraftImage | undefined): PlateMedia | undefined {
+  return im && { src: im.src, alt: im.alt, aspect: im.aspect };
 }

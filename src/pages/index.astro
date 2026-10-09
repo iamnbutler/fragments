@@ -2,47 +2,20 @@
 import Base from '../layouts/Base.astro';
 import Cover from '../components/riso/Cover.astro';
 import Bio from '../components/riso/Bio.astro';
-import PostSpread from '../components/riso/PostSpread.astro';
-import ShotSpread from '../components/riso/ShotSpread.astro';
-import ListSpread from '../components/riso/ListSpread.astro';
-import BulletinSpread from '../components/riso/BulletinSpread.astro';
-import ClippingsSpread from '../components/riso/ClippingsSpread.astro';
 import JumpSpread from '../components/riso/JumpSpread.astro';
 import DraftSpread from '../components/riso/drafts/DraftSpread.astro';
 import { loadDrafts } from '../lib/drafts';
-import { loadStream } from '../lib/stream';
 import { impose } from '../lib/zine';
-import { measureAll } from '../lib/tone';
 import { ISSUE } from '../lib/issue';
 
-const stream = await loadStream();
-const drafts = loadDrafts();
-// While the style settles, the issue stops after the gpuikit feature: enough
-// spreads to judge the look without printing the whole back catalogue.
-// FULL_ISSUE=1 prints everything (the build smoke test needs it).
-const STOP_AFTER = process.env.FULL_ISSUE ? '' : 'gpuikit';
-const all = impose(stream, drafts);
-const isStop = (s: (typeof all)[number]) =>
-  (s.kind === 'draft' && s.draft.slug === STOP_AFTER) || (s.kind === 'jump' && 'slug' in s.item && s.item.slug === STOP_AFTER);
-const end = all.findLastIndex(isStop);
-const spreads = end < 0 ? all : all.slice(0, end + 1);
-// Check every plate's tone so dark images can be separated as negatives.
-await measureAll(stream.flatMap((i) => {
-  if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
-  return i.media.filter((m) => !m.video || m.video.endsWith('.m3u8')).map((m) => m.src);
-}));
+const spreads = impose(loadDrafts());
 ---
-<Base description={`_fragments, issue ${ISSUE.number}, ${ISSUE.season}: work, writing and clippings from Nate Butler.`} bodyClass="issue">
+<Base description={`_fragments, issue ${ISSUE.number}, ${ISSUE.season}: work and writing from Nate Butler.`} bodyClass="issue">
   <main class="zine">
     {spreads.map((s) => {
       switch (s.kind) {
         case 'cover': return <Cover spread={s} />;
         case 'bio': return <Bio spread={s} />;
-        case 'post': return <PostSpread spread={s} />;
-        case 'shot': return <ShotSpread spread={s} />;
-        case 'list': return <ListSpread spread={s} />;
-        case 'bulletin': return <BulletinSpread spread={s} />;
-        case 'clippings': return <ClippingsSpread spread={s} />;
         case 'jump': return <JumpSpread spread={s} />;
         case 'draft': return <DraftSpread spread={s} />;
       }

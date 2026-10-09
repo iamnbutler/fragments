@@ -1,18 +1,17 @@
-import type { StreamItem, FragmentItem, NoteItem, ReshareItem } from './stream';
 import type { Draft } from './drafts';
 import { SPOT, PAPERS } from './spectrum';
 
 /**
- * PRESS RUN: the stream, imposed as a printed zine.
+ * PRESS RUN: the issue, imposed as a printed zine.
  *
- * Items are grouped into spreads (two facing pages) and every spread gets a
- * layout, an ink pair and a paper chosen by a generator seeded from the
- * content itself, so the same content always prints the same way but no two
- * neighbouring spreads share a composition.
+ * The cover and the bio open every issue; each feature follows as its own
+ * art-directed spreads, then plain jump spreads for any text the design has
+ * no room for. Every spread gets an ink pair, a paper and a seed for its
+ * misregistration, so the same content always prints the same way.
  */
 
 export type Ink = 'yellow' | 'blue' | 'teal' | 'black';
-export type Paper = 'newsprint' | 'cream' | 'bone' | 'toner';
+export type Paper = 'newsprint' | 'bone';
 
 interface SpreadBase {
   n: number; // spread index in the issue
@@ -20,46 +19,17 @@ interface SpreadBase {
   seed: number;
   inks: [Ink, Ink]; // [light plate, key plate]
   paper: Paper;
-  section?: SectionKey;
+  /** the feature a spread belongs to; flats group by it */
+  group?: { key: string; title: string };
 }
 
-export type PostLayout = 'tower' | 'banner' | 'toner';
-export type ShotLayout = 'bleed' | 'plate' | 'contact' | 'toner' | 'diptych';
-export type ListLayout = 'index' | 'ledger';
-export type ClipLayout = 'solo' | 'pair' | 'trio' | 'blowup' | 'wall';
-
-export type SectionKey = 'features' | 'plates' | 'dispatches' | 'library';
-
-/**
- * The issue's departments, in reading order. Long writing leads and gets room;
- * pictures follow; short things cluster together; reference lists close.
- */
-export const SECTIONS: Record<SectionKey, { no: string; title: string; dek: string; kinds: string }> = {
-  features: {
-    no: 'I',
-    title: 'Features',
-    dek: 'Long writing about design, tools and building software. The longer pieces jump to the following pages.',
-    kinds: 'Essays',
-  },
-  plates: {
-    no: 'II',
-    title: 'Plates',
-    dek: 'The work: interfaces, identities, experiments and renders, printed as large as the page allows.',
-    kinds: 'Shots',
-  },
-  dispatches: {
-    no: 'III',
-    title: 'Dispatches',
-    dek: 'Short notes, links worth your time, and posts by other people that Nate passed along.',
-    kinds: 'Notes, links and clippings',
-  },
-  library: {
-    no: 'IV',
-    title: 'Library',
-    dek: 'Lists and indexes Nate keeps adding to.',
-    kinds: 'Lists',
-  },
-};
+/** A picture to print as plates. */
+export interface PlateMedia {
+  src: string;
+  alt?: string;
+  /** width / height */
+  aspect?: number;
+}
 
 export interface Ref {
   n: number;
@@ -76,9 +46,8 @@ export interface JumpItem {
 }
 
 /**
- * Art direction for each local draft: how many designed spreads it gets,
+ * Art direction for each feature: how many designed spreads it gets,
  * roughly how much running text each one holds, and its inks and paper.
- * Text that doesn't fit continues on plain jump spreads.
  */
 export interface DraftDesign {
   caps: number[];
@@ -91,21 +60,6 @@ export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
     inks: [['blue', 'teal'], ['blue', 'teal']],
     paper: ['newsprint', 'bone'],
   },
-  ace2: {
-    caps: [2000, 700, 1900],
-    inks: [['yellow', 'black'], ['blue', 'black'], ['teal', 'black']],
-    paper: ['newsprint', 'newsprint', 'bone'],
-  },
-  telephone: {
-    caps: [1500, 1300, 1700, 1500],
-    inks: [['yellow', 'black'], ['yellow', 'blue'], ['blue', 'teal'], ['yellow', 'black']],
-    paper: ['newsprint', 'bone', 'toner', 'newsprint'],
-  },
-  gpuikit: {
-    caps: [0, 1500, 1300],
-    inks: [['blue', 'black'], ['blue', 'black'], ['blue', 'teal']],
-    paper: ['bone', 'newsprint', 'newsprint'],
-  },
 };
 const GENERIC_DRAFT: DraftDesign = { caps: [2600], inks: [['yellow', 'black']], paper: ['newsprint'] };
 export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAFT;
@@ -113,7 +67,6 @@ export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAF
 export type Spread =
   | (SpreadBase & { kind: 'cover' })
   | (SpreadBase & { kind: 'bio' })
-  | (SpreadBase & { kind: 'post'; layout: PostLayout; item: FragmentItem; blocks: Block[]; jump?: number; archive: boolean })
   | (SpreadBase & { kind: 'jump'; item: JumpItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean; proof?: boolean })
   | (SpreadBase & {
       kind: 'draft';
@@ -123,11 +76,7 @@ export type Spread =
       blocks: Block[];
       jump?: number;
       first: number;
-    })
-  | (SpreadBase & { kind: 'shot'; layout: ShotLayout; items: FragmentItem[] })
-  | (SpreadBase & { kind: 'list'; layout: ListLayout; item: FragmentItem })
-  | (SpreadBase & { kind: 'bulletin'; items: (NoteItem | FragmentItem)[] })
-  | (SpreadBase & { kind: 'clippings'; layout: ClipLayout; items: ReshareItem[] });
+    });
 
 // --- seeded randomness --------------------------------------------------------
 
@@ -166,156 +115,26 @@ export const INK_PAIRS: [Ink, Ink][] = [
 
 // --- imposition --------------------------------------------------------------
 
-const isLoneShot = (i: StreamItem) =>
-  i.kind === 'shot' && i.media.length === 1 && !i.text.trim();
-
-/** Essays this short read as notes; they cluster with the dispatches. */
-export const SHORT_WORDS = 170;
-const words = (md: string) => md.split(/\s+/).filter(Boolean).length;
-
-/** How much set text each opener holds, and each jump spread after it. */
-export const OPENER_CHARS: Record<PostLayout, number> = { tower: 1900, banner: 2900, toner: 1050 };
 const JUMP_CHARS = 4400;
-const MAX_JUMPS = 3;
-/** Less than this left over isn't worth a jump; pick a roomier opener. */
-const MIN_JUMP = 1000;
+const MAX_JUMPS = 4;
 
-const ARCHIVE_MS = 3 * 365 * 24 * 3600 * 1000;
-
-export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
+export function impose(drafts: Draft[] = []): Spread[] {
   const spreads: Spread[] = [];
-  let lastPair = -1;
-  const history: string[] = [];
-  let section: SectionKey | undefined;
-  const now = Date.now();
+  const base = (seedKey: string, inks: [Ink, Ink], paper: Paper, group?: SpreadBase['group']): SpreadBase => ({
+    n: spreads.length,
+    page: spreads.length * 2,
+    seed: hash(seedKey),
+    inks,
+    paper,
+    group,
+  });
 
-  const push = (
-    seedKey: string,
-    make: (r: ReturnType<typeof rng>, base: SpreadBase) => Spread,
-    opts: { paper?: Paper } = {},
-  ) => {
-    const seed = hash(seedKey);
-    const r = rng(seed);
-    let pi = Math.floor(r.next() * INK_PAIRS.length);
-    if (pi === lastPair) pi = (pi + 1) % INK_PAIRS.length;
-    lastPair = pi;
-    const paper: Paper = opts.paper ?? r.pick(['newsprint', 'newsprint', 'bone', 'cream'] as const);
-    const base: SpreadBase = { n: spreads.length, page: spreads.length * 2, seed, inks: INK_PAIRS[pi], paper, section };
-    const s = make(r, base);
-    spreads.push(s);
-    return s;
-  };
+  spreads.push({ ...base('cover', ['yellow', 'teal'], 'newsprint'), kind: 'cover' });
+  spreads.push({ ...base('bio', ['yellow', 'blue'], 'bone'), kind: 'bio' });
 
-  /** Pick a layout that neither of the last two spreads used. */
-  const choose = <T extends string>(r: ReturnType<typeof rng>, options: T[]): T => {
-    const recent = history.slice(-2);
-    let pool = options.filter((o) => !recent.includes(o));
-    if (!pool.length) pool = options.filter((o) => o !== history[history.length - 1]);
-    const out = r.pick(pool.length ? pool : options);
-    history.push(out);
-    return out;
-  };
-  const mark = (layout: string) => history.push(layout);
-
-  push('cover', (_r, b) => ({ ...b, kind: 'cover', inks: ['yellow', 'teal'], paper: 'newsprint' }));
-  push('bio', (_r, b) => ({ ...b, kind: 'bio', inks: ['yellow', 'blue'], paper: 'bone' }));
-
-  // --- sort the stream into departments, each newest first ---
-  const features = stream.filter((x): x is FragmentItem => x.kind === 'post' && words(x.text) >= SHORT_WORDS);
-  const plates = stream.filter((x): x is FragmentItem => x.kind === 'shot');
-  const dispatches = stream.filter(
-    (x): x is NoteItem | FragmentItem => x.kind === 'note' || x.kind === 'link' || (x.kind === 'post' && words(x.text) < SHORT_WORDS),
-  );
-  const library = stream.filter((x): x is FragmentItem => x.kind === 'list');
-  const shares = stream.filter((x): x is ReshareItem => x.kind === 'reshare');
-
-  // Clippings thread through the issue as breathers. Features get a few light
-  // ones between long reads; plates a steady trickle; dispatches the rest,
-  // where short things belong together.
-  const quota = {
-    features: Math.round(shares.length * 0.22),
-    plates: Math.round(shares.length * 0.3),
-  };
-  let si = 0;
-  let lastClip = '';
-  const isTextOnly = (c: ReshareItem) => !c.original.media.length && !c.original.link;
-
-  const takeClippings = (end: number, opts: { max: number; wall: boolean }) => {
-    const first = shares[si];
-    const r = rng(hash(first.key));
-    let layout: ClipLayout;
-    let n: number;
-    let runText = 0;
-    while (si + runText < end && runText < 4 && isTextOnly(shares[si + runText]) && shares[si + runText].original.text.length < 300) runText++;
-    const short = isTextOnly(first) && first.original.text.length >= 8 && first.original.text.length <= 170 && !/https?:|\w\.\w+\/|…|\.\.\./.test(first.original.text);
-    const roll = r.next();
-    if (opts.wall && runText >= 3 && lastClip !== 'wall' && roll < 0.7) { layout = 'wall'; n = runText; }
-    else if (short && lastClip !== 'blowup' && roll < 0.75) { layout = 'blowup'; n = 1; }
-    else {
-      const want = r.pick([1, 2, 2, 3, 3]);
-      n = Math.max(1, Math.min(want, opts.max, end - si));
-      layout = n === 1 ? 'solo' : n === 2 ? 'pair' : 'trio';
-      if (layout === lastClip && n > 1) { n = n === 2 ? 3 : 2; n = Math.min(n, opts.max, end - si); layout = n === 1 ? 'solo' : n === 2 ? 'pair' : 'trio'; }
-      const group = shares.slice(si, si + n);
-      if (n === 3 && group.some((g) => g.original.media.length && g.original.text.length > 220)) { n = 2; layout = 'pair'; }
-    }
-    const items = shares.slice(si, si + n);
-    si += n;
-    lastClip = layout;
-    mark('clippings');
-    push(first.key, (r2, b) => ({
-      ...b,
-      kind: 'clippings',
-      layout,
-      items,
-      paper: layout === 'wall' ? r2.pick(['toner', 'cream'] as const) : r2.chance(0.18) ? 'toner' : b.paper,
-    }));
-  };
-
-  const feature = (item: FragmentItem) => {
-    const bs = blocks(item.text, item.title, { refs: true });
-    const archive = now - Date.parse(item.date) > ARCHIVE_MS;
-    const total = bs.reduce((n, b) => n + (b.t === 'code' ? b.text.split('\n').length * 40 : b.text.length), 0);
-    const opener = push(item.key, (r, b) => {
-      const all = ['tower', 'banner', 'toner'] as PostLayout[];
-      const fits = all.filter((l) => OPENER_CHARS[l] >= total || total - OPENER_CHARS[l] > MIN_JUMP);
-      const layout = choose(r, fits.length ? fits : all);
-      const cut = takeBlocks(bs, OPENER_CHARS[layout]);
-      return { ...b, kind: 'post', layout, item, blocks: cut.blocks, archive, paper: layout === 'toner' ? 'toner' : b.paper };
-    }) as Extract<Spread, { kind: 'post' }>;
-    let next = opener.blocks.length;
-    let prev: { jump?: number } = opener;
-    let from = opener.page;
-    for (let part = 1; part <= MAX_JUMPS && next < bs.length; part++) {
-      const rest = bs.slice(next).reduce((n, b) => n + b.text.length, 0);
-      if (rest < 120) break;
-      const cut = takeBlocks(bs, JUMP_CHARS, next);
-      next = cut.next;
-      const refs = collectRefs(cut.blocks, item.text);
-      const j = push(`${item.key}-jump-${part}`, (_r, b) => ({
-        ...b,
-        kind: 'jump',
-        item,
-        blocks: cut.blocks,
-        refs,
-        from,
-        part,
-        last: next >= bs.length,
-        paper: b.paper === 'cream' ? 'newsprint' : b.paper,
-      })) as Extract<Spread, { kind: 'jump' }>;
-      mark('jump');
-      prev.jump = j.page;
-      prev = j;
-      from = j.page;
-    }
-  };
-
-  /**
-   * A draft prints as its own designed spreads, then plain jumps for any
-   * text the design has no room for. Every spread of it is stamped PROOF.
-   */
-  const draftFeature = (d: Draft) => {
+  for (const d of drafts) {
     const design = draftDesign(d.slug);
+    const group = { key: d.slug, title: d.title };
     const bs = blocks(d.text, d.title, { refs: true });
     let next = 0;
     let prev: { jump?: number } | null = null;
@@ -325,8 +144,8 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
     for (let part = 0; part < parts; part++) {
       const cut = design.caps[part] ? takeBlocks(bs, design.caps[part], next) : { blocks: [], next };
       next = cut.next;
-      mark('draft');
-      const s = push(`${d.key}-${part}`, (_r, b) => ({
+      const b = base(`${d.key}-${part}`, design.inks[part] ?? design.inks[0], design.paper[part] ?? design.paper[0], group);
+      const s: Extract<Spread, { kind: 'draft' }> = {
         ...b,
         kind: 'draft',
         draft: d,
@@ -334,18 +153,17 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
         parts,
         blocks: cut.blocks,
         first: first < 0 ? b.page : first,
-        inks: design.inks[part] ?? design.inks[0],
-        paper: design.paper[part] ?? design.paper[0],
-      })) as Extract<Spread, { kind: 'draft' }>;
+      };
+      spreads.push(s);
       if (first < 0) first = s.page;
       if (prev && cut.blocks.length) prev.jump = s.page;
       if (cut.blocks.length) { prev = s; from = s.page; }
     }
-    for (let part = 1; part <= 4 && next < bs.length; part++) {
+    for (let part = 1; part <= MAX_JUMPS && next < bs.length; part++) {
       const cut = takeBlocks(bs, JUMP_CHARS, next);
       next = cut.next;
-      const j = push(`${d.key}-jump-${part}`, (_r, b) => ({
-        ...b,
+      const j: Extract<Spread, { kind: 'jump' }> = {
+        ...base(`${d.key}-jump-${part}`, design.inks[design.inks.length - 1], 'newsprint', group),
         kind: 'jump',
         item: d,
         blocks: cut.blocks,
@@ -353,96 +171,14 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
         from,
         part,
         last: next >= bs.length,
-        proof: true,
-        inks: design.inks[design.inks.length - 1],
-        paper: 'newsprint',
-      })) as Extract<Spread, { kind: 'jump' }>;
-      mark('jump');
+        proof: d.proof,
+      };
+      spreads.push(j);
       if (prev) prev.jump = j.page;
       prev = j;
       from = j.page;
     }
-  };
-
-  const shot = (queue: FragmentItem[], i: number): number => {
-    const item = queue[i];
-    const nxt = queue[i + 1];
-    if (isLoneShot(item) && nxt && isLoneShot(nxt) && !history.slice(-2).includes('diptych')) {
-      mark('diptych');
-      push(item.key, (_r, b) => ({ ...b, kind: 'shot', layout: 'diptych', items: [item, nxt] }));
-      return 2;
-    }
-    push(item.key, (r, b) => {
-      const n = item.media.length;
-      const options: ShotLayout[] = n >= 4 ? ['contact', 'plate', 'bleed', 'toner'] : ['bleed', 'plate', 'toner'];
-      const layout = choose(r, options);
-      return { ...b, kind: 'shot', layout, items: [item], paper: layout === 'toner' ? 'toner' : b.paper };
-    });
-    return 1;
-  };
-
-  const bulletin = (queue: (NoteItem | FragmentItem)[], i: number): number => {
-    const group: (NoteItem | FragmentItem)[] = [];
-    let weight = 0;
-    while (i + group.length < queue.length && group.length < 3) {
-      const it = queue[i + group.length];
-      const w = it.kind === 'post' ? 2 : 1;
-      if (group.length && weight + w > 3) break;
-      group.push(it);
-      weight += w;
-    }
-    mark('bulletin');
-    push(group[0].key, (_r, b) => ({ ...b, kind: 'bulletin', items: group }));
-    return group.length;
-  };
-
-  /**
-   * Lay out one department: its own spreads with clippings
-   * threaded through at an even rate up to `shareEnd`.
-   */
-  const department = (
-    key: SectionKey,
-    count: number,
-    take: (i: number) => number,
-    shareEnd: number,
-    clip: { max: number; wall: boolean; run: number },
-  ) => {
-    if (!count) return;
-    section = key;
-    const shareStart = si;
-    const shareCount = Math.max(0, shareEnd - shareStart);
-    let i = 0;
-    let run = 0;
-    while (i < count || si < shareEnd) {
-      const clipTurn =
-        si < shareEnd &&
-        (i >= count || (run < clip.run && i > 0 && (si - shareStart) / Math.max(1, shareCount) <= i / count));
-      if (clipTurn) {
-        takeClippings(shareEnd, clip);
-        run++;
-      } else {
-        i += take(i);
-        run = 0;
-      }
-    }
-  };
-
-  department(
-    'features',
-    drafts.length + features.length,
-    (i) => (i < drafts.length ? draftFeature(drafts[i]) : feature(features[i - drafts.length]), 1),
-    si + quota.features,
-    { max: 2, wall: false, run: 1 },
-  );
-
-  department('plates', plates.length, (i) => shot(plates, i), si + quota.plates, { max: 3, wall: false, run: 1 });
-  department('dispatches', dispatches.length, (i) => bulletin(dispatches, i), shares.length, { max: 3, wall: true, run: 2 });
-  department('library', library.length, (i) => {
-    const item = library[i];
-    push(item.key, (r, b) => ({ ...b, kind: 'list', layout: choose(r, ['index', 'ledger'] as ListLayout[]), item }));
-    return 1;
-  }, si, { max: 0, wall: false, run: 0 });
-
+  }
   return spreads;
 }
 
@@ -494,89 +230,6 @@ export function inline(md: string): string {
     .trim();
 }
 
-/** Body paragraphs of an essay, without headings, code, images or lists. */
-export function paragraphs(md: string, title = ''): string[] {
-  const blocks = md.replace(/```[\s\S]*?```/g, '').split(/\n\s*\n/);
-  const out: string[] = [];
-  for (const raw of blocks) {
-    const b = raw.trim();
-    if (!b || /^#{1,6}\s/.test(b) || /^!\[/.test(b) || /^[-*+]\s|^\d+\.\s|^>|^\|/.test(b)) continue;
-    const t = inline(b.replace(/\n/g, ' '));
-    if (t && t !== title && t.length > 2) out.push(t);
-  }
-  return out;
-}
-
-/** Trim paragraphs to roughly `chars` characters, ending on a sentence. */
-export function excerpt(paras: string[], chars: number): { paras: string[]; more: boolean } {
-  const out: string[] = [];
-  let used = 0;
-  for (const p of paras) {
-    if (used + p.length <= chars) {
-      out.push(p);
-      used += p.length;
-      continue;
-    }
-    const room = chars - used;
-    if (room > 120) {
-      const cut = p.slice(0, room);
-      const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
-      out.push(end > 60 ? cut.slice(0, end + 1) : cut.replace(/\s+\S*$/, '') + '…');
-    }
-    return { paras: out, more: true };
-  }
-  return { paras: out, more: false };
-}
-
-/** A sentence worth pulling out large. */
-export function pullQuote(paras: string[], seed: number): string | null {
-  const sentences = paras
-    .slice(1)
-    .flatMap((p) => p.match(/[^.!?]+[.!?]/g) ?? [])
-    .map((s) => s.trim())
-    .filter((s) => s.length > 50 && s.length < 150 && !/https?:|\(|\)/.test(s));
-  if (!sentences.length) return null;
-  return sentences[seed % sentences.length];
-}
-
-export interface ListEntry {
-  label: string;
-  href?: string;
-  note?: string;
-  section?: string;
-}
-
-/** Entries of a list fragment: link bullets, or headed sections. */
-export function listEntries(md: string): ListEntry[] {
-  const out: ListEntry[] = [];
-  let section: string | undefined;
-  const lines = md.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    const h = line.match(/^#{2,3}\s+(.*)/);
-    if (h) {
-      section = inline(h[1]);
-      continue;
-    }
-    const li = line.match(/^(?:[-*+]|\d+\.)\s+(.*)/);
-    if (li) {
-      const body = li[1];
-      const link = body.match(/^\[([^\]]+)\]\(([^)]+)\)\s*(?:[-–—:]|u2013)?\s*(.*)$/);
-      if (link) out.push({ label: inline(link[1]), href: link[2], note: inline(link[3]) || undefined, section });
-      else out.push({ label: inline(body), section });
-    }
-  }
-  if (out.length) return out;
-  // Sectioned list (e.g. a CV): each heading is an entry, its first line the note.
-  for (let i = 0; i < lines.length; i++) {
-    const h = lines[i].trim().match(/^#{2,3}\s+(.*)/);
-    if (!h) continue;
-    const next = lines.slice(i + 1).find((l) => l.trim());
-    out.push({ label: inline(h[1]), note: next && !/^#/.test(next.trim()) ? inline(next) : undefined });
-  }
-  return out;
-}
-
 export function domain(url?: string): string {
   if (!url) return '';
   try {
@@ -596,33 +249,18 @@ export function readingMinutes(md: string): number {
   return Math.max(1, Math.round(md.split(/\s+/).length / 230));
 }
 
-/** Short title for a spread, used by the contents page and running heads. */
+/** Short title for a spread, used by flats and running heads. */
 export function spreadTitle(s: Spread): string {
   switch (s.kind) {
     case 'cover':
       return 'Cover';
     case 'bio':
       return 'Hi friends';
-    case 'post':
-    case 'list':
-      return s.item.title;
-    case 'shot':
-      return s.items.map((i) => i.title).join(' / ');
-    case 'bulletin':
-      return s.items.map((i) => (i.kind === 'note' ? 'Dispatch' : (i as FragmentItem).title)).join(' / ');
-    case 'clippings':
-      return s.items.map((i) => '@' + i.original.author.handle).join(', ');
     case 'jump':
       return `${s.item.title} (continued)`;
     case 'draft':
       return s.part === 0 ? s.draft.title : `${s.draft.title} (continued)`;
   }
-}
-
-/** A resized JPEG from the Bluesky CDN for halftoning; the original blob stays the proof. */
-export function plateSrc(src: string, size: 'feed_fullsize' | 'feed_thumbnail' = 'feed_fullsize'): string {
-  const m = src.match(/getBlob\?did=([^&]+)&cid=([^&]+)/);
-  return m ? `https://cdn.bsky.app/img/${size}/plain/${m[1]}/${m[2]}@jpeg` : src;
 }
 
 export const INK_HEX: Record<Ink | 'paper', string> = { ...SPOT, paper: PAPERS.newsprint };

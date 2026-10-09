@@ -1,18 +1,22 @@
 /**
- * Local drafts: long-form pieces that live in `src/content/drafts/<slug>.md`
- * (assets in `static/drafts/<slug>/`) and aren't published to the AT Protocol
- * repository yet. They print in the issue as PROOF features, each with its
- * own art-directed spreads, and get a reading page at `/d/<slug>`.
+ * Drafts: long-form pieces that live in `content/drafts/<slug>.md`, with
+ * their images in media as `drafts/<slug>/<name>`. They print in the issue
+ * as features, each with its own art-directed spreads, and get a reading
+ * page at `/d/<slug>`. Until a piece sets `proof: false` it's marked as a
+ * PROOF and kept out of search.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import { media } from './media';
 
 export interface DraftImage {
+  /** media name, e.g. drafts/desktop-tools/fig-1-boundary */
+  name: string;
   src: string;
   alt: string;
   caption?: string;
-  /** width / height, read from the file */
+  /** width / height */
   aspect?: number;
   /** line art (an SVG figure) rather than a photograph or screenshot */
   figure: boolean;
@@ -43,48 +47,20 @@ export interface Draft {
   dek: string;
   /** the dek with its [inline](links), as printed */
   dekParts: TextPart[];
-  kicker: string;
+  /** a department line over the title, if any */
+  kicker?: string;
+  /** still a proof: stamped, marked in the running heads, not indexed */
+  proof: boolean;
   repo?: string;
   links: { label: string; url: string }[];
   facts: { label: string; value: string }[];
-  pullquotes: string[];
   images: DraftImage[];
-  art: string;
   /** markdown body */
   text: string;
   href: string;
 }
 
-const DIR = path.join(process.cwd(), 'src/content/drafts');
-const STATIC = path.join(process.cwd(), 'static');
-
-/** width / height of an SVG, PNG or JPEG, from its header. */
-function aspectOf(file: string): number | undefined {
-  try {
-    const buf = fs.readFileSync(file);
-    if (file.endsWith('.svg')) {
-      const s = buf.toString('utf8', 0, 2000);
-      const vb = s.match(/viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/);
-      if (vb) return Number(vb[1]) / Number(vb[2]);
-      const w = s.match(/width="([\d.]+)"/), h = s.match(/height="([\d.]+)"/);
-      return w && h ? Number(w[1]) / Number(h[1]) : undefined;
-    }
-    if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') return buf.readUInt32BE(16) / buf.readUInt32BE(20);
-    if (buf[0] === 0xff && buf[1] === 0xd8) {
-      let i = 2;
-      while (i < buf.length) {
-        if (buf[i] !== 0xff) { i++; continue; }
-        const m = buf[i + 1];
-        const len = buf.readUInt16BE(i + 2);
-        if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) {
-          return buf.readUInt16BE(i + 7) / buf.readUInt16BE(i + 5);
-        }
-        i += 2 + len;
-      }
-    }
-  } catch {}
-  return undefined;
-}
+const DIR = path.join(process.cwd(), 'content/drafts');
 
 const str = (v: unknown) => (v == null ? '' : v instanceof Date ? v.toISOString().slice(0, 10) : String(v));
 
@@ -111,22 +87,23 @@ export function loadDrafts(): Draft[] {
       date: str(data.date) || new Date().toISOString().slice(0, 10),
       dek: textParts(str(data.dek)).map((t) => t.text).join(''),
       dekParts: textParts(str(data.dek)),
-      kicker: str(data.kicker) || 'Feature',
+      kicker: str(data.kicker) || undefined,
+      proof: data.proof !== false,
       repo: data.repo ? str(data.repo) : undefined,
       links: (data.links ?? []).map((l: any) => ({ label: str(l.label), url: str(l.url) })),
       facts: (data.facts ?? []).map((l: any) => ({ label: str(l.label), value: str(l.value) })),
-      pullquotes: (data.pullquotes ?? []).map(str),
       images: (data.images ?? []).map((im: any) => {
-        const src = str(im.src);
+        const name = str(im.src);
+        const m = media(name);
         return {
-          src,
+          name,
+          src: m.url,
           alt: str(im.alt),
           caption: im.caption ? str(im.caption) : undefined,
-          aspect: aspectOf(path.join(STATIC, src)),
-          figure: src.endsWith('.svg'),
+          aspect: m.width && m.height ? m.width / m.height : undefined,
+          figure: m.type === 'image/svg+xml',
         };
       }),
-      art: str(data.art),
       text: content.trim(),
       href: `/d/${slug}/`,
     });
@@ -135,7 +112,7 @@ export function loadDrafts(): Draft[] {
   return (cache = out);
 }
 
-/** An image of a draft by file name (the part after the last slash). */
+/** An image of a draft by its short name (the part after the last slash). */
 export function img(d: Draft, name: string): DraftImage | undefined {
-  return d.images.find((i) => i.src.endsWith(`/${name}`));
+  return d.images.find((i) => i.name.endsWith(`/${name}`));
 }

@@ -16,10 +16,10 @@
 .inkfig-ghost {
   background: var(--ghost);
   opacity: 0.6;
-  transform: translate(calc(var(--mx) * 1.6 + var(--px, 0) * 8px), calc(var(--my) * 1.6 + var(--py, 0) * 8px));
+  /* fixed out of register: diagrams don't follow the pointer, so they stay readable */
+  transform: translate(calc(var(--mx) * 1.6), calc(var(--my) * 1.6));
 }
 .fit-cover .inkfig-key, .fit-cover .inkfig-ghost { -webkit-mask-size: cover; mask-size: cover; }
-.paper-toner .inkfig-key, .paper-toner .inkfig-ghost { mix-blend-mode: screen; }
 .inkfig figcaption { margin-top: 0.6cqw; }
 
 .proof-stamp {
@@ -35,7 +35,6 @@
   filter: url(#rubber);
   pointer-events: none;
 }
-.paper-toner .proof-stamp { mix-blend-mode: normal; }
 .ps-word { font-size: clamp(14px, 1.8cqw, 28px); font-weight: 900; letter-spacing: 0.16em; margin-right: -0.16em; font-variation-settings: 'wdth' 100; }
 .ps-line { font-size: clamp(7.5px, 0.62cqw, 10px); font-weight: 700; letter-spacing: 0.2em; }
 .ps-date { font-size: clamp(7.5px, 0.62cqw, 10px); font-weight: 600; letter-spacing: 0.24em; }
@@ -49,5 +48,127 @@
   margin: 0; font: 700 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--dk);
 }
-.dr-kicker::after { content: '  ·  in proof'; color: var(--teal); }
+.dr-proof { white-space: pre; color: var(--teal); }
 .dr-dek { margin: 0; font: italic 400 clamp(14px, 1.45cqw, 23px)/1.3 var(--f-serif); text-wrap: pretty; }
+.layout-dr .cap { font: 400 var(--fs-cap)/1.35 var(--f-display); margin: 0; }
+.jump-proof {
+  margin-left: 1em; padding: 0.1em 0.5em; border: 0.12em solid var(--teal); color: var(--teal);
+  font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; mix-blend-mode: multiply;
+}
+
+/* a plate set in a draft spread */
+.layout-dr .plate { width: 100%; }
+
+/* ─── desktop-tools ──────────────────────────────────────────────────── */
+
+.dt-open { gap: 1cqw; }
+.dt-window {
+  position: relative; flex: none; height: 17cqw; border: 0.22cqw solid var(--dk); border-radius: 0.8cqw;
+  overflow: hidden; background: var(--sheet);
+}
+.dt-lights { position: absolute; top: 0; left: 0; right: 0; height: 2cqw; border-bottom: 0.22cqw solid var(--dk); display: flex; gap: 0.6cqw; align-items: center; padding-left: 0.9cqw; }
+.dt-lights i { width: 0.9cqw; height: 0.9cqw; border-radius: 50%; border: 0.18cqw solid var(--dk); }
+.dt-screen {
+  position: absolute; inset: 2cqw 0 0;
+  background: radial-gradient(circle, var(--dk) 38%, transparent 41%) 0 0 / 0.62cqw 0.62cqw;
+  -webkit-mask: linear-gradient(115deg, #000 10%, transparent 75%);
+  mask: linear-gradient(115deg, #000 10%, transparent 75%);
+  mix-blend-mode: multiply;
+}
+.dt-cursor {
+  position: absolute; right: 22%; top: 46%; width: 2.6cqw; height: 3.6cqw; background: var(--lt);
+  clip-path: polygon(0 0, 0 78%, 24% 60%, 42% 100%, 56% 94%, 39% 55%, 72% 55%);
+  mix-blend-mode: multiply;
+}
+.dt-title { --fs: 6.6cqw; margin-top: -9.6cqw; position: relative; z-index: 2; padding-left: 1cqw; }
+.dt-deck { display: flex; flex-direction: column; gap: 0.8cqw; }
+.dt-manual { gap: 1cqw; }
+.dt-fig1 { flex: none; }
+.dt-fig1 figcaption { max-width: 90%; }
+.dt-hook { position: relative; flex: none; display: flex; gap: 2.2cqw; padding: 1cqw 0 0 1.6cqw; }
+.dt-hook-bar { position: absolute; left: 0; right: 30%; top: 0.4cqw; height: 0.4cqw; background: var(--black); border-radius: 0.2cqw; }
+.dt-key { display: flex; flex-direction: column; align-items: center; gap: 0.2cqw; transform-origin: 50% -0.6cqw; rotate: calc((var(--i) - 1) * 7deg); color: var(--black); font: 800 clamp(9px, 0.78cqw, 12px)/1 var(--f-display); letter-spacing: 0.12em; text-transform: uppercase; }
+.dt-key svg { width: 6cqw; height: 2.4cqw; rotate: -90deg; translate: 0 1.6cqw; margin-bottom: 3.2cqw; fill: none; stroke: var(--lt); stroke-width: 2.6; mix-blend-mode: multiply; }
+
+.dt-strip { grid-column: 1 / 9; grid-row: 1 / 4; padding: 3.6cqw 1cqw 0 4cqw; }
+.dt-strip .inkfig-plates { aspect-ratio: 3.15; }
+.dt-strip .inkfig-key, .dt-strip .inkfig-ghost { -webkit-mask-size: 100% auto; mask-size: 100% auto; -webkit-mask-position: center top; mask-position: center top; }
+.dt-body { grid-column: 1 / 9; grid-row: 4 / 7; padding: 0.4cqw 1.5cqw 0.6cqw 4cqw; display: flex; flex-direction: column; gap: 0.6cqw; min-height: 0; }
+.dt-body .cols-3 { columns: 3; column-gap: 2.4cqw; column-fill: auto; }
+.dt-stamps { grid-column: 1 / 9; grid-row: 7 / 9; padding: 0.6cqw 2cqw 3.8cqw 4cqw; display: flex; align-items: center; gap: 2.4cqw; }
+.dt-out {
+  display: inline-block; padding: 0.4cqw 1cqw; border: 0.3cqw solid currentColor; outline: 0.12cqw solid currentColor; outline-offset: 0.24cqw;
+  font: 900 clamp(13px, 1.7cqw, 26px)/1 var(--f-display); letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--blue); filter: url(#rubber); mix-blend-mode: multiply; rotate: -4deg;
+}
+.out-refused { rotate: 3deg; }
+.out-unknown {
+  position: relative; font-size: clamp(18px, 2.9cqw, 44px); color: var(--black); border-color: var(--teal); outline-color: var(--teal); rotate: -7deg;
+  text-shadow: calc(var(--mx) * 2) calc(var(--my) * 2) 0 var(--teal);
+}
+.dt-stack { grid-column: 9 / 13; grid-row: 1 / 9; position: relative; }
+.dt-stack .inkfig { position: absolute; left: 50%; top: 52%; width: 48cqw; translate: -50% -50%; rotate: 90deg; }
+.dt-war { position: absolute; left: 1cqw; right: 3cqw; bottom: 3.6cqw; display: grid; grid-template-columns: 1fr 1fr; gap: 1cqw; }
+.dt-war-note {
+  margin: 0; padding: 0.6cqw 0.8cqw; background: var(--copy); box-shadow: 0 1px 2px rgb(0 0 0 / 0.2); rotate: -1.5deg;
+  font: 400 clamp(10px, 0.85cqw, 13px)/1.3 var(--f-display);
+}
+.dt-war-note + .dt-war-note { rotate: 1.8deg; }
+.dt-war-no { display: block; color: var(--teal); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.9em; margin-bottom: 0.2cqw; }
+
+/* ─── a draft with no design of its own ──────────────────────────────── */
+
+.gen-title { --fs: 6cqw; }
+
+/* ─── the draft's own page ───────────────────────────────────────────── */
+
+.single-draft .single-paper { position: relative; }
+.ps-single { top: 28px; right: 28px; }
+.draft-dek { margin: 18px 0 0; max-width: 40ch; font: italic 400 clamp(18px, 2.2vw, 26px)/1.3 var(--f-serif); }
+.single-draft .single-meta a { color: inherit; }
+.draft-fig { margin: 2.4em 0; }
+.draft-fig .inkfig-plates { max-height: 80vh; }
+.draft-fig figcaption { font: 400 13px/1.4 var(--f-display); margin-top: 0.6em; }
+.draft-foot { margin: 48px auto 0; max-width: 980px; display: grid; grid-template-columns: 2fr 1fr; gap: 32px; padding-top: 18px; border-top: 2px solid; font: 400 14px/1.4 var(--f-display); }
+.draft-facts { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
+.draft-facts dt { font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+.draft-facts dd { margin: 0; }
+.draft-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.draft-links a { color: inherit; text-decoration-color: var(--lt); text-decoration-thickness: 2px; }
+@media (max-width: 760px) {
+  .draft-foot { grid-template-columns: 1fr; }
+  .ps-single { position: relative; top: auto; right: auto; margin: 0 0 18px auto; width: max-content; }
+}
+
+/* ─── phones: one page at a time ─────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .zine .layout-dr .pg { display: flex !important; gap: 14px; }
+  .zine .dr-prose { flex: none; overflow: visible; max-height: none !important; }
+  .zine .proof-stamp { top: 34px; right: 14px; left: auto; bottom: auto; }
+  .zine .ps-word { font-size: 16px; }
+  .zine .ps-line, .zine .ps-date { font-size: 8px; }
+  .zine .layout-dr .cap { font-size: 12px; }
+  .zine .dr-kicker { font-size: 11px; }
+  .zine .dr-dek { font-size: 18px; }
+  .zine .dt-strip, .zine .dt-body, .zine .dt-stamps { padding: 20px; margin: 0; }
+
+  .zine .dt-window { height: 44vw; }
+  .zine .dt-title { --fs: 13vw; font-size: 13vw; margin-top: -20vw; }
+  .zine .dt-key { font-size: 10px; }
+  .zine .dt-key svg { width: 46px; height: 18px; translate: 0 12px; margin-bottom: 24px; }
+  .zine .dt-strip { padding-top: 44px; }
+  .zine .dt-strip .inkfig-plates { aspect-ratio: 1.6; }
+  .zine .dt-strip .inkfig-key, .zine .dt-strip .inkfig-ghost { -webkit-mask-size: contain; mask-size: contain; }
+  .zine .dt-body .cols-3 { columns: 1; }
+  .zine .dt-stamps { flex-wrap: wrap; }
+  .zine .dt-out { font-size: 18px; } .zine .out-unknown { font-size: 28px; }
+  .zine .dt-stack { padding: 20px; }
+  .zine .dt-stack .inkfig { position: static; width: 100%; translate: none; rotate: none; }
+  .zine .dt-stack .inkfig figcaption { position: static; }
+  .zine .dt-war { position: static; margin-top: 14px; grid-template-columns: 1fr; }
+  .zine .dt-war-note { font-size: 13px; }
+}
+
+/* code inside poured prose wraps instead of running out of its column */
+.dr-prose pre.b-code { white-space: pre-wrap; overflow-wrap: anywhere; font-size: clamp(8.5px, 0.74cqw, 12px); }

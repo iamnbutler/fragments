@@ -1,7 +1,7 @@
 ---
 /**
- * A local draft on its own page: the whole text, its figures and facts,
- * stamped as a proof. Not indexed; drafts aren't published yet.
+ * A local draft on its own page: the whole text, its figures and facts.
+ * While it's a proof it's stamped as one and not indexed.
  */
 import Base from '../../layouts/Base.astro';
 import Reg from '../../components/riso/Reg.astro';
@@ -12,7 +12,7 @@ import ProofStamp from '../../components/riso/drafts/ProofStamp.astro';
 import { loadDrafts, type Draft } from '../../lib/drafts';
 import { renderMarkdownWithHeadings } from '../../lib/markdown';
 import { draftDesign, printDate, readingMinutes, hash, rng } from '../../lib/zine';
-import { media } from '../../components/riso/drafts/util';
+import { plateOf } from '../../components/riso/drafts/util';
 import { ISSUE } from '../../lib/issue';
 
 export function getStaticPaths() {
@@ -24,12 +24,6 @@ const { html, headings } = await renderMarkdownWithHeadings(d.text);
 const [lt, dk] = draftDesign(d.slug).inks[0];
 const r = rng(hash(d.key));
 const mins = readingMinutes(d.text);
-// Tones of the screenshots, judged by eye (see the designs).
-const TONES: Record<string, number> = {
-  'icon-stable.png': 0.2, 'icon-canary.png': 0.24,
-  'showcase-home.png': 0.2, 'showcase-control-sizes.png': 0.18,
-  'homepage.png': 0.9, 'homepage-notes.png': 0.9,
-};
 // Hang the pictures between sections, in order.
 const parts = html.split(/(?=<h2[\s>])/);
 const figs = d.images;
@@ -37,20 +31,20 @@ const per = Math.max(1, Math.ceil(figs.length / Math.max(1, parts.length - 1)));
 const sections = parts.map((h, i) => ({ html: h, figs: i === 0 ? [] : figs.slice((i - 1) * per, i * per) }));
 const leftover = figs.slice((parts.length - 1) * per);
 ---
-<Base title={`${d.title} (proof)`} description={d.dek} bodyClass="single" noindex>
+<Base title={d.proof ? `${d.title} (proof)` : d.title} description={d.dek} bodyClass="single" noindex={d.proof} preloadSerif>
   <main
     class="single-page single-post single-draft"
     style={`--lt:var(--${lt});--dk:var(--${dk});--mx:${r.range(-2.4, 2.4).toFixed(2)}px;--my:${r.range(-1.8, 1.8).toFixed(2)}px;--lx:0px;--ly:0px`}
   >
     <nav class="single-nav" aria-label="Issue">
       <a href="/">_fragments, issue {ISSUE.number}</a>
-      <span>Proof, not yet published</span>
+      {d.proof && <span>Proof, not yet published</span>}
     </nav>
     <article class="sheet single-sheet paper-newsprint" data-kind="draft">
       <div class="single-paper">
-        <ProofStamp date={d.date} class="ps-single" />
+        {d.proof && <ProofStamp date={d.date} class="ps-single" />}
         <header class="single-head">
-          <p class="single-kind">{d.kicker}, in proof</p>
+          {(d.kicker || d.proof) && <p class="single-kind">{[d.kicker, d.proof && 'in proof'].filter(Boolean).join(', ')}</p>}
           <Reg as="h1" text={d.title} class="t-tower single-title" style={`--fs:clamp(44px, ${Math.min(13, Math.max(6, 110 / Math.pow(d.title.length, 0.7))).toFixed(2)}vw, 150px)`} />
           <p class="draft-dek"><Linked parts={d.dekParts} /></p>
           <p class="cap single-meta">
@@ -74,7 +68,7 @@ const leftover = figs.slice((parts.length - 1) * per);
                   <InkFig image={im} ink="dk" ghost="lt" class="draft-fig" />
                 ) : (
                   <figure class="draft-shot single-plate">
-                    <Plate media={media(im, TONES[im.src.split('/').pop()!] ?? 0.6)!} inks={[lt, dk]} fit="contain" proof />
+                    <Plate media={plateOf(im)!} inks={[lt, dk]} fit="contain" proof />
                     <figcaption class="cap">{im.caption} <button class="proof-toggle" type="button" aria-pressed="false">Show original color</button></figcaption>
                   </figure>
                 ))}
@@ -82,7 +76,7 @@ const leftover = figs.slice((parts.length - 1) * per);
             ))}
             {leftover.map((im) => im.figure
               ? <InkFig image={im} ink="dk" ghost="lt" class="draft-fig" />
-              : <figure class="draft-shot single-plate"><Plate media={media(im, TONES[im.src.split('/').pop()!] ?? 0.6)!} inks={[lt, dk]} fit="contain" proof /><figcaption class="cap">{im.caption} <button class="proof-toggle" type="button" aria-pressed="false">Show original color</button></figcaption></figure>)}
+              : <figure class="draft-shot single-plate"><Plate media={plateOf(im)!} inks={[lt, dk]} fit="contain" proof /><figcaption class="cap">{im.caption} <button class="proof-toggle" type="button" aria-pressed="false">Show original color</button></figcaption></figure>)}
           </div>
         </div>
         <footer class="draft-foot">

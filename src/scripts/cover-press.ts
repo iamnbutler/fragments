@@ -189,6 +189,9 @@ export function coverPress(root: HTMLElement) {
   };
   const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
 
+  // the 800px still when the plate is no wider than that in device pixels
+  const still = (w: CoverWork) => plate.getBoundingClientRect().width * Math.min(devicePixelRatio || 1, 2) <= 800 ? w.small : w.still;
+
   const load = (i: number) => {
     const w = works[i];
     const done = (el: HTMLImageElement | HTMLVideoElement) => {
@@ -199,7 +202,11 @@ export function coverPress(root: HTMLElement) {
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, el);
-      img.src = `/covers/${w.id}.jpg`;
+      const src = still(w);
+      if (img.currentSrc !== new URL(src, location.href).href) {
+        img.removeAttribute('srcset');
+        img.src = src;
+      }
       img.style.objectPosition = `${w.focus[0] * 100}% ${w.focus[1] * 100}%`;
       pencil.ed.textContent = `${i + 1}/${works.length}`;
       pencil.title.textContent = `Untitled, ${w.date}`;
@@ -209,18 +216,18 @@ export function coverPress(root: HTMLElement) {
       if (el instanceof HTMLVideoElement && onScreen && !reduced()) el.play().catch(() => {});
       kick();
     };
-    if (w.video && !reduced()) {
+    if (w.loop && !reduced()) {
       const v = document.createElement('video');
       v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
       v.crossOrigin = 'anonymous';
       v.addEventListener('loadeddata', () => done(v), { once: true });
-      v.src = `/covers/${w.id}.mp4`;
+      v.src = w.loop;
       v.load();
     } else {
       const im = new Image();
       im.decoding = 'async';
       im.onload = () => done(im);
-      im.src = `/covers/${w.id}.jpg`;
+      im.src = still(w);
     }
   };
 

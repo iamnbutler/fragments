@@ -9,11 +9,12 @@ import Sheet from './Sheet.astro';
 import Reg from './Reg.astro';
 import Plate from './Plate.astro';
 import type { Spread } from '../../lib/zine';
+import { media } from '../../lib/media';
 
 interface Props { spread: Spread; }
 const { spread } = Astro.props;
-// GitHub avatar, saved locally (it's only 250px at the source).
-const avatar = { src: '/bio/avatar.png', alt: 'Nate’s avatar: a black cat with big glowing eyes', aspect: 1 };
+// His GitHub avatar, kept in media (it's only 250px at the source).
+const avatar = { src: media('bio/avatar').url, alt: 'Nate’s avatar: a black cat with big glowing eyes', aspect: 1 };
 ---
 <Sheet spread={spread} label="About Nate">
   <div class="pg pg-l bio-l">

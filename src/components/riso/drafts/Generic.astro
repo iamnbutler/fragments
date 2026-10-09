@@ -14,7 +14,7 @@ const end = !spread.jump && blocks.length > 0;
 const [a, b] = split(blocks, 0.4);
 ---
 <div class="pg pg-l gen-open">
-  <p class="dr-kicker">{d.kicker}</p>
+  {(d.kicker || d.proof) && <p class="dr-kicker">{d.kicker}{d.proof && <span class="dr-proof">{d.kicker && '  ·  '}in proof</span>}</p>}
   <Reg as="h2" text={d.title} class="t-tower gen-title" />
   <p class="dr-dek"><Linked parts={d.dekParts} /></p>
   <Prose flow={d.key} blocks={a} cols={1} dropcap />

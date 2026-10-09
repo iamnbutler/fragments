@@ -53,7 +53,8 @@ export function flats(sheets: HTMLElement[]) {
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'flats-toggle';
-  toggle.setAttribute('aria-label', 'Show every spread (F)');
+  toggle.setAttribute('aria-label', 'Flats: show every spread');
+  toggle.setAttribute('aria-keyshortcuts', 'F');
   toggle.innerHTML =
     '<svg viewBox="0 0 20 14" aria-hidden="true"><rect x="0.5" y="0.5" width="8.5" height="5.5"/><rect x="11" y="0.5" width="8.5" height="5.5"/><rect x="0.5" y="8" width="8.5" height="5.5"/><rect x="11" y="8" width="8.5" height="5.5"/></svg><span>Flats</span>';
   toggle.addEventListener('click', () => zoomOut());
