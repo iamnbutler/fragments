@@ -8,6 +8,7 @@ import { measureAll } from '../../lib/tone';
 import { renderMarkdownWithHeadings } from '../../lib/markdown';
 import { domain, hash, inline, listEntries, paragraphs, printDate, readingMinutes, rng, type Ink } from '../../lib/zine';
 import type { Fragment } from '../../lib/types';
+import { ISSUE } from '../../lib/issue';
 
 export async function getStaticPaths() {
   const fragments = await fetchAllFragments();
@@ -44,7 +45,6 @@ const entries = fragment.type === 'list' ? listEntries(fragment.content ?? '') :
 const sections = [...new Set(entries.map((e) => e.section ?? ''))];
 const intro = fragment.type === 'list' ? paragraphs(fragment.content ?? '', fragment.title)[0] : '';
 const hasLinkItems = entries.some((e) => e.href);
-const issue = allFragments.length;
 const desc = inline(paragraphs(fragment.content ?? '', fragment.title)[0] ?? '').slice(0, 160);
 ---
 <Base title={fragment.title} atUri={fragment.atUri} description={desc || undefined} bodyClass="single">
@@ -53,7 +53,7 @@ const desc = inline(paragraphs(fragment.content ?? '', fragment.title)[0] ?? '')
     style={`--lt:var(--${inks[0]});--dk:var(--${inks[1]});--mx:${mx}px;--my:${my}px;--lx:${r.range(-26, 26).toFixed(1)}px;--ly:${r.range(-18, 18).toFixed(1)}px`}
   >
     <nav class="single-nav" aria-label="Issue">
-      <a href="/">_fragments, issue {issue}</a>
+      <a href="/">_fragments, issue {ISSUE.number}</a>
       <span>No. {fragment.id}</span>
     </nav>
 

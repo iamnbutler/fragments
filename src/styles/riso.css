@@ -55,6 +55,10 @@ body {
   overflow-x: hidden;
 }
 a { color: inherit; }
+/* Quiet links: names that are links but print as type. The underline only
+   comes up under the pointer or focus. */
+a.ql { text-decoration: none; }
+a.ql:hover, a.ql:focus-visible { text-decoration: underline; text-decoration-color: var(--dk, currentColor); text-decoration-thickness: 0.1em; text-underline-offset: 0.16em; }
 img, video, svg { display: block; max-width: 100%; }
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 .visually-hidden {
@@ -399,6 +403,14 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 }
 .js-press .sheet.is-printed .bio-wave { animation: wave 1.6s var(--ease-paper) 0.9s 1; }
 @keyframes wave { 0%, 100% { rotate: 12deg; } 20%, 60% { rotate: -10deg; } 40%, 80% { rotate: 22deg; } }
+.bio-av {
+  position: absolute; right: 3.2cqw; bottom: 3.4cqw; width: 11cqw;
+  padding: 0.55cqw 0.55cqw 1.6cqw; background: var(--sheet);
+  rotate: 3deg; box-shadow: 0.2cqw 0.3cqw 0 rgb(0 0 0 / 0.12);
+  transition: rotate 0.4s var(--ease-paper);
+}
+.bio-av:hover { rotate: -1deg; }
+.bio-av .plate { aspect-ratio: 1; }
 .bio-lede { margin: 0; max-width: 21ch; font: 500 clamp(18px, 2.55cqw, 40px)/1.12 var(--f-serif); letter-spacing: -0.01em; text-wrap: pretty; }
 .bio-r { display: flex; flex-direction: column; gap: 1.5cqw; padding-top: 6cqw; }
 .bio-p { margin: 0; max-width: 34ch; font: 400 clamp(14px, 1.45cqw, 22px)/1.4 var(--f-serif); text-wrap: pretty; }
@@ -881,6 +893,7 @@ table.ledger.pg-r { margin-left: 4.5cqw; margin-right: 4cqw; }
   .zine .bio-hi .reg { font-size: 21vw; }
   .zine .bio-wave { font-size: 12vw; right: auto; left: 0; top: 0; }
   .zine .bio-lede { font-size: 24px; }
+  .zine .bio-av { position: relative; inset: auto; order: 3; align-self: flex-end; width: 30vw; margin-top: -8px; }
   .zine .bio-r { padding-top: 32px; gap: 18px; }
   .zine .bio-p, .zine .bio-bye { font-size: 18px; }
   .zine .bio-cv { margin-top: 10px; border-top-width: 3px; }

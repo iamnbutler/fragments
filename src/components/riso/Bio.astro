@@ -1,15 +1,19 @@
 ---
 /**
  * Hi friends: who Nate is, right after the cover. The left page is a yellow
- * flood with the greeting overprinted in blue and teal; the right page is
- * the rest of the letter, where he's been, and where to find him.
+ * flood with the greeting overprinted in blue and teal, and his avatar
+ * printed small in the corner; the right page is the rest of the letter,
+ * where he's been, and where to find him.
  */
 import Sheet from './Sheet.astro';
 import Reg from './Reg.astro';
+import Plate from './Plate.astro';
 import type { Spread } from '../../lib/zine';
 
 interface Props { spread: Spread; }
 const { spread } = Astro.props;
+// GitHub avatar, saved locally (it's only 250px at the source).
+const avatar = { src: '/bio/avatar.png', alt: 'Nate’s avatar: a black cat with big glowing eyes', aspect: 1 };
 ---
 <Sheet spread={spread} label="About Nate">
   <div class="pg pg-l bio-l">
@@ -18,15 +22,18 @@ const { spread } = Astro.props;
       <Reg as="span" text="Hi friends" class="t-tower" style="--fs:13.4cqw;--lt:var(--teal);--dk:var(--blue)" />
       <span class="bio-wave" aria-hidden="true">👋</span>
     </h2>
+    <a class="bio-av" href="https://github.com/iamnbutler" aria-label="Nate on GitHub">
+      <Plate media={avatar} inks={['blue', 'black']} fit="cover" eager />
+    </a>
     <p class="bio-lede">I'm a software designer &amp; maker enabling people's creativity and ability to share knowledge. Chances are you have probably used something I've built.</p>
   </div>
   <div class="pg pg-r bio-r">
     <p class="bio-p bio-first">I want to help people create the things important to them&thinsp;&mdash;&thinsp;to empower them to create something themselves and feel the euphoria it brings.</p>
     <p class="bio-p">I'm interested in local &amp; open source software, and finding ways to reclaim our applications from the web and our daily lives from large corporations.</p>
     <dl class="bio-cv">
-      <div class="bio-now"><dt>Now</dt><dd><b>GitHub Next</b> <span>exploring the future of software</span></dd></div>
-      <div><dt>Before</dt><dd><b>Zed</b> <span>designed it</span></dd></div>
-      <div><dt>Before</dt><dd><b>Facebook</b> <span>News Feed &amp; Developer Tools</span></dd></div>
+      <div class="bio-now"><dt>Now</dt><dd><b><a class="ql" href="https://githubnext.com">GitHub Next</a></b> <span>exploring the future of software</span></dd></div>
+      <div><dt>Before</dt><dd><b><a class="ql" href="https://zed.dev">Zed</a></b> <span>designed it</span></dd></div>
+      <div><dt>Before</dt><dd><b><a class="ql" href="https://www.facebook.com">Facebook</a></b> <span>News Feed &amp; Developer Tools</span></dd></div>
     </dl>
     <p class="bio-bye">Say hi on <a href="https://bsky.app/profile/nate.rip">Bluesky</a> or come visit <a href="https://nate.rip">nate.rip</a>!</p>
   </div>

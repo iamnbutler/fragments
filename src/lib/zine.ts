@@ -84,20 +84,17 @@ export interface DraftDesign {
   caps: number[];
   inks: [Ink, Ink][];
   paper: Paper[];
-  companion?: string;
 }
 export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
   'desktop-tools': {
     caps: [1500, 2300],
     inks: [['blue', 'teal'], ['blue', 'teal']],
     paper: ['newsprint', 'bone'],
-    companion: 'ace2',
   },
   ace2: {
     caps: [2000, 700, 1900],
     inks: [['yellow', 'black'], ['blue', 'black'], ['teal', 'black']],
     paper: ['newsprint', 'newsprint', 'bone'],
-    companion: 'desktop-tools',
   },
   telephone: {
     caps: [1500, 1300, 1700, 1500],
@@ -126,7 +123,6 @@ export type Spread =
       blocks: Block[];
       jump?: number;
       first: number;
-      companion?: { title: string; page: number };
     })
   | (SpreadBase & { kind: 'shot'; layout: ShotLayout; items: FragmentItem[] })
   | (SpreadBase & { kind: 'list'; layout: ListLayout; item: FragmentItem })
@@ -439,15 +435,6 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
     { max: 2, wall: false, run: 1 },
   );
 
-  // Companion features point at each other by page.
-  const firstPage = new Map<string, number>();
-  for (const s of spreads) if (s.kind === 'draft' && s.part === 0) firstPage.set(s.draft.slug, s.page);
-  for (const s of spreads) {
-    if (s.kind !== 'draft') continue;
-    const c = draftDesign(s.draft.slug).companion;
-    const other = c && drafts.find((d) => d.slug === c);
-    if (other && firstPage.has(c)) s.companion = { title: other.title, page: firstPage.get(c)! };
-  }
   department('plates', plates.length, (i) => shot(plates, i), si + quota.plates, { max: 3, wall: false, run: 1 });
   department('dispatches', dispatches.length, (i) => bulletin(dispatches, i), shares.length, { max: 3, wall: true, run: 2 });
   department('library', library.length, (i) => {

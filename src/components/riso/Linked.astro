@@ -1,0 +1,11 @@
+---
+/**
+ * A line of text whose names are links that don't look like links: they
+ * print as type and only show themselves on hover or focus.
+ */
+import type { TextPart } from '../../lib/drafts';
+
+interface Props { parts: TextPart[]; }
+const { parts } = Astro.props;
+---
+{parts.map((p) => p.url ? <a class="ql" href={p.url}>{p.text}</a> : p.text)}

@@ -5,6 +5,7 @@
  * black for engineering, teal for rules and breakage, yellow for one stamp.
  */
 import Reg from '../Reg.astro';
+import Linked from '../Linked.astro';
 import Plate from '../Plate.astro';
 import InkFig from './InkFig.astro';
 import Prose from './Prose.astro';
@@ -44,7 +45,7 @@ const CARGO = [
     </div>
     <aside class="gk-issue">
       <p class="gk-catno"><span>Catalog No. 0.9</span><span>{d.kicker}</span></p>
-      <p class="dr-dek">{d.dek}</p>
+      <p class="dr-dek"><Linked parts={d.dekParts} /></p>
       <p class="cap">{img(d, 'showcase-home.png')?.caption}</p>
       <p class="cap">Continued on page {spread.page + 2}</p>
     </aside>

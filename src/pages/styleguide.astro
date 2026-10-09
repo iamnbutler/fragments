@@ -25,6 +25,7 @@ import { impose, blocks, takeBlocks, OPENER_CHARS, INK_PAIRS, INK_HEX, SECTIONS,
 import { measureAll, isDark } from '../lib/tone';
 import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
 import { COVER_MAPS, COVER_WORKS } from '../lib/covers';
+import { ISSUE } from '../lib/issue';
 
 const stream = await loadStream();
 const drafts = loadDrafts();
@@ -33,8 +34,6 @@ await measureAll(stream.flatMap((i) => {
   if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
   return i.media.filter((m) => !m.video || m.video.endsWith('.m3u8')).map((m) => m.src);
 }));
-const issue = stream.filter((i) => i.kind !== 'note' && i.kind !== 'reshare').length;
-const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 
 // ── specimens: one of every spread, found in the issue or set specially ──
@@ -189,7 +188,7 @@ const SCREENS = [
 <Base title="Specimen book" description="The house style of _fragments: inks, papers, type, grid, print effects, motion and every spread layout." bodyClass="styleguide" noindex>
   <main class="sb" style="--lt:var(--yellow);--dk:var(--black);--mx:1.6px;--my:-1.1px;--lx:0px;--ly:0px">
     <nav class="single-nav sb-nav" aria-label="Site">
-      <a href="/">_fragments, issue {issue}</a>
+      <a href="/">_fragments, issue {ISSUE.number}</a>
       <span>Specimen book</span>
     </nav>
 
@@ -531,7 +530,7 @@ const SCREENS = [
                     <span class="sb-ticket-when">{sp.when}</span>
                     <span class="sb-ticket-file"><code>{sp.file}</code>, inks {s.inks[0]} + {s.inks[1]}, {s.paper}</span>
                   </p>
-                  {s.kind === 'cover' ? <Cover spread={s} issue={issue} printed={printed} />
+                  {s.kind === 'cover' ? <Cover spread={s} />
                     : s.kind === 'bio' ? <Bio spread={s} />
                     : s.kind === 'post' ? <PostSpread spread={s} />
                     : s.kind === 'shot' ? <ShotSpread spread={s} />

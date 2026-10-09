@@ -5,6 +5,7 @@
  * line work and the three outcome words.
  */
 import Reg from '../Reg.astro';
+import Linked from '../Linked.astro';
 import InkFig from './InkFig.astro';
 import Prose from './Prose.astro';
 import Cont from './Cont.astro';
@@ -31,14 +32,7 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
       <Reg as="h2" text="Did the click land?" class="t-tower dt-title" style="--lt:var(--blue);--dk:var(--teal)" />
       <div class="dt-deck">
         <p class="dr-kicker">{d.kicker}</p>
-        <p class="dr-dek">{d.dek}</p>
-        {spread.companion && (
-          <a class="dr-companion" href={`#p-${spread.companion.page}`}>
-            <span>Companion piece</span>
-            <strong>{spread.companion.title}</strong>
-            <span>page {spread.companion.page}</span>
-          </a>
-        )}
+        <p class="dr-dek"><Linked parts={d.dekParts} /></p>
       </div>
       <Prose flow={d.key} blocks={a} cols={2} dropcap />
     </div>

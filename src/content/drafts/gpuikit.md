@@ -2,7 +2,7 @@
 title: gpuikit
 slug: gpuikit
 date: 2026-09-04
-dek: A component kit for gpui, Zed's Rust UI framework, that took three years and three names to become mostly a set of agreements between its parts.
+dek: "A component kit for [gpui](https://www.gpui.rs), [Zed](https://zed.dev)'s Rust UI framework, that took three years and three names to become mostly a set of agreements between its parts."
 kicker: Toolkit
 draft: true
 repo: https://github.com/iamnbutler/gpuikit

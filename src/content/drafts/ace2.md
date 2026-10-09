@@ -17,7 +17,7 @@ links:
     url: https://github.com/githubnext/ace2/issues/5
   - label: pi (pi-durable)
     url: https://github.com/earendil-works/pi
-  - label: githubnext/desktop-tools (companion piece)
+  - label: githubnext/desktop-tools
     url: https://github.com/githubnext/desktop-tools
 facts:
   - label: First commit

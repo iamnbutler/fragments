@@ -2,7 +2,7 @@
 title: "Did the click land?"
 slug: desktop-tools
 date: 2026-10-08
-dek: "desktop-tools gives agents eyes and hands on a Mac, and most of the work went into what an agent should believe after it acts."
+dek: "[desktop-tools](https://github.com/githubnext/desktop-tools) gives agents eyes and hands on a Mac, and most of the work went into what an agent should believe after it acts."
 kicker: Workshop
 draft: true
 repo: https://github.com/githubnext/desktop-tools
@@ -17,7 +17,7 @@ links:
     url: https://github.com/githubnext/ace2/issues/8
   - label: Peekaboo
     url: https://github.com/openclaw/Peekaboo
-  - label: githubnext/ace2 (companion piece)
+  - label: githubnext/ace2
     url: https://github.com/githubnext/ace2
 facts:
   - label: Extracted

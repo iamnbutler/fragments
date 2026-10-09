@@ -289,7 +289,7 @@ function buildBoard(sheets: HTMLElement[], open: (i: number) => void, back: () =
   const board = document.createElement('div');
   board.className = 'flats-board';
 
-  const issue = document.querySelector('.cover-issue')?.textContent?.match(/\d+/)?.[0] ?? '';
+  const issue = document.querySelector<HTMLElement>('.cv')?.dataset.issue ?? '';
   const pages = sheets.length * 2;
   const slug = document.createElement('header');
   slug.className = 'flats-slug';

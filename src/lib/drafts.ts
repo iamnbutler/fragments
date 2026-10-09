@@ -18,12 +18,31 @@ export interface DraftImage {
   figure: boolean;
 }
 
+/** A run of text; `url` makes it a link. */
+export interface TextPart { text: string; url?: string; }
+
+/** Split `[text](url)` links out of a one-line string. */
+export function textParts(src: string): TextPart[] {
+  const out: TextPart[] = [];
+  let at = 0;
+  for (const m of src.matchAll(/\[([^\]]+)\]\(([^)\s]+)\)/g)) {
+    if (m.index! > at) out.push({ text: src.slice(at, m.index) });
+    out.push({ text: m[1], url: m[2] });
+    at = m.index! + m[0].length;
+  }
+  if (at < src.length) out.push({ text: src.slice(at) });
+  return out;
+}
+
 export interface Draft {
   key: string;
   slug: string;
   title: string;
   date: string;
+  /** plain text, for meta descriptions */
   dek: string;
+  /** the dek with its [inline](links), as printed */
+  dekParts: TextPart[];
   kicker: string;
   repo?: string;
   links: { label: string; url: string }[];
@@ -90,7 +109,8 @@ export function loadDrafts(): Draft[] {
       slug,
       title: str(data.title) || slug,
       date: str(data.date) || new Date().toISOString().slice(0, 10),
-      dek: str(data.dek),
+      dek: textParts(str(data.dek)).map((t) => t.text).join(''),
+      dekParts: textParts(str(data.dek)),
       kicker: str(data.kicker) || 'Feature',
       repo: data.repo ? str(data.repo) : undefined,
       links: (data.links ?? []).map((l: any) => ({ label: str(l.label), url: str(l.url) })),

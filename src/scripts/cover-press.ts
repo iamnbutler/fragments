@@ -3,7 +3,8 @@
  * The render's luminance is cut into a few flat steps of a spectrum map,
  * dithered with grain so the step edges stipple like ink, and printed over
  * paper mottle. When the cover arrives the steps develop from two to their
- * full count; across the plate the pointer sets how many steps the proof
+ * full count. The issue's own render prints first (`?cover=N` asks for
+ * another); across the plate the pointer sets how many steps the proof
  * is cut into, and a click pulls a proof of another render. Looping renders
  * play while the cover's on screen, unless motion is reduced.
  */
@@ -129,7 +130,8 @@ export function coverPress(root: HTMLElement) {
   const BASE = 7;
 
   const asked = Number(new URLSearchParams(location.search).get('cover'));
-  let index = Number.isInteger(asked) && asked >= 1 && asked <= works.length ? asked - 1 : Math.floor(Math.random() * works.length);
+  const start = Number(cv.dataset.start ?? 0);
+  let index = Number.isInteger(asked) && asked >= 1 && asked <= works.length ? asked - 1 : start;
   let work = works[index];
   let source: HTMLImageElement | HTMLVideoElement | null = null;
   let steps = 2; // what's on the plate

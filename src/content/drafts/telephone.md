@@ -2,7 +2,7 @@
 title: Telephone
 slug: telephone
 date: 2026-09-14
-dek: A small Rust CLI and MCP server that lets Codex and Claude Code sessions on the same machine find each other, pass notes and wait for replies, and that's careful about what it can't promise.
+dek: "A small Rust CLI and MCP server that lets [Codex](https://github.com/openai/codex) and [Claude Code](https://github.com/anthropics/claude-code) sessions on the same machine find each other, pass notes and wait for replies, and that's careful about what it can't promise."
 kicker: Field Notes
 draft: true
 repo: https://github.com/iamnbutler/telephone

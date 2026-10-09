@@ -2,31 +2,34 @@
 /**
  * The cover of _fragments: one of Nate's own renders, pulled as a stepped,
  * grainy gradient-map proof across the whole spread, with a margin under it
- * signed in pencil like an edition print. Click the plate for another proof.
+ * captioned like an edition print. The issue's own render prints first;
+ * click the plate for a proof of another.
  * Without WebGL the render shows as it is.
  */
 import Sheet from './Sheet.astro';
 import type { Spread } from '../../lib/zine';
 import { COVER_WORKS, COVER_MAPS } from '../../lib/covers';
+import { ISSUE } from '../../lib/issue';
 
-interface Props { spread: Spread; issue: number; printed: string; }
-const { spread, issue, printed } = Astro.props;
-const first = COVER_WORKS[0];
+interface Props { spread: Spread; }
+const { spread } = Astro.props;
+const at = ISSUE.cover - 1;
+const first = COVER_WORKS[at];
 const n = COVER_WORKS.length;
 ---
 <Sheet spread={spread} label="Cover" folio={false}>
-  <div class="cv" data-works={JSON.stringify(COVER_WORKS)} data-maps={JSON.stringify(COVER_MAPS)}>
+  <div class="cv" data-issue={ISSUE.number} data-start={at} data-works={JSON.stringify(COVER_WORKS)} data-maps={JSON.stringify(COVER_MAPS)}>
     <button class="cv-plate" type="button" aria-label="Pull a proof of another render">
       <img class="cv-img" src={`/covers/${first.id}.jpg`} alt="" style={`object-position:${first.focus[0] * 100}% ${first.focus[1] * 100}%`} />
       <canvas class="cv-gl" aria-hidden="true"></canvas>
     </button>
     <p class="cv-pencil" aria-live="polite">
-      <span class="cv-ed">1/{n}</span>
+      <span class="cv-ed">{ISSUE.cover}/{n}</span>
       <span class="cv-title">Untitled, {first.date}</span>
       <span class="cv-sig">Nate Butler</span>
     </p>
     <h1 class="masthead">_fragments</h1>
-    <p class="cv-issue"><span>Issue {issue}</span> <span>{printed}</span></p>
+    <p class="cv-issue"><span>Issue {ISSUE.number}</span> <span>{ISSUE.season}</span></p>
     <a class="cover-turn" href="#p-2">Turn the page</a>
   </div>
 </Sheet>

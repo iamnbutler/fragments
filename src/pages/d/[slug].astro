@@ -5,6 +5,7 @@
  */
 import Base from '../../layouts/Base.astro';
 import Reg from '../../components/riso/Reg.astro';
+import Linked from '../../components/riso/Linked.astro';
 import Plate from '../../components/riso/Plate.astro';
 import InkFig from '../../components/riso/drafts/InkFig.astro';
 import ProofStamp from '../../components/riso/drafts/ProofStamp.astro';
@@ -12,6 +13,7 @@ import { loadDrafts, type Draft } from '../../lib/drafts';
 import { renderMarkdownWithHeadings } from '../../lib/markdown';
 import { draftDesign, printDate, readingMinutes, hash, rng } from '../../lib/zine';
 import { media } from '../../components/riso/drafts/util';
+import { ISSUE } from '../../lib/issue';
 
 export function getStaticPaths() {
   return loadDrafts().map((d) => ({ params: { slug: d.slug }, props: { draft: d } }));
@@ -41,7 +43,7 @@ const leftover = figs.slice((parts.length - 1) * per);
     style={`--lt:var(--${lt});--dk:var(--${dk});--mx:${r.range(-2.4, 2.4).toFixed(2)}px;--my:${r.range(-1.8, 1.8).toFixed(2)}px;--lx:0px;--ly:0px`}
   >
     <nav class="single-nav" aria-label="Issue">
-      <a href="/">_fragments, current issue</a>
+      <a href="/">_fragments, issue {ISSUE.number}</a>
       <span>Proof, not yet published</span>
     </nav>
     <article class="sheet single-sheet paper-newsprint" data-kind="draft">
@@ -50,7 +52,7 @@ const leftover = figs.slice((parts.length - 1) * per);
         <header class="single-head">
           <p class="single-kind">{d.kicker}, in proof</p>
           <Reg as="h1" text={d.title} class="t-tower single-title" style={`--fs:clamp(44px, ${Math.min(13, Math.max(6, 110 / Math.pow(d.title.length, 0.7))).toFixed(2)}vw, 150px)`} />
-          <p class="draft-dek">{d.dek}</p>
+          <p class="draft-dek"><Linked parts={d.dekParts} /></p>
           <p class="cap single-meta">
             <time datetime={d.date}>{printDate(d.date)}</time>
             <span>{mins} minute read</span>

@@ -13,6 +13,7 @@ import { loadDrafts } from '../lib/drafts';
 import { loadStream } from '../lib/stream';
 import { impose } from '../lib/zine';
 import { measureAll } from '../lib/tone';
+import { ISSUE } from '../lib/issue';
 
 const stream = await loadStream();
 const drafts = loadDrafts();
@@ -30,14 +31,12 @@ await measureAll(stream.flatMap((i) => {
   if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
   return i.media.filter((m) => !m.video || m.video.endsWith('.m3u8')).map((m) => m.src);
 }));
-const issue = stream.filter((i) => i.kind !== 'note' && i.kind !== 'reshare').length;
-const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
-<Base description={`_fragments, issue ${issue}: work, writing and clippings from Nate Butler.`} bodyClass="issue">
+<Base description={`_fragments, issue ${ISSUE.number}, ${ISSUE.season}: work, writing and clippings from Nate Butler.`} bodyClass="issue">
   <main class="zine">
     {spreads.map((s) => {
       switch (s.kind) {
-        case 'cover': return <Cover spread={s} issue={issue} printed={printed} />;
+        case 'cover': return <Cover spread={s} />;
         case 'bio': return <Bio spread={s} />;
         case 'post': return <PostSpread spread={s} />;
         case 'shot': return <ShotSpread spread={s} />;
@@ -49,7 +48,7 @@ const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'n
       }
     })}
     <footer class="colophon-end">
-      <p>End of issue {issue}. Back to the <a href="#p-0">cover</a>.</p>
+      <p>End of issue {ISSUE.number}. Back to the <a href="#p-0">cover</a>.</p>
     </footer>
   </main>
   <script>

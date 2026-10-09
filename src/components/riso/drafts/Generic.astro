@@ -1,6 +1,7 @@
 ---
 /** A draft with no design of its own yet: title, dek, facts and text. */
 import Reg from '../Reg.astro';
+import Linked from '../Linked.astro';
 import Prose from './Prose.astro';
 import Cont from './Cont.astro';
 import { split } from './util';
@@ -15,7 +16,7 @@ const [a, b] = split(blocks, 0.4);
 <div class="pg pg-l gen-open">
   <p class="dr-kicker">{d.kicker}</p>
   <Reg as="h2" text={d.title} class="t-tower gen-title" />
-  <p class="dr-dek">{d.dek}</p>
+  <p class="dr-dek"><Linked parts={d.dekParts} /></p>
   <Prose flow={d.key} blocks={a} cols={1} dropcap />
 </div>
 <div class="pg pg-r">
