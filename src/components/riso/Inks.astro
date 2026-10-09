@@ -59,7 +59,7 @@ const curve = (role: Role) =>
 const neg = (r: Role): Role => ({ ...r, invert: !r.invert });
 
 const filters: { id: string; role: Role; color: string }[] = [];
-for (const ink of ['pink', 'red', 'blue', 'black'] as const) {
+for (const ink of ['yellow', 'teal', 'blue', 'black'] as const) {
   filters.push({ id: `ht-lt-${ink}`, role: ROLES.lt, color: INK_HEX[ink] });
   filters.push({ id: `ht-dk-${ink}`, role: ROLES.dk, color: INK_HEX[ink] });
   // negatives, for dark images

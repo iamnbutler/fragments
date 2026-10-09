@@ -1,7 +1,7 @@
 ---
 /**
  * Telephone as a manual exchange: an operator, a jack field, patch cords.
- * Pink is anything live, blue the Codex side, red the Claude side, black
+ * Yellow is anything live, blue the Codex side, teal the Claude side, black
  * the line art and the fine print. The payphone ASCII art is Joan Stark's
  * and the homepage palette David Aerne's; their credit travels with the art.
  */
@@ -31,7 +31,7 @@ const [a, b] = split(blocks, 0.5);
     <div class="tel-board" aria-hidden="true">
       <InkFig image={fig1} ink="lt" fit="cover" caption={false} />
     </div>
-    <Reg as="h2" text={d.title} class="t-tower tel-title" style="--lt:var(--pink);--dk:var(--black)" />
+    <Reg as="h2" text={d.title} class="t-tower tel-title" style="--lt:var(--yellow);--dk:var(--black)" />
     <div class="tel-ticket" role="group" aria-label="Operator's ticket">
       <p class="tel-ticket-head"><span>Operator’s ticket</span><span>No. 0914</span></p>
       <p class="dr-kicker">{d.kicker}</p>
@@ -98,14 +98,14 @@ const [a, b] = split(blocks, 0.5);
         <figure class="tel-notes">
           <span class="tape tape-a" aria-hidden="true"></span>
           <span class="tape tape-b" aria-hidden="true"></span>
-          <Plate media={notes} inks={['pink', 'black']} mode="key" fit="contain" />
+          <Plate media={notes} inks={['yellow', 'black']} mode="key" fit="contain" />
           <figcaption class="cap">{img(d, 'homepage-notes.png')?.caption}</figcaption>
         </figure>
       )}
       <p class="tel-q">{q[0]}</p>
       {home && (
         <figure class="tel-phone">
-          <div class="tel-phone-crop"><Plate media={home} inks={['pink', 'black']} mode="key" fit="cover" /></div>
+          <div class="tel-phone-crop"><Plate media={home} inks={['yellow', 'black']} mode="key" fit="cover" /></div>
           <figcaption class="cap">The homepage at nate.rip/telephone. {CREDIT}</figcaption>
         </figure>
       )}

@@ -1,13 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import Cover from '../components/riso/Cover.astro';
-import Contents from '../components/riso/Contents.astro';
+import Bio from '../components/riso/Bio.astro';
 import PostSpread from '../components/riso/PostSpread.astro';
 import ShotSpread from '../components/riso/ShotSpread.astro';
 import ListSpread from '../components/riso/ListSpread.astro';
 import BulletinSpread from '../components/riso/BulletinSpread.astro';
 import ClippingsSpread from '../components/riso/ClippingsSpread.astro';
-import SectionSpread from '../components/riso/SectionSpread.astro';
 import JumpSpread from '../components/riso/JumpSpread.astro';
 import DraftSpread from '../components/riso/drafts/DraftSpread.astro';
 import { loadDrafts } from '../lib/drafts';
@@ -26,8 +25,6 @@ const isStop = (s: (typeof all)[number]) =>
   (s.kind === 'draft' && s.draft.slug === STOP_AFTER) || (s.kind === 'jump' && 'slug' in s.item && s.item.slug === STOP_AFTER);
 const end = all.findLastIndex(isStop);
 const spreads = end < 0 ? all : all.slice(0, end + 1);
-const lastPage = spreads[spreads.length - 1].page + 1;
-for (const s of spreads) if (s.kind === 'section') s.entries = s.entries.filter((e) => e.page <= lastPage);
 // Check every plate's tone so dark images can be separated as negatives.
 await measureAll(stream.flatMap((i) => {
   if (i.kind === 'reshare') return [...i.original.media.map((m) => m.src), ...(i.original.author.avatar ? [i.original.author.avatar] : [])];
@@ -41,13 +38,12 @@ const printed = new Date().toLocaleDateString('en-US', { month: 'long', year: 'n
     {spreads.map((s) => {
       switch (s.kind) {
         case 'cover': return <Cover spread={s} issue={issue} printed={printed} />;
-        case 'contents': return <Contents spread={s} spreads={spreads} issue={issue} />;
+        case 'bio': return <Bio spread={s} />;
         case 'post': return <PostSpread spread={s} />;
         case 'shot': return <ShotSpread spread={s} />;
         case 'list': return <ListSpread spread={s} />;
         case 'bulletin': return <BulletinSpread spread={s} />;
         case 'clippings': return <ClippingsSpread spread={s} />;
-        case 'section': return <SectionSpread spread={s} />;
         case 'jump': return <JumpSpread spread={s} />;
         case 'draft': return <DraftSpread spread={s} />;
       }

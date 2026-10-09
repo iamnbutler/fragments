@@ -1,7 +1,7 @@
 ---
 /**
- * Ace, on our own machines: the house that is also the office. Pink and
- * black open on the icon's dither; the system drawing prints in blue; red
+ * Ace, on our own machines: the house that is also the office. Yellow and
+ * black open on the icon's dither; the system drawing prints in blue; teal
  * is held back for the security notice.
  */
 import Reg from '../Reg.astro';
@@ -28,7 +28,7 @@ const [a, b] = split(blocks, 0.5);
       <p class="ace-word" aria-hidden="true">ACE</p>
       {canary && (
         <figure class="ace-stamp">
-          <div class="ace-perf"><Plate media={canary} inks={['pink', 'black']} fit="cover" /></div>
+          <div class="ace-perf"><Plate media={canary} inks={['yellow', 'black']} fit="cover" /></div>
           <figcaption class="cap">{img(d, 'icon-canary.png')?.caption}</figcaption>
         </figure>
       )}

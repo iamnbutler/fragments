@@ -10,13 +10,12 @@ import Plate from '../components/riso/Plate.astro';
 import Clipping from '../components/riso/Clipping.astro';
 import ProofStamp from '../components/riso/drafts/ProofStamp.astro';
 import Cover from '../components/riso/Cover.astro';
-import Contents from '../components/riso/Contents.astro';
+import Bio from '../components/riso/Bio.astro';
 import PostSpread from '../components/riso/PostSpread.astro';
 import ShotSpread from '../components/riso/ShotSpread.astro';
 import ListSpread from '../components/riso/ListSpread.astro';
 import BulletinSpread from '../components/riso/BulletinSpread.astro';
 import ClippingsSpread from '../components/riso/ClippingsSpread.astro';
-import SectionSpread from '../components/riso/SectionSpread.astro';
 import JumpSpread from '../components/riso/JumpSpread.astro';
 import DraftSpread from '../components/riso/drafts/DraftSpread.astro';
 import '../styles/styleguide.css';
@@ -94,19 +93,12 @@ const groups: { key: string; no: string; title: string; dek: string; specs: Spec
   {
     key: 'front', no: 'G1', title: 'Front matter', dek: 'The two spreads every issue opens on.',
     specs: [
-      ...spec('cover', 'Cover', 'Cover.astro + Print.astro', 'Always spread 0. A ring print on toner faces the name, the issue and a stepped swatch print. The prints are the art; the type stays plain.', find((s) => s.kind === 'cover')),
-      ...spec('contents', 'Contents', 'Contents.astro', 'Always spread 1. Lists every department and every spread a reader can land on, with the colophon.', find((s) => s.kind === 'contents')),
+      ...spec('cover', 'Cover', 'Cover.astro + scripts/cover-press.ts', 'Always spread 0. One of Nate’s 2017 renders pulled as a stepped gradient-map proof across the spread, numbered and signed on the line beneath it, then the name and the issue.', find((s) => s.kind === 'cover')),
+      ...spec('bio', 'Hi friends', 'Bio.astro', 'Always spread 1. Who Nate is, in his words: a greeting overprinted on a yellow flood, then where he works and has worked.', find((s) => s.kind === 'bio')),
     ],
   },
   {
-    key: 'sections', no: 'G2', title: 'Section openers', dek: 'Each department opens on its own print, with the name knocked out of it up the page.',
-    specs: [
-      ...spec('section-features', 'Opener on newsprint', 'SectionSpread.astro', 'Features, Dispatches and Library open on the issue’s paper.', find((s) => s.kind === 'section' && s.key === 'features')),
-      ...spec('section-plates', 'Opener on toner', 'SectionSpread.astro', 'Plates always opens on toner.', find((s) => s.kind === 'section' && s.key === 'plates')),
-    ],
-  },
-  {
-    key: 'essays', no: 'G3', title: 'Essays and jumps', dek: 'Long writing gets an opener chosen to fit its length, then plain jump spreads; outbound links become numbered margin notes.',
+    key: 'essays', no: 'G2', title: 'Essays and jumps', dek: 'Long writing gets an opener chosen to fit its length, then plain jump spreads; outbound links become numbered margin notes.',
     specs: [
       ...spec('post-tower', 'Essay: tower', 'PostSpread.astro', 'Condensed title stacked on the left page, two columns of text on the right. Holds about 1,900 characters.', postOf('tower')),
       ...spec('post-banner', 'Essay: banner', 'PostSpread.astro', 'Spaced title across both pages over a heavy rule, with a pull quote. The roomiest opener, about 2,900 characters.', postOf('banner')),
@@ -116,14 +108,14 @@ const groups: { key: string; no: string; title: string; dek: string; specs: Spec
     ],
   },
   {
-    key: 'proofs', no: 'G4', title: 'PROOF features', dek: 'Local drafts print as art-directed features, each with its own ink pairing from the ramp. Only the opening spread is stamped PROOF.',
+    key: 'proofs', no: 'G3', title: 'PROOF features', dek: 'Local drafts print as art-directed features, each with its own ink pairing from the ramp. Only the opening spread is stamped PROOF.',
     specs: [
       ...drafts.flatMap((d) => spec(`draft-${d.slug}`, `${d.title}, opening`, `drafts/${({ ace2: 'Ace', 'desktop-tools': 'DesktopTools', gpuikit: 'Gpuikit', telephone: 'Telephone' } as Record<string, string>)[d.slug] ?? 'Generic'}.astro`, `${d.kicker}. Inks: ${(spreads.find((s) => s.kind === 'draft' && s.draft.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'draft' && s.draft.slug === d.slug && s.part === 0))),
       ...spec('draft-later', 'A later spread of a feature', 'drafts/Telephone.astro', 'Later spreads keep the quiet “Proof” running head and lose the stamp.', find((s) => s.kind === 'draft' && s.part === 2)),
     ],
   },
   {
-    key: 'plates', no: 'G5', title: 'Plates', dek: 'Shots, printed as large as the page allows. Every photo is separated into a light plate and a key plate.',
+    key: 'plates', no: 'G4', title: 'Plates', dek: 'Shots, printed as large as the page allows. Every photo is separated into a light plate and a key plate.',
     specs: [
       ...spec('shot-bleed', 'Plate: bleed', 'ShotSpread.astro', 'One picture across both pages, its label on a slip in a seeded corner.', shotOf('bleed')),
       ...spec('shot-plate', 'Plate: plate and notes', 'ShotSpread.astro', 'The picture fills one page; the other carries the description, a strip of further frames and the title.', shotOf('plate')),
@@ -133,7 +125,7 @@ const groups: { key: string; no: string; title: string; dek: string; specs: Spec
     ],
   },
   {
-    key: 'dispatches', no: 'G6', title: 'Dispatches and clippings', dek: 'Short notes, links as tear-off coupons, short essays, and other people’s posts pasted in as photocopies.',
+    key: 'dispatches', no: 'G5', title: 'Dispatches and clippings', dek: 'Short notes, links as tear-off coupons, short essays, and other people’s posts pasted in as photocopies.',
     specs: [
       ...spec('bulletin-1', 'Notices: one', 'BulletinSpread.astro', 'A single notice, centred.', bulletinWith(1)),
       ...spec('bulletin-2', 'Notices: two', 'BulletinSpread.astro', 'One notice a page.', bulletinWith(2)),
@@ -147,7 +139,7 @@ const groups: { key: string; no: string; title: string; dek: string; specs: Spec
     ],
   },
   {
-    key: 'library', no: 'G7', title: 'Library', dek: 'Lists Nate keeps adding to.',
+    key: 'library', no: 'G6', title: 'Library', dek: 'Lists Nate keeps adding to.',
     specs: [
       ...spec('list-index', 'Index', 'ListSpread.astro', 'A huge entry count in the light ink, then up to 16 entries with leaders.', listOf('index')),
       ...spec('list-ledger', 'Ledger', 'ListSpread.astro', 'A spaced title over a rule and two columns of up to 26 entries.', listOf('ledger')),
@@ -163,9 +155,9 @@ const clipping = stream.find((i): i is ReshareItem => i.kind === 'reshare' && !!
 const paper = PAPERS.newsprint;
 const pct = (i: number, n: number) => `${((i / (n - 1)) * 100).toFixed(1)}%`;
 const SPOT_ROLE: Record<string, string> = {
-  pink: 'Light plate. Floods, tape, halftone highlights, the cover block.',
-  red: 'Light plate. Coupons, rules, the screened sun; every clipping stamp and the PROOF stamp.',
-  blue: 'Key plate on pink. Nate’s marker notes; a lighter blue (#6A7DD4) sets them on toner.',
+  yellow: 'Light plate. Floods, tape, halftone highlights. Too pale for small type.',
+  blue: 'Light plate under teal or black, key plate on yellow. Nate’s marker notes; a lighter blue (#6A7DD4) sets them on toner.',
+  teal: 'Key plate and the accent: coupons, rules, every clipping stamp and the PROOF stamp.',
   black: 'Key plate. Type, rules, shadows.',
 };
 const TOKENS: [string, string, string][] = [
@@ -195,7 +187,7 @@ const SCREENS = [
 ];
 ---
 <Base title="Specimen book" description="The house style of _fragments: inks, papers, type, grid, print effects, motion and every spread layout." bodyClass="styleguide" noindex>
-  <main class="sb" style="--lt:var(--pink);--dk:var(--black);--mx:1.6px;--my:-1.1px;--lx:0px;--ly:0px">
+  <main class="sb" style="--lt:var(--yellow);--dk:var(--black);--mx:1.6px;--my:-1.1px;--lx:0px;--ly:0px">
     <nav class="single-nav sb-nav" aria-label="Site">
       <a href="/">_fragments, issue {issue}</a>
       <span>Specimen book</span>
@@ -326,7 +318,7 @@ const SCREENS = [
           <dt><code>.reg .t-tower</code><span>Essay towers, index and contact titles. Width 62, weight 860, caps, line height 0.84. Size fitted to title length: <code>min(12, max(4.4, 112 / len^0.72))</code> cqw.</span></dt>
           <dd><Reg as="p" text="Building UI in GPUI" class="t-tower" style="--fs:7cqw" /></dd>
           <dt><code>.reg .t-spaced</code><span>Banner and ledger titles, plate labels. Width 125, weight 300, tracked 0.34em.</span></dt>
-          <dd><Reg as="p" text="Contents" class="t-spaced" style="--fs:4.4cqw" /></dd>
+          <dd><Reg as="p" text="Ledger" class="t-spaced" style="--fs:4.4cqw" /></dd>
           <dt><code>.t-reverse</code><span>Titles on toner: newsprint type with a light-ink shadow.</span></dt>
           <dd class="sb-dd-toner paper-toner"><p class="t-reverse" style="--fs:5cqw">Powering a static site</p></dd>
           <dt><code>.prose-cols .dropcap</code><span>Running text. <code>--fs-body: clamp(12px, 1.06cqw, 17px)</code>, line height 1.5, hyphenated, indented paragraphs, run-in heads and square bullets.</span></dt>
@@ -398,14 +390,14 @@ const SCREENS = [
         <div class="sb-plates">
           {light && (
             <Fragment>
-              <figure class="sb-plate"><Plate media={light} inks={['pink', 'black']} alt="" proof /><figcaption class="cap">Duotone, pink + black <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>
-              <figure class="sb-plate" style="--lt:var(--red);--dk:var(--blue)"><Plate media={light} inks={['red', 'blue']} alt="" /><figcaption class="cap">Duotone, red + blue</figcaption></figure>
-              <figure class="sb-plate"><Plate media={light} inks={['pink', 'blue']} mode="key" alt="" /><figcaption class="cap">Key plate only, blue</figcaption></figure>
+              <figure class="sb-plate"><Plate media={light} inks={['yellow', 'black']} alt="" proof /><figcaption class="cap">Duotone, yellow + black <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>
+              <figure class="sb-plate" style="--lt:var(--blue);--dk:var(--teal)"><Plate media={light} inks={['blue', 'teal']} alt="" /><figcaption class="cap">Duotone, blue + teal</figcaption></figure>
+              <figure class="sb-plate"><Plate media={light} inks={['yellow', 'blue']} mode="key" alt="" /><figcaption class="cap">Key plate only, blue</figcaption></figure>
               <figure class="sb-plate"><Plate media={light} inks={['black', 'black']} mode="mono" alt="" /><figcaption class="cap">Mono, as in clippings</figcaption></figure>
-              <figure class="sb-plate sb-plate-toner paper-toner"><Plate media={light} inks={['pink', 'black']} mode="rev" alt="" /><figcaption class="cap">Reverse, on toner</figcaption></figure>
+              <figure class="sb-plate sb-plate-toner paper-toner"><Plate media={light} inks={['yellow', 'black']} mode="rev" alt="" /><figcaption class="cap">Reverse, on toner</figcaption></figure>
             </Fragment>
           )}
-          {dark && <figure class="sb-plate" style="--lt:var(--pink);--dk:var(--blue)"><Plate media={dark} inks={['pink', 'blue']} alt="" proof /><figcaption class="cap">Negative, for dark UI <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>}
+          {dark && <figure class="sb-plate" style="--lt:var(--yellow);--dk:var(--blue)"><Plate media={dark} inks={['yellow', 'blue']} alt="" proof /><figcaption class="cap">Negative, for dark UI <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>}
         </div>
         <table class="sb-table">
           <thead><tr><th scope="col">Screen</th><th scope="col">Filter</th><th scope="col">Cell</th><th scope="col">Carries</th></tr></thead>
@@ -415,7 +407,7 @@ const SCREENS = [
         <h3 class="sb-sub">Registration</h3>
         <p class="sb-note">Display type prints twice: the light plate is a pseudo-element offset by 1.8 × the misregistration, the key plate is the text. Move the pointer over a spread to push the plates apart; the Misregistration dial above scales every spread’s offset.</p>
         <div class="sb-reg-row">
-          {(['pink', 'red'] as Ink[]).map((lt) => <Reg as="p" text="Out of register" class="t-tower" style={`--fs:6cqw;--lt:var(--${lt});--mx:3px;--my:-2px`} />)}
+          {(['yellow', 'teal'] as Ink[]).map((lt) => <Reg as="p" text="Out of register" class="t-tower" style={`--fs:6cqw;--lt:var(--${lt});--mx:3px;--my:-2px`} />)}
         </div>
 
         <h3 class="sb-sub">Texture</h3>
@@ -474,7 +466,7 @@ const SCREENS = [
       <div class="sb-board paper-newsprint sb-parts">
         <figure class="sb-part-cell">
           <div class="sb-part-stage"><div class="stamp sb-static" style="--stamp-rot:-6deg"><span class="stamp-top">Clipped from</span><span class="stamp-handle">@meodai.bsky.social</span><span class="stamp-date">15 Sep 2026</span></div></div>
-          <figcaption class="cap"><b>Clipping stamp.</b> Always red, so a reshare can’t be mistaken for Nate’s own work. <code>.stamp</code></figcaption>
+          <figcaption class="cap"><b>Clipping stamp.</b> Always teal, so a reshare can’t be mistaken for Nate’s own work. <code>.stamp</code></figcaption>
         </figure>
         <figure class="sb-part-cell">
           <div class="sb-part-stage"><ProofStamp date={drafts[0]?.date ?? '2026-10-08'} class="sb-static" /></div>
@@ -540,13 +532,12 @@ const SCREENS = [
                     <span class="sb-ticket-file"><code>{sp.file}</code>, inks {s.inks[0]} + {s.inks[1]}, {s.paper}</span>
                   </p>
                   {s.kind === 'cover' ? <Cover spread={s} issue={issue} printed={printed} />
-                    : s.kind === 'contents' ? <Contents spread={s} spreads={spreads} issue={issue} />
+                    : s.kind === 'bio' ? <Bio spread={s} />
                     : s.kind === 'post' ? <PostSpread spread={s} />
                     : s.kind === 'shot' ? <ShotSpread spread={s} />
                     : s.kind === 'list' ? <ListSpread spread={s} />
                     : s.kind === 'bulletin' ? <BulletinSpread spread={s} />
                     : s.kind === 'clippings' ? <ClippingsSpread spread={s} />
-                    : s.kind === 'section' ? <SectionSpread spread={s} />
                     : s.kind === 'jump' ? <JumpSpread spread={s} />
                     : s.kind === 'draft' ? <DraftSpread spread={s} />
                     : null}

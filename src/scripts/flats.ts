@@ -293,7 +293,7 @@ function buildBoard(sheets: HTMLElement[], open: (i: number) => void, back: () =
   const pages = sheets.length * 2;
   const slug = document.createElement('header');
   slug.className = 'flats-slug';
-  const inks = ['pink', 'red', 'blue', 'black'];
+  const inks = ['yellow', 'teal', 'blue', 'black'];
   const bars = inks.flatMap((ink) => [100, 70, 40, 15].map((t) => `<span style="--c:var(--${ink});--t:${t / 100}"></span>`)).join('');
   const reg = '<svg class="reg-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><path d="M12 0v24M0 12h24"/></svg>';
   slug.innerHTML = `${reg}<p class="slug-text"><span>_fragments</span><span>Issue ${issue}</span><span>${sheets.length} spreads, ${pages} pages</span><span>Flats</span></p><div class="bars" aria-hidden="true">${bars}</div>${reg}`;

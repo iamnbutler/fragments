@@ -3,11 +3,11 @@ import { readFileSync } from 'node:fs';
 const read = path => readFileSync(`dist/${path}`, 'utf8');
 assert.equal(read('CNAME').trim(), 'nate.rip');
 
-// Home: one issue of spreads, opening on the cover and the contents.
+// Home: one issue of spreads, opening on the cover and the bio.
 const home = read('index.html');
 assert.match(home, /<main\b/);
 assert.match(home, /class="[^"]*\bspread-cover\b/);
-assert.match(home, /class="[^"]*\bspread-contents\b/);
+assert.match(home, /class="[^"]*\bspread-bio\b/);
 assert.doesNotMatch(home, /<video[^>]*\sautoplay(?:\s|=|>)/);
 for (const id of [5, 6, 7, 8]) {
   const videos = home.match(new RegExp(`<video\\b[^>]*aria-label="Fixture video ${id}"[^>]*>[\\s\\S]*?</video>`, 'g')) ?? [];

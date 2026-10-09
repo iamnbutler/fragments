@@ -25,14 +25,14 @@ export const MID = [
 export const MAIN = ['#F3DEB1', '#FCC135', '#FF5846', '#FFA0C8', '#4F77D6', '#005FAF', '#005555', '#003C1E', '#000000'] as const;
 
 /**
- * The four spot inks, all from the main row. Pink and red are the light
- * plates; blue and black key. They replace the fluorescent pink, orange,
- * blue and black of the first printing.
+ * The four spot inks, all from the main row: yellow is the light plate,
+ * blue sits between, teal and black key. Teal is also the accent for
+ * stamps and marks. They replace pink and red from the earlier printing.
  */
 export const SPOT = {
-  pink: '#FFA0C8',
-  red: '#FF5846',
+  yellow: '#FCC135',
   blue: '#4F77D6',
+  teal: '#005555',
   black: '#000000',
 } as const;
 

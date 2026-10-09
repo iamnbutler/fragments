@@ -11,7 +11,7 @@ import { SPOT, PAPERS } from './spectrum';
  * neighbouring spreads share a composition.
  */
 
-export type Ink = 'pink' | 'red' | 'blue' | 'black';
+export type Ink = 'yellow' | 'blue' | 'teal' | 'black';
 export type Paper = 'newsprint' | 'cream' | 'bone' | 'toner';
 
 interface SpreadBase {
@@ -67,12 +67,6 @@ export interface Ref {
   label: string;
 }
 
-export interface SectionEntry {
-  page: number;
-  title: string;
-  kind: string;
-}
-
 /** What a jump spread needs from the piece it continues. */
 export interface JumpItem {
   key: string;
@@ -95,34 +89,33 @@ export interface DraftDesign {
 export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
   'desktop-tools': {
     caps: [1500, 2300],
-    inks: [['red', 'blue'], ['blue', 'red']],
+    inks: [['blue', 'teal'], ['blue', 'teal']],
     paper: ['newsprint', 'bone'],
     companion: 'ace2',
   },
   ace2: {
     caps: [2000, 700, 1900],
-    inks: [['pink', 'black'], ['blue', 'black'], ['red', 'black']],
+    inks: [['yellow', 'black'], ['blue', 'black'], ['teal', 'black']],
     paper: ['newsprint', 'newsprint', 'bone'],
     companion: 'desktop-tools',
   },
   telephone: {
     caps: [1500, 1300, 1700, 1500],
-    inks: [['pink', 'black'], ['pink', 'blue'], ['red', 'blue'], ['pink', 'black']],
+    inks: [['yellow', 'black'], ['yellow', 'blue'], ['blue', 'teal'], ['yellow', 'black']],
     paper: ['newsprint', 'bone', 'toner', 'newsprint'],
   },
   gpuikit: {
     caps: [0, 1500, 1300],
-    inks: [['blue', 'black'], ['blue', 'black'], ['red', 'blue']],
+    inks: [['blue', 'black'], ['blue', 'black'], ['blue', 'teal']],
     paper: ['bone', 'newsprint', 'newsprint'],
   },
 };
-const GENERIC_DRAFT: DraftDesign = { caps: [2600], inks: [['pink', 'black']], paper: ['newsprint'] };
+const GENERIC_DRAFT: DraftDesign = { caps: [2600], inks: [['yellow', 'black']], paper: ['newsprint'] };
 export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAFT;
 
 export type Spread =
   | (SpreadBase & { kind: 'cover' })
-  | (SpreadBase & { kind: 'contents' })
-  | (SpreadBase & { kind: 'section'; key: SectionKey; entries: SectionEntry[] })
+  | (SpreadBase & { kind: 'bio' })
   | (SpreadBase & { kind: 'post'; layout: PostLayout; item: FragmentItem; blocks: Block[]; jump?: number; archive: boolean })
   | (SpreadBase & { kind: 'jump'; item: JumpItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean; proof?: boolean })
   | (SpreadBase & {
@@ -169,10 +162,10 @@ export function rng(seed: number) {
 }
 
 export const INK_PAIRS: [Ink, Ink][] = [
-  ['pink', 'black'],
-  ['red', 'black'],
-  ['pink', 'blue'],
-  ['red', 'blue'],
+  ['yellow', 'black'],
+  ['yellow', 'blue'],
+  ['blue', 'black'],
+  ['yellow', 'teal'],
 ];
 
 // --- imposition --------------------------------------------------------------
@@ -228,8 +221,8 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
   };
   const mark = (layout: string) => history.push(layout);
 
-  push('cover', (_r, b) => ({ ...b, kind: 'cover', inks: ['pink', 'red'], paper: 'newsprint' }));
-  push('contents', (_r, b) => ({ ...b, kind: 'contents', inks: ['red', 'black'], paper: 'bone' }));
+  push('cover', (_r, b) => ({ ...b, kind: 'cover', inks: ['yellow', 'teal'], paper: 'newsprint' }));
+  push('bio', (_r, b) => ({ ...b, kind: 'bio', inks: ['yellow', 'blue'], paper: 'bone' }));
 
   // --- sort the stream into departments, each newest first ---
   const features = stream.filter((x): x is FragmentItem => x.kind === 'post' && words(x.text) >= SHORT_WORDS);
@@ -408,7 +401,7 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
   };
 
   /**
-   * Lay out one department: an opener, then its own spreads with clippings
+   * Lay out one department: its own spreads with clippings
    * threaded through at an even rate up to `shareEnd`.
    */
   const department = (
@@ -420,15 +413,6 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
   ) => {
     if (!count) return;
     section = key;
-    const opener = push(`section-${key}`, (_r, b) => ({
-      ...b,
-      kind: 'section',
-      key,
-      entries: [],
-      paper: key === 'plates' ? 'toner' : b.paper,
-    })) as Extract<Spread, { kind: 'section' }>;
-    mark('section');
-    const start = spreads.length;
     const shareStart = si;
     const shareCount = Math.max(0, shareEnd - shareStart);
     let i = 0;
@@ -445,7 +429,6 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
         run = 0;
       }
     }
-    opener.entries = spreads.slice(start).flatMap((s) => entryFor(s));
   };
 
   department(
@@ -474,28 +457,6 @@ export function impose(stream: StreamItem[], drafts: Draft[] = []): Spread[] {
   }, si, { max: 0, wall: false, run: 0 });
 
   return spreads;
-}
-
-/** What a section opener lists for a spread: Nate's own work, not clippings. */
-function entryFor(s: Spread): SectionEntry[] {
-  switch (s.kind) {
-    case 'post':
-      return [{ page: s.page, title: s.item.title, kind: 'Essay' }];
-    case 'draft':
-      return s.part === 0 ? [{ page: s.page, title: s.draft.title, kind: 'Proof' }] : [];
-    case 'shot':
-      return s.items.map((i) => ({ page: s.page, title: i.title, kind: 'Plate' }));
-    case 'list':
-      return [{ page: s.page, title: s.item.title, kind: 'Index' }];
-    case 'bulletin':
-      return s.items.map((i) => ({
-        page: s.page,
-        title: i.kind === 'note' ? inline(i.text).slice(0, 48).replace(/\s+\S*$/, '') + '…' : (i as FragmentItem).title,
-        kind: i.kind === 'note' ? 'Dispatch' : i.kind === 'link' ? 'Link' : 'Short',
-      }));
-    default:
-      return [];
-  }
 }
 
 /** Numbered references used in a run of blocks, in order. */
@@ -653,8 +614,8 @@ export function spreadTitle(s: Spread): string {
   switch (s.kind) {
     case 'cover':
       return 'Cover';
-    case 'contents':
-      return 'Contents';
+    case 'bio':
+      return 'Hi friends';
     case 'post':
     case 'list':
       return s.item.title;
@@ -664,8 +625,6 @@ export function spreadTitle(s: Spread): string {
       return s.items.map((i) => (i.kind === 'note' ? 'Dispatch' : (i as FragmentItem).title)).join(' / ');
     case 'clippings':
       return s.items.map((i) => '@' + i.original.author.handle).join(', ');
-    case 'section':
-      return SECTIONS[s.key].title;
     case 'jump':
       return `${s.item.title} (continued)`;
     case 'draft':

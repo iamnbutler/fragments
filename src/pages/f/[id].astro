@@ -29,7 +29,7 @@ const idx = sorted.findIndex((f) => f.id === fragment.id);
 const prev = idx > 0 ? sorted[idx - 1] : null;
 const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
-const PAIRS: [Ink, Ink][] = [['pink', 'black'], ['red', 'black'], ['pink', 'blue'], ['red', 'blue']];
+const PAIRS: [Ink, Ink][] = [['yellow', 'black'], ['yellow', 'blue'], ['blue', 'black'], ['yellow', 'teal']];
 const seed = hash(`f-${fragment.id}`);
 const r = rng(seed);
 const inks = PAIRS[seed % PAIRS.length];
@@ -75,7 +75,7 @@ const desc = inline(paragraphs(fragment.content ?? '', fragment.title)[0] ?? '')
           <div class="single-plates">
             {item.media.map((m, i) => (
               <div class="single-plate">
-                <Plate media={m} inks={i % 2 ? [inks[0] === 'pink' ? 'red' : 'pink', inks[1]] : inks} fit="contain" alt={m.alt || `${fragment.title}${item.media.length > 1 ? `, frame ${i + 1}` : ''}`} proof={!m.video} eager={i === 0} />
+                <Plate media={m} inks={i % 2 ? [inks[0] === 'yellow' ? 'blue' : 'yellow', inks[1]] : inks} fit="contain" alt={m.alt || `${fragment.title}${item.media.length > 1 ? `, frame ${i + 1}` : ''}`} proof={!m.video} eager={i === 0} />
                 <div class="single-plate-foot">
                   <span class="cap">Frame {i + 1} of {item.media.length}</span>
                   {!m.video && <button class="proof-toggle" type="button" aria-pressed="false">Show original color</button>}
