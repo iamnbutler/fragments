@@ -22,7 +22,7 @@ https://fragments.iamnbutler.workers.dev.
 ## Layout
 
 - `content/drafts/*.md`: pieces, with front matter for title, dek, figures
-  and links. A piece prints as a PROOF until it sets `proof: false`.
+  and links.
 - `src/pages/index.astro`: the issue (cover, bio, then each piece's spreads).
 - `src/pages/d/[slug].astro`: a piece on its own page.
 - `src/pages/styleguide.astro`: the house style and every spread design.

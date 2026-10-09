@@ -30,7 +30,7 @@ const keys = ['Accessibility', 'Screen Recording', 'Event Synthesizing'];
       </div>
       <Reg as="h2" text={d.title} class="t-tower dt-title" style="--lt:var(--blue);--dk:var(--teal)" />
       <div class="dt-deck">
-        {(d.kicker || d.proof) && <p class="dr-kicker">{d.kicker}{d.proof && <span class="dr-proof">{d.kicker && '  ·  '}in proof</span>}</p>}
+        {d.kicker && <p class="dr-kicker">{d.kicker}</p>}
         <p class="dr-dek"><Linked parts={d.dekParts} /></p>
       </div>
       <Prose flow={d.key} blocks={a} cols={2} dropcap />

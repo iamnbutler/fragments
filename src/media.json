@@ -139,6 +139,34 @@
     "width": 960,
     "height": 620
   },
+  "drafts/jev-demos/fig-1-call": {
+    "key": "drafts/jev-demos/fig-1-call.d82e6ce585.svg",
+    "type": "image/svg+xml",
+    "bytes": 4624,
+    "width": 960,
+    "height": 640
+  },
+  "drafts/jev-demos/fig-2-modes": {
+    "key": "drafts/jev-demos/fig-2-modes.61d7f540cf.svg",
+    "type": "image/svg+xml",
+    "bytes": 3217,
+    "width": 960,
+    "height": 600
+  },
+  "drafts/jev-demos/fig-3-budget": {
+    "key": "drafts/jev-demos/fig-3-budget.0ae91158f9.svg",
+    "type": "image/svg+xml",
+    "bytes": 5872,
+    "width": 960,
+    "height": 590
+  },
+  "drafts/jev-demos/fig-4-pairs": {
+    "key": "drafts/jev-demos/fig-4-pairs.0b67becda7.svg",
+    "type": "image/svg+xml",
+    "bytes": 2415,
+    "width": 960,
+    "height": 640
+  },
   "fonts/archivo": {
     "key": "fonts/archivo.4c98b9d490.woff2",
     "type": "font/woff2",

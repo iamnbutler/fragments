@@ -4,7 +4,6 @@ slug: desktop-tools
 date: 2026-10-08
 dek: "[desktop-tools](https://github.com/githubnext/desktop-tools) gives agents eyes and hands on a Mac, and most of the work went into what an agent should believe after it acts."
 draft: true
-proof: false
 repo: https://github.com/githubnext/desktop-tools
 links:
   - label: githubnext/desktop-tools

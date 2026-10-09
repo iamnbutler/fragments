@@ -2,8 +2,7 @@
  * Drafts: long-form pieces that live in `content/drafts/<slug>.md`, with
  * their images in media as `drafts/<slug>/<name>`. They print in the issue
  * as features, each with its own art-directed spreads, and get a reading
- * page at `/d/<slug>`. Until a piece sets `proof: false` it's marked as a
- * PROOF and kept out of search.
+ * page at `/d/<slug>`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -49,8 +48,6 @@ export interface Draft {
   dekParts: TextPart[];
   /** a department line over the title, if any */
   kicker?: string;
-  /** still a proof: stamped, marked in the running heads, not indexed */
-  proof: boolean;
   repo?: string;
   links: { label: string; url: string }[];
   facts: { label: string; value: string }[];
@@ -88,7 +85,6 @@ export function loadDrafts(): Draft[] {
       dek: textParts(str(data.dek)).map((t) => t.text).join(''),
       dekParts: textParts(str(data.dek)),
       kicker: str(data.kicker) || undefined,
-      proof: data.proof !== false,
       repo: data.repo ? str(data.repo) : undefined,
       links: (data.links ?? []).map((l: any) => ({ label: str(l.label), url: str(l.url) })),
       facts: (data.facts ?? []).map((l: any) => ({ label: str(l.label), value: str(l.value) })),

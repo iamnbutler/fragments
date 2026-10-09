@@ -60,6 +60,11 @@ export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
     inks: [['blue', 'teal'], ['blue', 'teal']],
     paper: ['newsprint', 'bone'],
   },
+  'jev-demos': {
+    caps: [1300, 1700],
+    inks: [['yellow', 'black'], ['yellow', 'teal']],
+    paper: ['newsprint', 'newsprint'],
+  },
 };
 const GENERIC_DRAFT: DraftDesign = { caps: [2600], inks: [['yellow', 'black']], paper: ['newsprint'] };
 export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAFT;
@@ -67,7 +72,7 @@ export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAF
 export type Spread =
   | (SpreadBase & { kind: 'cover' })
   | (SpreadBase & { kind: 'bio' })
-  | (SpreadBase & { kind: 'jump'; item: JumpItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean; proof?: boolean })
+  | (SpreadBase & { kind: 'jump'; item: JumpItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean })
   | (SpreadBase & {
       kind: 'draft';
       draft: Draft;
@@ -171,7 +176,6 @@ export function impose(drafts: Draft[] = []): Spread[] {
         from,
         part,
         last: next >= bs.length,
-        proof: d.proof,
       };
       spreads.push(j);
       if (prev) prev.jump = j.page;
@@ -318,5 +322,7 @@ export function takeBlocks(bs: Block[], chars: number, from = 0): { blocks: Bloc
     out.push(bs[i]);
     used += bs[i].t === 'code' ? bs[i].text.split('\n').length * 40 : bs[i].text.length;
   }
+  // A heading goes with the text under it, never at the foot of a frame.
+  while (i < bs.length && out.length > 1 && out[out.length - 1].t === 'h') { out.pop(); i--; }
   return { blocks: out, next: i };
 }

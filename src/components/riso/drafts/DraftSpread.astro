@@ -1,25 +1,22 @@
 ---
 /**
  * One spread of a local draft. Each draft has its own art-directed design;
- * this picks it and, while the draft is a proof, adds the proof markings:
- * one PROOF stamp on the opening spread, and a running head on every spread
- * saying it isn't published yet.
+ * this picks it.
  */
 import Sheet from '../Sheet.astro';
-import ProofStamp from './ProofStamp.astro';
 import DesktopTools from './DesktopTools.astro';
+import JevDemos from './JevDemos.astro';
 import Generic from './Generic.astro';
 import type { Spread } from '../../../lib/zine';
 
 interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
 const { spread } = Astro.props;
 const { draft, part, parts } = spread;
-const DESIGNS: Record<string, any> = { 'desktop-tools': DesktopTools };
+const DESIGNS: Record<string, any> = { 'desktop-tools': DesktopTools, 'jev-demos': JevDemos };
 const Design = DESIGNS[draft.slug] ?? Generic;
-const label = part === 0 ? `${draft.title}, ${draft.proof ? 'a draft feature' : 'a feature'}` : `${draft.title}, part ${part + 1} of ${parts}`;
-const running = `${draft.proof ? 'Proof: ' : ''}${draft.kicker ?? draft.title}, ${part + 1} of ${parts}`;
+const label = part === 0 ? `${draft.title}, a feature` : `${draft.title}, part ${part + 1} of ${parts}`;
+const running = `${draft.kicker ?? draft.title}, ${part + 1} of ${parts}`;
 ---
 <Sheet spread={spread} label={label} layout={`dr dr-${draft.slug} dr-${draft.slug}-${part}`} running={running}>
   <Design spread={spread} />
-  {draft.proof && part === 0 && <ProofStamp date={draft.date} class={`ps-${draft.slug}-${part}`} />}
 </Sheet>
