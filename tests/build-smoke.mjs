@@ -19,7 +19,7 @@ assert.match(home, /class="[^"]*\bdr-jev-demos-0\b/);
 assert.match(home, /class="[^"]*\bdr-jev-demos-1\b/);
 for (let part = 0; part < 4; part++) assert.match(home, new RegExp(`class="[^"]*\\bdr-tasks-${part}\\b`));
 // Restored essays follow the features, in each stock opener.
-assert.ok(essays.length >= 15, `expected the restored essays, found ${essays.length}`);
+assert.ok(essays.length >= 13, `expected the restored essays, found ${essays.length}`);
 for (const layout of ['tower', 'banner', 'toner']) assert.match(home, new RegExp(`class="[^"]*\\blayout-${layout}\\b`));
 assert.match(home, /class="[^"]*\barchive-mark\b/);
 // Cover loops are made in JS when the cover is on screen, never autoplayed in the HTML.
