@@ -4,8 +4,9 @@ anchor: '@file'
 created: 2026-10-09T16:18:14Z
 norm: '1'
 sig: e3b0c44298fc1c14
-body_hash: d8f2382e44f4b042
-raw_hash: ebc7c360ad811287
+body_hash: c234b62e21900069
+raw_hash: d519a72efdcd382f
+vouched: 2026-10-10T12:45:48Z
 lines: 1-8
 supersedes: 01M4GQAAXFC35TG8QQPBJZX6EG
 ---
