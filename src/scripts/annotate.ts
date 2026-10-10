@@ -3,8 +3,9 @@
  * element, write a note, copy it as markdown for an agent. Dev only; the
  * production build drops this branch and never bundles React.
  *
- * Cmd/Ctrl+Shift+A turns annotating on and off (Agentation's own key is
- * Cmd/Ctrl+Shift+F). A modal dialog makes the rest of the page inert, so
+ * Ctrl+Shift+A turns annotating on and off; Cmd+Shift+A is Chrome's tab
+ * search, so it's Control on a Mac too (Agentation's own key, Cmd/Ctrl+Shift+F,
+ * also works). A modal dialog makes the rest of the page inert, so
  * while one is open the toolbar is portalled into it, as a popover in the
  * top layer, and notes can go on the modal.
  */
@@ -20,12 +21,12 @@ if (import.meta.env.DEV) {
     place();
 
     addEventListener('keydown', (e) => {
-      if (!(e.metaKey || e.ctrlKey) || !e.shiftKey || e.key.toLowerCase() !== 'a') return;
+      if (!e.ctrlKey || e.metaKey || !e.shiftKey || e.code !== 'KeyA') return;
       e.preventDefault();
       e.stopPropagation();
       place();
       document.dispatchEvent(new KeyboardEvent('keydown', {
-        key: 'F', code: 'KeyF', shiftKey: true, metaKey: e.metaKey, ctrlKey: e.ctrlKey, bubbles: true,
+        key: 'F', code: 'KeyF', shiftKey: true, ctrlKey: true, bubbles: true,
       }));
     }, true);
   });

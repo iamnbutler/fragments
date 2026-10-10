@@ -135,9 +135,10 @@ function ask(onChoice: (yes: boolean) => void) {
   d.className = 'fold-ask';
   d.setAttribute('aria-labelledby', 'fold-ask-title');
   d.innerHTML = `
-    <form method="dialog" class="fa-card">
-      <p class="fa-kicker">_fragments <span aria-hidden="true">·</span> before you start</p>
-      <h2 class="fa-title" id="fold-ask-title">Fold what you’ve read?</h2>
+    <form method="dialog" class="fa-card" tabindex="-1">
+      <p class="fa-running" aria-hidden="true">_fragments</p>
+      <p class="fa-mark">Before you start</p>
+      <h2 class="fa-title" id="fold-ask-title"><span data-text="Fold what you’ve read?">Fold what you’ve read?</span></h2>
       <p class="fa-lede">This issue keeps growing. With a cookie, the pieces you’ve read fold shut on your next visit, so the new pages come first.</p>
       <div class="fa-paths">
         <button class="fa-path fa-yes" value="yes">
@@ -145,7 +146,7 @@ function ask(onChoice: (yes: boolean) => void) {
           <b>Use a cookie</b>
           <span>Fold what I’ve read next time</span>
         </button>
-        <span class="fa-fold" aria-hidden="true"><span>fold here</span></span>
+        <span class="fa-fold" aria-hidden="true"><span>✂ fold here</span></span>
         <button class="fa-path fa-no" value="no">
           <span class="fa-arrow" aria-hidden="true">→</span>
           <b>No thanks</b>
@@ -153,6 +154,7 @@ function ask(onChoice: (yes: boolean) => void) {
         </button>
       </div>
       <p class="fa-small">The cookie lists the spreads you’ve looked at and nothing else, and only this site reads it. Saying no keeps just that answer. You can change your mind at the end of the issue.</p>
+      <p class="fa-folio" aria-hidden="true">ii</p>
     </form>`;
   d.addEventListener('close', () => {
     if (d.returnValue === 'yes' || d.returnValue === 'no') onChoice(d.returnValue === 'yes');
@@ -160,8 +162,8 @@ function ask(onChoice: (yes: boolean) => void) {
   });
   document.body.append(d);
   d.showModal();
-  // land on the paths, not the first link in the page
-  d.querySelector<HTMLButtonElement>('.fa-yes')!.focus();
+  // land on the leaf itself, so a Tab goes to the first path and no ring shows on load
+  d.querySelector<HTMLElement>('.fa-card')!.focus();
 }
 
 // ── the control at the end of the issue ────────────────────────────────────
