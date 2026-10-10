@@ -5,6 +5,8 @@
  * It only appears when the margin beside the spread can hold it.
  */
 
+import { shown } from './seen';
+
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** Room the rail needs to the right of the spread, in CSS pixels. */
@@ -69,6 +71,7 @@ export function pageRail(sheets: HTMLElement[]) {
     const mid = innerHeight / 2;
     let best = 0, dist = Infinity;
     sheets.forEach((s, i) => {
+      if (!shown(s)) return;
       const r = s.getBoundingClientRect();
       const d = Math.abs(r.top + r.height / 2 - mid);
       if (d < dist) { dist = d; best = i; }

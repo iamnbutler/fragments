@@ -8,12 +8,14 @@ const finePointer = () => matchMedia('(pointer: fine)').matches;
 
 import { copyfit } from './flow';
 import { pageRail } from './rail';
+import { seen, shown } from './seen';
 
 export function pressRun() {
   const root = document.documentElement;
   const sheets = [...document.querySelectorAll<HTMLElement>('.sheet')];
   if (!sheets.length) return;
   copyfit();
+  seen(sheets);
   pageRail(sheets);
 
   // ── print-in ────────────────────────────────────────────────────────────
@@ -64,10 +66,10 @@ export function pressRun() {
   }
 
   // ── keyboard page turns ─────────────────────────────────────────────────
-  const current = () => {
+  const current = (list: HTMLElement[]) => {
     const mid = innerHeight / 2;
     let best = 0, dist = Infinity;
-    sheets.forEach((s, i) => {
+    list.forEach((s, i) => {
       const r = s.getBoundingClientRect();
       const d = Math.abs(r.top + r.height / 2 - mid);
       if (d < dist) { dist = d; best = i; }
@@ -82,9 +84,11 @@ export function pressRun() {
     const next = e.key === 'j' || e.key === 'ArrowRight';
     const prev = e.key === 'k' || e.key === 'ArrowLeft';
     if (!next && !prev) return;
-    const i = Math.max(0, Math.min(sheets.length - 1, current() + (next ? 1 : -1)));
+    // folded pieces are skipped; their fold strips open them
+    const live = sheets.filter(shown);
+    const i = Math.max(0, Math.min(live.length - 1, current(live) + (next ? 1 : -1)));
     e.preventDefault();
-    sheets[i].scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
+    live[i].scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
   });
 
   // Flats and the cover press wait until the page has loaded and gone idle:

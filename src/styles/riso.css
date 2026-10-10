@@ -366,12 +366,141 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
   font: 500 14px/1.4 var(--f-display); scroll-snap-align: end;
 }
 
+/* ─── folding what you've read ─────────────────────────────────────── */
+
+/* A folded piece keeps its layout, so its copy stays poured and its flats
+   are right; it just takes no room and can't be reached. */
+.zine > .sheet.is-folded {
+  min-height: 0; height: 0; padding: 0; overflow: clip; visibility: hidden; scroll-snap-align: none;
+}
+.fold { display: grid; justify-items: center; padding: 10px 2vw calc(16px + var(--n, 1) * 3px); }
+.fold + .fold { margin-top: -8px; } /* read pieces pile up */
+.fold-tab {
+  all: unset; box-sizing: border-box; position: relative; cursor: pointer;
+  width: min(96vw, calc((100svh - 5svh) * 1.45));
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: baseline; gap: 10px 22px;
+  padding: 17px 24px 16px;
+  background: radial-gradient(120% 200% at 50% 50%, transparent 60%, rgb(0 0 0 / 0.05)), var(--newsprint);
+  color: #000;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.18), 0 12px 20px -14px rgb(0 0 0 / 0.55);
+  transition: translate 0.35s var(--ease-press), box-shadow 0.35s var(--ease-press);
+}
+/* the crease of the closed spread */
+.fold-tab::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 46px; translate: -50% 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.07) 46%, rgb(255 255 255 / 0.3) 52%, transparent);
+}
+/* one edge under the strip for every spread folded into it */
+.fold-leaves {
+  position: absolute; left: 5px; right: 5px; top: 100%; height: calc(var(--n, 1) * 3px); pointer-events: none;
+  background: repeating-linear-gradient(to bottom, var(--newsprint) 0 2px, rgb(0 0 0 / 0.2) 2px 3px);
+  box-shadow: 0 6px 10px -8px rgb(0 0 0 / 0.5);
+}
+.fold-kicker { font: 600 10.5px/1 var(--f-display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--blue); }
+.fold-title {
+  font: 800 clamp(14px, 1.3vw, 18px)/1.1 var(--f-display); font-variation-settings: 'wdth' 85;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fold-pages { font: 500 12px/1 var(--f-display); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; opacity: 0.65; }
+.fold-open {
+  font: 600 11px/1 var(--f-display); letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: underline transparent; text-underline-offset: 0.3em; text-decoration-thickness: 1.5px;
+  transition: text-decoration-color 0.2s;
+}
+.fold-open::after { content: ' ↓'; }
+.fold-tab:hover, .fold-tab:focus-visible { translate: 0 -2px; box-shadow: 0 1px 0 rgb(0 0 0 / 0.18), 0 18px 26px -16px rgb(0 0 0 / 0.55); }
+.fold-tab:hover .fold-open, .fold-tab:focus-visible .fold-open { text-decoration-color: var(--blue); }
+.fold-tab:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+@media (max-width: 760px) {
+  .fold-tab { grid-template-columns: minmax(0, 1fr) auto; padding: 14px 16px; }
+  .fold-kicker, .fold-pages { grid-row: 1; }
+  .fold-title { grid-column: 1 / -1; }
+  .fold-open { grid-column: 1 / -1; justify-self: start; }
+}
+
+/* asking first: two paths, folded down the middle */
+dialog.fold-ask {
+  width: min(780px, calc(100vw - 32px)); max-width: none; max-height: calc(100svh - 32px);
+  padding: 0; border: 0; background: none; color: #000; overflow: visible;
+}
+dialog.fold-ask::backdrop { background: color-mix(in srgb, var(--desk) 74%, transparent); backdrop-filter: blur(4px); }
+.fa-card {
+  position: relative; margin: 0; max-height: calc(100svh - 32px); overflow: auto;
+  padding: clamp(24px, 4.4vw, 48px);
+  background: radial-gradient(120% 90% at 50% 40%, transparent 60%, rgb(0 0 0 / 0.06)), var(--newsprint);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.2), 0 44px 80px -34px rgb(0 0 0 / 0.65);
+  animation: fa-land 0.8s var(--ease-paper) both;
+}
+@keyframes fa-land { from { opacity: 0; translate: 0 26px; rotate: -1.4deg; } }
+/* crop marks, just off the trim */
+dialog.fold-ask { --m: rgb(0 0 0 / 0.5); }
+dialog.fold-ask::before {
+  content: ''; position: absolute; inset: -12px; pointer-events: none;
+  background:
+    linear-gradient(var(--m), var(--m)) 0 11px / 8px 1px, linear-gradient(var(--m), var(--m)) 11px 0 / 1px 8px,
+    linear-gradient(var(--m), var(--m)) 100% 11px / 8px 1px, linear-gradient(var(--m), var(--m)) calc(100% - 11px) 0 / 1px 8px,
+    linear-gradient(var(--m), var(--m)) 0 calc(100% - 11px) / 8px 1px, linear-gradient(var(--m), var(--m)) 11px 100% / 1px 8px,
+    linear-gradient(var(--m), var(--m)) 100% calc(100% - 11px) / 8px 1px, linear-gradient(var(--m), var(--m)) calc(100% - 11px) 100% / 1px 8px;
+  background-repeat: no-repeat;
+  animation: fa-land 0.8s var(--ease-paper) both;
+}
+.fa-kicker { margin: 0 0 14px; font: 600 11px/1 var(--f-display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--blue); }
+.fa-title {
+  margin: 0; font: 900 clamp(36px, 6.4vw, 68px)/0.88 var(--f-display); font-variation-settings: 'wdth' 78;
+  letter-spacing: -0.02em; text-wrap: balance;
+}
+.fa-lede { margin: 16px 0 0; max-width: 44ch; font: 400 clamp(16px, 1.8vw, 19px)/1.45 var(--f-serif); text-wrap: pretty; }
+.fa-paths { display: grid; grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr); margin-top: clamp(22px, 3.4vw, 34px); }
+.fa-path {
+  all: unset; box-sizing: border-box; position: relative; cursor: pointer;
+  display: grid; align-content: end; gap: 7px; min-height: 150px; padding: 20px 22px 22px;
+  transition: translate 0.35s var(--ease-press), box-shadow 0.35s var(--ease-press);
+}
+.fa-path b { font: 800 clamp(23px, 2.7vw, 31px)/1 var(--f-display); font-variation-settings: 'wdth' 84; letter-spacing: -0.01em; }
+.fa-path > span:last-child { font: 400 italic 16px/1.3 var(--f-serif); }
+.fa-arrow { position: absolute; top: 14px; font: 400 30px/1 var(--f-display); }
+.fa-yes .fa-arrow { left: 18px; }
+.fa-no .fa-arrow { right: 18px; }
+.fa-no { text-align: right; }
+/* each path is two plates; the pointer pulls them into register */
+.fa-yes { background: var(--blue); color: var(--newsprint); box-shadow: 6px 6px 0 var(--yellow); }
+.fa-no { box-shadow: inset 0 0 0 2px #000, 6px 6px 0 color-mix(in srgb, var(--teal) 45%, transparent); }
+.fa-path:hover, .fa-path:focus-visible { translate: 4px 4px; }
+.fa-yes:hover, .fa-yes:focus-visible { box-shadow: 2px 2px 0 var(--yellow); }
+.fa-no:hover, .fa-no:focus-visible { box-shadow: inset 0 0 0 2px #000, 2px 2px 0 color-mix(in srgb, var(--teal) 45%, transparent); }
+.fa-path:focus-visible { outline: 3px solid var(--teal); outline-offset: 5px; }
+.fa-path:active { translate: 6px 6px; }
+.fa-yes:active { box-shadow: 0 0 0 var(--yellow); }
+/* the perforation between them */
+.fa-fold {
+  display: grid; place-items: center;
+  background: linear-gradient(rgb(0 0 0 / 0.5) 55%, transparent 0) 50% 0 / 1.5px 9px repeat-y;
+}
+.fa-fold span {
+  writing-mode: vertical-rl; padding: 8px 0; background: var(--newsprint);
+  font: 500 9.5px/1 var(--f-display); letter-spacing: 0.22em; text-transform: uppercase; color: rgb(0 0 0 / 0.55);
+}
+.fa-small { margin: clamp(20px, 3vw, 28px) 0 0; max-width: 62ch; font: 400 12.5px/1.5 var(--f-display); color: rgb(0 0 0 / 0.68); }
+@media (max-width: 600px) {
+  .fa-paths { grid-template-columns: minmax(0, 1fr); }
+  .fa-path { min-height: 0; padding-top: 52px; }
+  .fa-fold { height: 40px; background: linear-gradient(90deg, rgb(0 0 0 / 0.5) 55%, transparent 0) 0 50% / 9px 1.5px repeat-x; }
+  .fa-fold span { writing-mode: horizontal-tb; padding: 0 8px; }
+}
+
+/* the switch at the end of the issue */
+.fold-ctl { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin: 0; font: 500 13px/1.4 var(--f-display); }
+.fold-ctl button { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; }
+.fold-ctl button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
 /* ─── reduced motion ─────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   html:has(body.issue) { scroll-snap-type: none; }
   .js-press .sheet *, .js-press .sheet *::before, .js-press .sheet *::after { transition: none !important; }
   .bio-wave { animation: none !important; }
+  .fa-card, dialog.fold-ask::before { animation: none; }
+  .fa-path, .fold-tab { transition: none; }
 }
 
 /* ─── one page at a time: phones ─────────────────────────────────────── */

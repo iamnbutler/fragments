@@ -11,6 +11,8 @@
  * and the whole pasteboard moves as one transformed layer.
  */
 
+import { reveal, shown } from './seen';
+
 const DESIGN = 1280; // px width the clones are laid out at
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const narrow = () => matchMedia('(max-width: 760px)').matches;
@@ -66,6 +68,7 @@ export function flats(sheets: HTMLElement[]) {
     const mid = innerHeight / 2;
     let best = 0, bestD = Infinity;
     sheets.forEach((s, i) => {
+      if (!shown(s)) return;
       const r = s.getBoundingClientRect();
       const d = Math.abs(r.top + r.height / 2 - mid);
       if (d < bestD) { bestD = d; best = i; }
@@ -148,6 +151,7 @@ export function flats(sheets: HTMLElement[]) {
     } else {
       root.classList.add('flats-moving');
       root.classList.remove('flats-rest');
+      reveal(sheets[i]);
       sheets[i].scrollIntoView({ block: narrow() ? 'start' : 'center', behavior: 'instant' as ScrollBehavior });
       geo = measure(i, false);
       p = 1;
