@@ -11,7 +11,8 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "test:build": "astro build && node tests/build-smoke.mjs",
     "check": "tsc -p tsconfig.lib.json && tsc -p worker/tsconfig.json",
-    "media": "tsx scripts/media.ts"
+    "media": "tsx scripts/media.ts",
+    "figure-motion": "tsx scripts/figure-motion.ts"
   },
   "dependencies": {
     "@shikijs/rehype": "^3.22.0",
