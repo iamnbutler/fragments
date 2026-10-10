@@ -99,7 +99,6 @@ function fold(p: Piece) {
 
 // ── keeping track ──────────────────────────────────────────────────────────
 function track(pieces: Map<string, Piece>) {
-  const marks = readSeen();
   const part = new Map<HTMLElement, [string, number]>();
   for (const p of pieces.values()) p.sheets.forEach((s, i) => part.set(s, [p.key, i]));
   const timers = new Map<Element, number>();
@@ -111,6 +110,8 @@ function track(pieces: Map<string, Piece>) {
           if (timers.has(s)) continue;
           timers.set(s, window.setTimeout(() => {
             const [key, i] = part.get(s)!;
+            // read it fresh: folding by hand writes marks too
+            const marks = readSeen();
             marks.set(key, (marks.get(key) ?? 0) | (1 << i));
             if (getCookie(CHOICE) === 'yes') writeSeen(marks);
             io.unobserve(s);
@@ -232,6 +233,32 @@ export function seen(sheets: HTMLElement[]) {
   };
   fromHash();
   addEventListener('hashchange', fromHash);
+
+  // c folds the piece in view, and with cookies on, keeps it folded
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'c' || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (document.documentElement.classList.contains('flats-open') || document.querySelector('dialog[open]')) return;
+    const t = (e.composedPath()[0] ?? e.target) as HTMLElement;
+    if (t.closest?.('input, textarea, select, [contenteditable], video')) return;
+    const mid = innerHeight / 2;
+    let at: HTMLElement | null = null, dist = Infinity;
+    for (const s of sheets.filter(shown)) {
+      const r = s.getBoundingClientRect();
+      const d = Math.abs(r.top + r.height / 2 - mid);
+      if (d < dist) { dist = d; at = s; }
+    }
+    const p = at && pieces.get(at.dataset.section ?? 'front');
+    if (!p) return;
+    e.preventDefault();
+    if (getCookie(CHOICE) === 'yes') {
+      const marks = readSeen();
+      marks.set(p.key, (1 << p.sheets.length) - 1);
+      writeSeen(marks);
+    }
+    fold(p);
+    document.querySelector<HTMLElement>(`.fold[data-section="${CSS.escape(p.key)}"] .fold-tab`)?.focus({ preventScroll: true });
+    document.querySelector(`.fold[data-section="${CSS.escape(p.key)}"]`)?.scrollIntoView({ block: 'center' });
+  });
 
   if (!SHIP || getCookie(CHOICE) === null) ask(choose);
 }
