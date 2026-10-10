@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { media } from './media';
+import { media, hasMedia } from './media';
 
 export interface DraftImage {
   /** media name, e.g. drafts/desktop-tools/fig-1-boundary */
@@ -19,6 +19,8 @@ export interface DraftImage {
   aspect?: number;
   /** line art (an SVG figure) rather than a photograph or screenshot */
   figure: boolean;
+  /** a looping version of the figure, in media as `<name>-motion` */
+  motion?: string;
 }
 
 /** A run of text; `url` makes it a link. */
@@ -98,6 +100,7 @@ export function loadDrafts(): Draft[] {
           caption: im.caption ? str(im.caption) : undefined,
           aspect: m.width && m.height ? m.width / m.height : undefined,
           figure: m.type === 'image/svg+xml',
+          motion: hasMedia(`${name}-motion`) ? media(`${name}-motion`).url : undefined,
         };
       }),
       text: content.trim(),

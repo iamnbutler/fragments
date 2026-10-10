@@ -132,6 +132,13 @@
     "width": 960,
     "height": 600
   },
+  "drafts/desktop-tools/fig-2-loop-motion": {
+    "key": "drafts/desktop-tools/fig-2-loop-motion.19a6b8b234.svg",
+    "type": "image/svg+xml",
+    "bytes": 12335,
+    "width": 960,
+    "height": 600
+  },
   "drafts/desktop-tools/fig-3-patch-stack": {
     "key": "drafts/desktop-tools/fig-3-patch-stack.4c2e3b495b.svg",
     "type": "image/svg+xml",
@@ -160,6 +167,13 @@
     "width": 960,
     "height": 590
   },
+  "drafts/jev-demos/fig-3-budget-motion": {
+    "key": "drafts/jev-demos/fig-3-budget-motion.743434eb14.svg",
+    "type": "image/svg+xml",
+    "bytes": 7456,
+    "width": 960,
+    "height": 590
+  },
   "drafts/jev-demos/fig-4-pairs": {
     "key": "drafts/jev-demos/fig-4-pairs.0b67becda7.svg",
     "type": "image/svg+xml",
@@ -174,6 +188,13 @@
     "width": 960,
     "height": 600
   },
+  "drafts/tasks/fig-1-shapes-motion": {
+    "key": "drafts/tasks/fig-1-shapes-motion.721d8999c6.svg",
+    "type": "image/svg+xml",
+    "bytes": 19922,
+    "width": 960,
+    "height": 600
+  },
   "drafts/tasks/fig-2-barrier": {
     "key": "drafts/tasks/fig-2-barrier.31603b8f4e.svg",
     "type": "image/svg+xml",
@@ -181,10 +202,24 @@
     "width": 960,
     "height": 610
   },
+  "drafts/tasks/fig-2-barrier-motion": {
+    "key": "drafts/tasks/fig-2-barrier-motion.24d1c76494.svg",
+    "type": "image/svg+xml",
+    "bytes": 11003,
+    "width": 960,
+    "height": 610
+  },
   "drafts/tasks/fig-3-tick": {
     "key": "drafts/tasks/fig-3-tick.ea3268310a.svg",
     "type": "image/svg+xml",
     "bytes": 4466,
+    "width": 960,
+    "height": 610
+  },
+  "drafts/tasks/fig-3-tick-motion": {
+    "key": "drafts/tasks/fig-3-tick-motion.d2bd9a2b64.svg",
+    "type": "image/svg+xml",
+    "bytes": 9656,
     "width": 960,
     "height": 610
   },

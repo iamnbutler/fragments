@@ -3,6 +3,7 @@
  * A line drawing printed as an ink plate. The figures are black strokes on
  * transparent, so the file becomes a mask and the ink is whatever colour the
  * page asks for. An optional ghost plate in a second ink sits out of register.
+ * A figure with a looping version plays it while it's in view.
  */
 import type { DraftImage } from '../../../lib/drafts';
 
@@ -20,7 +21,7 @@ const ar = image?.aspect ?? 1.4;
 const cap = typeof caption === 'string' ? caption : caption ? image?.caption : undefined;
 ---
 {image && (
-  <figure class:list={['inkfig', `fit-${fit}`, cls]} style={`--ar:${ar.toFixed(4)};--fig:url("${image.src}");--ink:var(--${ink});${ghost ? `--ghost:var(--${ghost});` : ''}${style}`}>
+  <figure class:list={['inkfig', `fit-${fit}`, image.motion && 'has-motion', cls]} data-motion={image.motion} style={`--ar:${ar.toFixed(4)};--fig:url("${image.src}");${image.motion ? `--fig-motion:url("${image.motion}");` : ''}--ink:var(--${ink});${ghost ? `--ghost:var(--${ghost});` : ''}${style}`}>
     <div class="inkfig-plates" role="img" aria-label={image.alt}>
       {ghost && <span class="inkfig-ghost" aria-hidden="true"></span>}
       <span class="inkfig-key" aria-hidden="true"></span>
@@ -28,3 +29,8 @@ const cap = typeof caption === 'string' ? caption : caption ? image?.caption : u
     {cap && <figcaption class="cap">{cap}</figcaption>}
   </figure>
 )}
+
+<script>
+  import { figMotion } from '../../../scripts/figmotion';
+  figMotion();
+</script>

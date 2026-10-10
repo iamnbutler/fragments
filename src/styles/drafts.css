@@ -20,6 +20,11 @@
   transform: translate(calc(var(--mx) * 1.6), calc(var(--my) * 1.6));
 }
 .fit-cover .inkfig-key, .fit-cover .inkfig-ghost { -webkit-mask-size: cover; mask-size: cover; }
+/* the looping version, once it's loaded and the figure is in view */
+@media (prefers-reduced-motion: no-preference) {
+  .inkfig.is-playing .inkfig-key { -webkit-mask-image: var(--fig-motion); mask-image: var(--fig-motion); }
+}
+.flat .inkfig .inkfig-key { -webkit-mask-image: var(--fig); mask-image: var(--fig); }
 .inkfig figcaption { margin-top: 0.6cqw; }
 
 .layout-dr .pg { display: flex; flex-direction: column; gap: 1.2cqw; }
