@@ -1,9 +1,9 @@
 ---
-title: "Twelve Dollars a Week"
+title: "The Remote in Your Pocket"
 slug: open-remote
 date: 2026-10-10
 kicker: Open Remote
-dek: "TV remote apps on the App Store look free and charge $12 a week. [Open Remote](https://github.com/iamnbutler/open-tv-remote) does the same job for nothing, and it took a day to build."
+dek: "[Open Remote](https://github.com/iamnbutler/open-tv-remote) is a good TV remote for your iPhone, iPad or Mac. It's free, it stays free, and it took a day to build."
 draft: true
 repo: https://github.com/iamnbutler/open-tv-remote
 links:
@@ -29,24 +29,22 @@ facts:
   - label: TVs
     value: Google TV and Android TV, Roku, Samsung, LG
 images:
-  - src: drafts/open-remote/fig-1-meter
-    alt: "A step chart of one year. A staircase climbs fifty-two steps, one per week, from twelve dollars in the first week to six hundred and twenty-four dollars at the end of the year, with the first month marked at fifty-two dollars. A flat line along the bottom is labeled Open Remote, zero dollars."
-    caption: "Fig. 1. A year of the remote, a week at a time. Twelve dollars a week is $624 a year."
-  - src: drafts/open-remote/fig-2-wire
-    alt: "Line drawing of a phone on the left sending to four TVs on the right across a dashed band labeled your Wi-Fi. Each TV is labeled with how it listens: Google TV and Android TV on TLS ports 6467 for pairing and 6466 for the remote, with protobuf; Roku on HTTP port 8060; Samsung on a WebSocket, port 8002, with a token; LG on a WebSocket, port 3001, with a client key. A crossed-out cloud above reads no servers."
-    caption: "Fig. 2. Everything the app sends. Four ways of talking to a TV, all on your own network."
   - src: drafts/open-remote/fig-3-subject
     alt: "Line drawing in two halves. Before: a phone and a Mac both present certificates whose subject reads CN equals FreeRemote. The TV has one row in its table for that subject; the Mac's pairing overwrites the phone's, and the phone is asked for a code again. After: the subjects read FreeRemote 3FA9C2E1 and FreeRemote 7B04D96A, and the TV keeps two rows."
-    caption: "Fig. 3. The display name was never the key. The TV appears to keep one pairing per certificate subject."
+    caption: "Fig. 1. The display name was never the key. The TV appears to keep one pairing per certificate subject."
   - src: drafts/open-remote/fig-4-camera
     alt: "Line drawing of a living room seen from above. The TV on one wall shows a pairing request with the code 9F8ECF. Across the room a laptop's camera points at it. Arrows run from the laptop to a note labeled a frame, to Claude reading the code, to a file at /tmp/atv-code, to the harness, which polls the file and sends the code to the TV."
-    caption: "Fig. 4. Closing the loop. The MacBook's camera faced the TV, so the agent could read its own pairing codes."
+    caption: "Fig. 2. Closing the loop. The MacBook's camera faced the TV, so the agent could read its own pairing codes."
   - src: drafts/open-remote/fig-5-playnow
     alt: "A timeline from zero to forty-five seconds. A tap on a pinned show starts it. The phone finds the TV's Jellyfin session by matching its IP address, launches Jellyfin only if nothing is playing, and sends PlayNow. PlayNow repeats every eight seconds, at 0, 8, 16 and 24, until the server reports the asked-for item as now playing, which ends the line with a check. A wall at 45 seconds is labeled give up and say so."
-    caption: "Fig. 5. Play, and keep asking. The TV's Jellyfin app only hears commands while it's in front, so the phone repeats itself until the server shows the right thing playing."
+    caption: "Fig. 3. Play, and keep asking. The TV's Jellyfin app only hears commands while it's in front, so the phone repeats itself until the server shows the right thing playing."
 ---
 
-One Saturday morning in October, I found out what TV remote apps on the App Store cost. The one I looked at is free to download. Then comes the paywall, and then the price, set so it doesn't look like much: $12 a week. That's $624 a year for an app that sends a few bytes over Wi-Fi to a TV you already own.
+One Saturday morning in October I went looking for a TV remote app. The one I found is free to download. Then comes a paywall, with a price laid out like any other subscription until you get to the last word: $12 a week.
+
+Nobody means to pay that for a remote, and that's how it works. Monthly and yearly are what people expect, so a weekly price slips past. It's set for the people who won't stop to read the last word: someone busy, a parent with a kid on their hip, an older person who taps Continue because they just want the TV to work. And behind the paywall is shovelware, a few buttons that send a few bytes over Wi-Fi to a TV you already own.
+
+Apple reviews every app on the App Store. Catching this kind of bad-faith pricing should be the job, and it isn't being done.
 
 So I asked Claude to build one we could give away. No in-app purchases, no paywalls, iPhone and Mac. By 09:23 it was on my phone through TestFlight, and it worked great. By the end of the day it was [Open Remote](https://github.com/iamnbutler/open-tv-remote), open source and on its way to the App Store.
 
@@ -62,11 +60,7 @@ The TV stayed a shared, live thing all day: a family's TV that an agent was writ
 
 ## The easy part
 
-TV protocols sound like the hard part. They aren't big:
-
-- Google TV and Android TV (Sony, TCL, Chromecast) speak Android TV Remote v2. Pairing is on port 6467 and the remote on 6466, both over mutual TLS with a self-signed client certificate, and the messages are protobuf.
-- Roku takes plain HTTP on port 8060.
-- Samsung's Tizen TVs take a WebSocket on 8002 with a token, and LG's webOS a WebSocket on 3001 with a client key.
+TV protocols sound like the hard part. They aren't big. Each family of TVs speaks its own, and the app speaks four.
 
 There are no dependencies. Instead of pulling in libraries, Claude wrote a small protobuf reader and writer and an ASN.1 encoder that mints X.509 certificates, on top of Apple's Network and Security frameworks. All four TV drivers together are 1,134 lines. By 08:56 both apps built and the remote was running in the iPhone simulator.
 

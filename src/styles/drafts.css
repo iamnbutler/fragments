@@ -152,7 +152,7 @@
 
 /* ─── open-remote ────────────────────────────────────────────────────── */
 
-/* an orange for the money, from the Printmaking ramp; nothing else here uses it */
+/* an orange for the paywall, from the Printmaking ramp; nothing else here uses it */
 .dr-open-remote { --orange: #ff6000; }
 
 /* the one day it took, 08:00 to 20:00, across the head of the spread;
@@ -194,8 +194,11 @@
 .dr-open-remote-3 .or-fig { width: 74%; }
 .dr-open-remote-2 .pg-r .or-fig { width: 78%; }
 
-/* the paywall, pulled out in orange and voided */
-.or-wall { position: relative; flex: none; margin: auto 0 auto 3cqw; width: 34cqw; }
+/* the paywall, pulled out in orange, with the word that matters marked up like a proof */
+.or-wall {
+  position: relative; flex: none; margin: auto 0; display: grid; grid-template-columns: 27cqw 1fr;
+  column-gap: 1.8cqw; align-items: start;
+}
 .or-wall-print { position: relative; rotate: -2deg; isolation: isolate; }
 .or-wall-card, .or-wall-lt {
   -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.55'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)'/%3E%3C/svg%3E");
@@ -211,22 +214,44 @@
   translate: calc(var(--mx) * 2 + 0.7cqw) calc(var(--my) * 2 + 0.6cqw);
 }
 .or-wall-lock { font: 800 clamp(10px, 0.9cqw, 15px)/1 var(--f-display); letter-spacing: 0.24em; text-transform: uppercase; color: #000; }
-.or-wall-price { display: flex; align-items: flex-start; gap: 0.3cqw; color: #000; }
+.or-wall-price { display: flex; align-items: baseline; gap: 0.2cqw; color: #000; }
 .or-wall-price b { font: 900 12cqw/0.8 var(--f-display); font-variation-settings: 'wdth' 62; letter-spacing: -0.03em; }
-.or-wall-price span { padding-top: 0.6cqw; font: 800 clamp(11px, 1.3cqw, 21px)/1.05 var(--f-display); }
+.or-wall-price span { font: 800 clamp(11px, 1.6cqw, 26px)/1 var(--f-display); align-self: flex-start; padding-top: 0.4cqw; }
+.or-wall-price .or-wall-per { position: relative; align-self: baseline; padding: 0; font: 500 clamp(8px, 0.8cqw, 13px)/1 var(--f-display); }
+/* the proofreader's ring, in teal, round the word that does the damage */
+.or-wall-per::after {
+  content: ''; position: absolute; inset: -0.9cqw -1cqw -0.8cqw -0.9cqw; border: 0.24cqw solid var(--teal);
+  border-radius: 50%; rotate: -8deg; filter: url(#rubber);
+}
 .or-wall-go {
   align-self: stretch; padding: 0.8cqw; border-radius: 99px; background: #000; color: var(--orange); text-align: center;
   font: 800 clamp(10px, 1cqw, 16px)/1 var(--f-display); letter-spacing: 0.1em; text-transform: uppercase;
 }
 .or-wall-fine { font: 400 clamp(8px, 0.62cqw, 11px)/1.3 var(--f-display); color: #000; opacity: 0.75; }
-.or-void {
-  position: absolute; left: 62%; top: 68%; translate: -50% -50%; rotate: -12deg;
-  padding: 0.3cqw 1.4cqw 0.4cqw; border: 0.4cqw solid currentColor; outline: 0.15cqw solid currentColor; outline-offset: 0.3cqw;
-  font: 900 4.4cqw/1 var(--f-display); letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--teal); mix-blend-mode: multiply; filter: url(#rubber);
+.or-note {
+  margin: 7.4cqw 0 0; position: relative; color: var(--teal); rotate: -3deg;
+  font: italic 400 clamp(14px, 1.7cqw, 27px)/1.12 var(--f-serif); text-wrap: balance;
 }
-.or-wall figcaption { margin-top: 2.8cqw; max-width: 28cqw; }
-.or-meter { margin-top: auto; }
+.or-note b { font-weight: 700; }
+/* a leader back to the ring */
+.or-note::before {
+  content: ''; position: absolute; right: calc(100% + 0.4cqw); top: 0.9cqw; width: 4.6cqw; height: 0.2cqw;
+  background: var(--teal); rotate: 10deg; transform-origin: right center;
+}
+.layout-dr .or-wall figcaption { grid-column: 1 / -1; margin-top: 2.8cqw; max-width: 30cqw; }
+
+/* the TVs, as a plain table */
+.or-tvs { flex: none; width: 100%; border-collapse: collapse; caption-side: bottom; }
+.or-tvs caption { text-align: left; margin-top: 0.8cqw; }
+.or-tvs th, .or-tvs td {
+  padding: 0.7cqw 1cqw 0.7cqw 0; text-align: left; vertical-align: top;
+  font: 400 clamp(9px, 0.82cqw, 13px)/1.3 var(--f-display); font-variation-settings: 'wdth' 84;
+  border-bottom: 0.12cqw solid var(--dk);
+}
+.or-tvs thead th { font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; font-size: clamp(8px, 0.62cqw, 11px); border-bottom-width: 0.3cqw; color: var(--dk); }
+.or-tvs tbody th { width: 30%; font: 800 clamp(11px, 1.1cqw, 18px)/1.1 var(--f-display); font-variation-settings: 'wdth' 72; }
+.or-tvs tbody th span { display: block; margin-top: 0.2cqw; font: italic 400 clamp(9px, 0.78cqw, 12px)/1.2 var(--f-serif); }
+.or-tvs td:nth-child(2) { width: 33%; }
 
 /* lines of Swift, as a bar chart; the TVs in the light plate */
 .or-lines { flex: none; margin: 0; }
@@ -239,7 +264,7 @@
 .or-lines-n { text-align: right; font-variant-numeric: tabular-nums; }
 .or-lines li.hot { font-weight: 800; }
 .or-lines li.hot .or-lines-bar { background: var(--lt); box-shadow: inset 0 0 0 0.16cqw var(--dk); }
-.or-lines figcaption { margin-top: 1.2cqw; }
+.layout-dr .or-lines figcaption { margin-top: 1.2cqw; }
 
 .or-pull {
   flex: none; margin: 0; padding-top: 0.8cqw; border-top: 0.35cqw solid var(--lt);
@@ -295,7 +320,14 @@
   .zine .dr-open-remote .or-fig { width: 100%; }
   .zine .or-wall-card { padding: 22px; gap: 12px; }
   .zine .or-wall-price b { font-size: 26vw; }
-  .zine .or-void { font-size: 11vw; }
+  .zine .or-wall { grid-template-columns: 1fr; }
+  .zine .or-note { margin: 18px 0 0; font-size: 20px; }
+  .zine .or-note::before { display: none; }
+  .zine .or-wall-price .or-wall-per { font-size: 13px; }
+  .zine .or-wall-per::after { inset: -10px -12px -9px -10px; border-width: 2.5px; }
+  .zine .or-tvs th, .zine .or-tvs td { font-size: 12px; padding: 8px 8px 8px 0; }
+  .zine .or-tvs tbody th { font-size: 15px; }
+  .zine .or-tvs thead th { font-size: 10px; }
   .zine .or-wall figcaption { max-width: none; margin-top: 20px; }
   .zine .or-lines li { grid-template-columns: 38vw 1fr 44px; font-size: 12px; }
   .zine .or-lines-bar { height: 10px; }

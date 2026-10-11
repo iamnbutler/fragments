@@ -1,9 +1,9 @@
 ---
 /**
- * open-remote, "Twelve Dollars a Week". The four spot inks, plus an orange
- * for the money: the paywall pulled out on the opening spread and the meter
- * that runs up beside it. A clock of the one day it took runs across the head
- * of every spread, with the hours that spread covers inked in.
+ * open-remote, "The Remote in Your Pocket". The four spot inks, plus an
+ * orange for the paywall pulled out on the opening spread, with the word that
+ * does the damage marked up like a proof. A clock of the one day it took runs
+ * across the head of every spread, with the hours that spread covers inked in.
  */
 import Reg from '../Reg.astro';
 import Linked from '../Linked.astro';
@@ -46,6 +46,13 @@ const lines = [
 ];
 const most = Math.max(...lines.map((l) => l.n));
 
+const tvs = [
+  { tv: 'Google TV, Android TV', makes: 'Sony, TCL, Chromecast', wire: 'TLS on 6467 to pair, 6466 to control; protobuf', key: 'Its own certificate, and a six-character code from the TV' },
+  { tv: 'Roku', makes: '', wire: 'HTTP on 8060', key: 'Nothing' },
+  { tv: 'Samsung', makes: 'Tizen, 2016 on', wire: 'WebSocket on 8002', key: 'A token, after one Allow on the TV' },
+  { tv: 'LG', makes: 'webOS', wire: 'WebSocket on 3001', key: 'A client key, after one Accept on the TV' },
+];
+
 const papercuts = [
   'Bundle ID never registered',
   'Xcode signed out: “Failed to Use Accounts”',
@@ -67,24 +74,23 @@ const papercuts = [
         {d.kicker && <p class="dr-kicker">{d.kicker}</p>}
         <Reg as="h2" text={d.title} class="t-tower or-title" />
       </div>
-      <figure class="or-wall" aria-label="A paywall redrawn: Go Premium, $12.00 a week, a Continue button, and fine print saying it renews automatically. A stamp across it reads VOID.">
+      <figure class="or-wall" aria-label="A paywall redrawn: Go Premium, $12.00, a Continue button and fine print saying it renews automatically. The small word week after the price is circled in teal, with a note in the margin: a week, not a month, not a year.">
         <div class="or-wall-print" aria-hidden="true">
-        <span class="or-wall-lt"></span>
-        <div class="or-wall-card">
-          <span class="or-wall-lock">Go Premium</span>
-          <span class="or-wall-price"><b>$12</b><span>.00<br />/ week</span></span>
-          <span class="or-wall-go">Continue</span>
-          <span class="or-wall-fine">Renews automatically until you cancel.</span>
+          <span class="or-wall-lt"></span>
+          <div class="or-wall-card">
+            <span class="or-wall-lock">Go Premium</span>
+            <span class="or-wall-price"><b>$12</b><span>.00</span><span class="or-wall-per">/week</span></span>
+            <span class="or-wall-go">Continue</span>
+            <span class="or-wall-fine">Renews automatically until you cancel.</span>
+          </div>
         </div>
-        </div>
-        <span class="or-void" aria-hidden="true">Void</span>
-        <figcaption class="cap">A paywall like the one I saw, redrawn without its branding. The price is real.</figcaption>
+        <p class="or-note" aria-hidden="true">A <b>week.</b> Not a month, not a year.</p>
+        <figcaption class="cap">A paywall like the one I saw, redrawn without its branding. The price is the one it asked for.</figcaption>
       </figure>
     </div>
     <div class="pg pg-r or-body">
       <p class="dr-dek"><Linked parts={d.dekParts} /></p>
       <Prose flow={d.key} blocks={blocks} cols={2} dropcap end={end} />
-      <InkFig image={img(d, 'fig-1-meter')} ink="orange" class="or-fig or-meter" />
       <Cont spread={spread} />
     </div>
   </Fragment>
@@ -92,7 +98,13 @@ const papercuts = [
 {part === 1 && (
   <Fragment>
     <div class="pg pg-l or-body">
-      <InkFig image={img(d, 'fig-2-wire')} ink="dk" class="or-fig" />
+      <table class="or-tvs">
+        <caption class="cap">What the app says to each kind of TV, and how it gets let in. Nothing leaves your network.</caption>
+        <thead><tr><th scope="col">TV</th><th scope="col">Talks over</th><th scope="col">Gets in with</th></tr></thead>
+        <tbody>
+          {tvs.map((r) => <tr><th scope="row">{r.tv}<span>{r.makes}</span></th><td>{r.wire}</td><td>{r.key}</td></tr>)}
+        </tbody>
+      </table>
       <Prose flow={d.key} blocks={a} cols={2} />
     </div>
     <div class="pg pg-r or-body">
