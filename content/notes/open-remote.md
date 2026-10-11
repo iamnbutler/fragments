@@ -179,8 +179,9 @@ Numbers at this point:
 ### 6. Process / repo things worth mentioning
 - **"Never repeat anything written in code in words."** Nate's rule for docs.
   - The README lost its protocol table and folder layout.
-  - `docs/` went away: the privacy policy, support and security pages became the usual top-level files, and user
-    help moved to the wiki. The wiki is still waiting on Nate to create its first page; GitHub won't let the API do that.
+  - `docs/` went away: the privacy policy, support and security pages became the usual top-level files. User help
+    was staged for the GitHub wiki, but the wiki was never created (the API can't make its first page), and later
+    the wiki and the old nate.rip/open-tv-remote site were dropped rather than kept as dead links.
 - **Locked main.**
   - Changes need a PR, and the iOS and macOS builds must pass.
   - Squash merges only, no force pushes, and no admin bypass, so the rules apply to Nate too.
@@ -237,7 +238,8 @@ Numbers at this point:
   physical remote.
 
 ## Open items (as of writing)
-- Run the App Store Connect API key prompt, add secrets, cut v1.1.0 through CI. First CI signing run is unproven.
+- Done after these notes were first written: v1.1.0 uploaded to TestFlight from CI (iOS and macOS) on the first try,
+  with an Admin API key and cloud signing.
 - Nate to confirm on hardware:
   - Jellyfin play fixes
   - volume buttons
@@ -249,7 +251,6 @@ Numbers at this point:
 - Maybe: sync pairing between devices on the same Apple ID through iCloud Keychain. That would mean one identity
   for all of a person's devices. Unknown: whether the TV allows two connections at once from the same identity.
 - The App Store submission itself: the metadata and screenshots are ready, and the Chrome prompt hasn't been run yet.
-- Create the wiki's first page so the staged pages can be pushed.
 
 ## Possible angles / titles (take or leave)
 - "$12 a week for a remote" → "the remote is a few hundred lines of protocol and it should be free".
