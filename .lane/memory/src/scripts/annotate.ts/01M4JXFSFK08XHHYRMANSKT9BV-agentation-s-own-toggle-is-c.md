@@ -3,6 +3,10 @@ id: 01M4JXFSFK08XHHYRMANSKT9BV
 anchor: '@file'
 created: 2026-10-10T12:44:28Z
 norm: '1'
+sig: e3b0c44298fc1c14
+body_hash: c234b62e21900069
+raw_hash: d519a72efdcd382f
+lines: 1-33
 supersedes: 01M4JXEHTF566FMEKENT2QBK7Y
 ---
 
