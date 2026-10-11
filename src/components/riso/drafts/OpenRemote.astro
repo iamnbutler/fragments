@@ -1,0 +1,147 @@
+---
+/**
+ * open-remote, "Twelve Dollars a Week". The four spot inks, plus an orange
+ * for the money: the paywall pulled out on the opening spread and the meter
+ * that runs up beside it. A clock of the one day it took runs across the head
+ * of every spread, with the hours that spread covers inked in.
+ */
+import Reg from '../Reg.astro';
+import Linked from '../Linked.astro';
+import InkFig from './InkFig.astro';
+import Prose from './Prose.astro';
+import Cont from './Cont.astro';
+import { img } from '../../../lib/drafts';
+import { split } from './util';
+import type { Spread } from '../../../lib/zine';
+
+interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
+const { spread } = Astro.props;
+const { draft: d, part, blocks } = spread;
+const end = !spread.jump && blocks.length > 0;
+const [a, b] = split(blocks, 0.5);
+
+// the day, in hours from 08:00 to 20:00
+const FROM = 8, TO = 20;
+const at = (h: number, m: number) => (h + m / 60 - FROM) / (TO - FROM);
+const hours = Array.from({ length: TO - FROM + 1 }, (_, i) => FROM + i);
+const moments = [
+  { t: at(8, 39), label: 'the ask' },
+  { t: at(9, 23), label: 'on my phone' },
+  { t: at(12, 15), label: '“3-4 times”' },
+  { t: at(17, 44), label: 'Jellyfin' },
+  { t: at(20, 0), label: '1.1.0' },
+];
+const spans = [[at(8, 39), at(9, 23)], [at(8, 39), at(9, 0)], [at(12, 15), at(19, 49)], [at(17, 44), at(20, 0)]];
+const [s0, s1] = spans[part] ?? spans[0];
+
+// where the 6,303 lines of Swift go
+const lines = [
+  { label: 'Screens', n: 2048 },
+  { label: 'The four TVs', n: 1134, hot: true },
+  { label: 'TLS, certificates, protobuf', n: 818 },
+  { label: 'Jellyfin', n: 790 },
+  { label: 'App and settings', n: 908 },
+  { label: 'Finding TVs', n: 348 },
+  { label: 'Dev tools', n: 257 },
+];
+const most = Math.max(...lines.map((l) => l.n));
+
+const papercuts = [
+  'Bundle ID never registered',
+  'Xcode signed out: “Failed to Use Accounts”',
+  'A keychain prompt on every rebuild',
+  'An upload lost to | head',
+  'POSIX error 163',
+  'Every build said 1.0',
+];
+---
+<div class="or-clock" aria-hidden="true" style={`--s0:${s0};--s1:${s1}`}>
+  <span class="or-clock-span"></span>
+  {hours.map((h) => <span class="or-clock-h" style={`--t:${(h - FROM) / (TO - FROM)}`}>{String(h).padStart(2, '0')}</span>)}
+  {moments.map((m) => <span class="or-clock-m" style={`--t:${m.t}`}><i>{m.label}</i></span>)}
+</div>
+{part === 0 && (
+  <Fragment>
+    <div class="pg pg-l or-open">
+      <div class="or-head">
+        {d.kicker && <p class="dr-kicker">{d.kicker}</p>}
+        <Reg as="h2" text={d.title} class="t-tower or-title" />
+      </div>
+      <figure class="or-wall" aria-label="A paywall redrawn: Go Premium, $12.00 a week, a Continue button, and fine print saying it renews automatically. A stamp across it reads VOID.">
+        <div class="or-wall-print" aria-hidden="true">
+        <span class="or-wall-lt"></span>
+        <div class="or-wall-card">
+          <span class="or-wall-lock">Go Premium</span>
+          <span class="or-wall-price"><b>$12</b><span>.00<br />/ week</span></span>
+          <span class="or-wall-go">Continue</span>
+          <span class="or-wall-fine">Renews automatically until you cancel.</span>
+        </div>
+        </div>
+        <span class="or-void" aria-hidden="true">Void</span>
+        <figcaption class="cap">A paywall like the one I saw, redrawn without its branding. The price is real.</figcaption>
+      </figure>
+    </div>
+    <div class="pg pg-r or-body">
+      <p class="dr-dek"><Linked parts={d.dekParts} /></p>
+      <Prose flow={d.key} blocks={blocks} cols={2} dropcap end={end} />
+      <InkFig image={img(d, 'fig-1-meter')} ink="orange" class="or-fig or-meter" />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 1 && (
+  <Fragment>
+    <div class="pg pg-l or-body">
+      <InkFig image={img(d, 'fig-2-wire')} ink="dk" class="or-fig" />
+      <Prose flow={d.key} blocks={a} cols={2} />
+    </div>
+    <div class="pg pg-r or-body">
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <figure class="or-lines">
+        <ol aria-label="Lines of Swift by part of the app">
+          {lines.map((l) => (
+            <li class:list={[l.hot && 'hot']} style={`--w:${l.n / most}`}>
+              <span class="or-lines-label">{l.label}</span>
+              <span class="or-lines-bar"></span>
+              <span class="or-lines-n">{l.n.toLocaleString('en-US')}</span>
+            </li>
+          ))}
+        </ol>
+        <figcaption class="cap">Where 6,303 lines of Swift go. Talking to four kinds of TV is the smaller part.</figcaption>
+      </figure>
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 2 && (
+  <Fragment>
+    <div class="pg pg-l or-body">
+      <InkFig image={img(d, 'fig-3-subject')} ink="dk" class="or-fig" />
+      <Prose flow={d.key} blocks={a} cols={2} />
+    </div>
+    <div class="pg pg-r or-body">
+      <p class="or-pull" aria-hidden="true"><span>“I’ve needed to put codes</span> <span>in 3-4 times.”</span></p>
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <InkFig image={img(d, 'fig-4-camera')} ink="dk" class="or-fig" />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}
+{part === 3 && (
+  <Fragment>
+    <div class="pg pg-l or-body">
+      <InkFig image={img(d, 'fig-5-playnow')} ink="dk" class="or-fig" />
+      <Prose flow={d.key} blocks={a} cols={2} />
+    </div>
+    <div class="pg pg-r or-body">
+      <div class="or-cuts">
+        <p class="or-cuts-head">Not the TV</p>
+        <ul>
+          {papercuts.map((c) => <li>{c}</li>)}
+        </ul>
+      </div>
+      <Prose flow={d.key} blocks={b} cols={2} end={end} />
+      <Cont spread={spread} />
+    </div>
+  </Fragment>
+)}

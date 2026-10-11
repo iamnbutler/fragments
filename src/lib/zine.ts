@@ -67,6 +67,11 @@ export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
     inks: [['yellow', 'black'], ['yellow', 'teal']],
     paper: ['newsprint', 'newsprint'],
   },
+  'open-remote': {
+    caps: [1100, 2700, 2700, 3000],
+    inks: [['yellow', 'black'], ['blue', 'black'], ['teal', 'black'], ['yellow', 'teal']],
+    paper: ['newsprint', 'bone', 'newsprint', 'bone'],
+  },
   tasks: {
     caps: [1300, 2600, 2400, 2000],
     inks: [['blue', 'black'], ['blue', 'black'], ['teal', 'black'], ['blue', 'black']],

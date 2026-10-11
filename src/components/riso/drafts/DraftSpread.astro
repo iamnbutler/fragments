@@ -7,13 +7,14 @@ import Sheet from '../Sheet.astro';
 import DesktopTools from './DesktopTools.astro';
 import JevDemos from './JevDemos.astro';
 import Tasks from './Tasks.astro';
+import OpenRemote from './OpenRemote.astro';
 import Generic from './Generic.astro';
 import type { Spread } from '../../../lib/zine';
 
 interface Props { spread: Extract<Spread, { kind: 'draft' }>; }
 const { spread } = Astro.props;
 const { draft, part, parts } = spread;
-const DESIGNS: Record<string, any> = { 'desktop-tools': DesktopTools, 'jev-demos': JevDemos, tasks: Tasks };
+const DESIGNS: Record<string, any> = { 'desktop-tools': DesktopTools, 'jev-demos': JevDemos, tasks: Tasks, 'open-remote': OpenRemote };
 const Design = DESIGNS[draft.slug] ?? Generic;
 const label = part === 0 ? `${draft.title}, a feature` : `${draft.title}, part ${part + 1} of ${parts}`;
 const running = `${draft.kicker ?? draft.title}, ${part + 1} of ${parts}`;
