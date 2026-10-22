@@ -24,3 +24,7 @@ test('inline text keeps snake_case and code, and drops emphasis', () => {
   assert.equal(inline('a `*ptr` and *this* and _that_ and **bold**'), 'a *ptr and this and that and bold');
   assert.equal(inline('see [the plan](https://example.com) for __more__'), 'see the plan for more');
 });
+
+test('inline keeps angle brackets inside code spans', () => {
+  assert.equal(inline('a record at `~/.claude/sessions/<pid>.json` and <b>bold</b>'), 'a record at ~/.claude/sessions/<pid>.json and bold');
+});

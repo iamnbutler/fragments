@@ -587,6 +587,41 @@
     "width": 320,
     "height": 320
   },
+  "figs/telephone/fig-1-route": {
+    "key": "figs/telephone/fig-1-route.d2421f5a17.svg",
+    "type": "image/svg+xml",
+    "bytes": 264386,
+    "width": 960,
+    "height": 510
+  },
+  "figs/telephone/fig-2-window": {
+    "key": "figs/telephone/fig-2-window.96ade4945b.svg",
+    "type": "image/svg+xml",
+    "bytes": 168716,
+    "width": 960,
+    "height": 470
+  },
+  "figs/telephone/fig-3-two-phones": {
+    "key": "figs/telephone/fig-3-two-phones.ea5708854a.svg",
+    "type": "image/svg+xml",
+    "bytes": 316032,
+    "width": 960,
+    "height": 560
+  },
+  "figs/telephone/fig-4-envelope": {
+    "key": "figs/telephone/fig-4-envelope.6b08a524fa.svg",
+    "type": "image/svg+xml",
+    "bytes": 205772,
+    "width": 960,
+    "height": 614
+  },
+  "figs/telephone/ill-1-candlestick": {
+    "key": "figs/telephone/ill-1-candlestick.546040c74b.svg",
+    "type": "image/svg+xml",
+    "bytes": 2856,
+    "width": 480,
+    "height": 560
+  },
   "figs/writing-with-adhd/fig-1-four-traits": {
     "key": "figs/writing-with-adhd/fig-1-four-traits.fddfda80dc.svg",
     "type": "image/svg+xml",

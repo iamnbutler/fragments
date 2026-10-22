@@ -19,6 +19,7 @@ import { ferrotype } from './ferrotype';
 import { designDocsV2 } from './design-docs-v2';
 import { figGen } from './fig-gen';
 import { writingWithAdhd } from './writing-with-adhd';
+import { telephoneLine } from './telephone-line';
 
 const DESIGNS: Record<string, (s: PieceSpread) => Html> = {
   'desktop-tools': desktopTools,
@@ -31,6 +32,7 @@ const DESIGNS: Record<string, (s: PieceSpread) => Html> = {
   'design-docs-v2': designDocsV2,
   'fig-gen': figGen,
   'writing-with-adhd': writingWithAdhd,
+  'telephone-line': telephoneLine,
 };
 
 /** One spread of a piece, on its own design. */

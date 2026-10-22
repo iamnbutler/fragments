@@ -1,0 +1,51 @@
+/* telephone-line: its own spreads. */
+
+/* the jack field across the head of every spread, one cord patched in */
+.tl-board { position: absolute; z-index: 3; top: 1.6cqw; left: 4cqw; right: 4cqw; pointer-events: none; }
+.tl-board svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tl-jack { fill: var(--sheet); stroke: var(--dk); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.tl-jack.is-on { fill: var(--dk); }
+.tl-cord { fill: none; stroke: var(--red); stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke; mix-blend-mode: multiply; }
+.dr-telephone-line .pg { padding-top: 6cqw; }
+
+.tl-open { gap: 1.3cqw; }
+.tl-head { display: flex; flex-direction: column; gap: 1cqw; }
+.tl-title { --fs: 5.5cqw; position: relative; z-index: 2; }
+
+/* the dek, as an operator's call ticket */
+.tl-ticket {
+  flex: none; position: relative; padding: 1cqw 1.3cqw 0.9cqw; rotate: -1.2deg;
+  border: 0.16cqw solid var(--dk); background: color-mix(in srgb, var(--yellow) 22%, var(--sheet));
+}
+.tl-ticket::before { content: ''; position: absolute; top: 0; bottom: 0; left: 4.2cqw; border-left: 0.14cqw dashed var(--dk); opacity: 0.5; }
+.tl-ticket .dr-dek { padding-left: 4.4cqw; }
+.tl-ticket-head, .tl-ticket-foot {
+  display: flex; justify-content: space-between; margin: 0 0 0.6cqw 4.4cqw;
+  font: 700 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--dk);
+}
+.tl-ticket-head span + span { color: var(--red); }
+.tl-ticket-foot { margin: 0.7cqw 0 0 4.4cqw; font-weight: 500; letter-spacing: 0.06em; text-transform: none; font-family: var(--f-mono, monospace); opacity: 0.8; }
+
+.tl-phone { flex: 1 1 0; min-height: 0; }
+.tl-phone .inkfig-plates { height: 100%; aspect-ratio: auto; }
+.tl-fig { flex: none; }
+.tl-envelope { width: 86%; align-self: center; }
+
+.tl-pull {
+  flex: none; margin: 0; padding-top: 0.8cqw; border-top: 0.35cqw solid var(--red);
+  font: italic 400 clamp(20px, 2.9cqw, 46px)/1.04 var(--f-serif); color: var(--dk); text-wrap: balance;
+}
+.tl-pull span { display: block; }
+
+/* phones: one page at a time */
+@media (max-width: 760px) {
+  .zine .tl-board { display: none; }
+  .zine .dr-telephone-line .pg { padding-top: 20px; }
+  .zine .tl-title { --fs: 10.5vw; font-size: 10.5vw; }
+  .zine .tl-ticket { padding: 12px 14px 10px; }
+  .zine .tl-ticket::before { left: 44px; }
+  .zine .tl-ticket .dr-dek { padding-left: 46px; }
+  .zine .tl-ticket-head, .zine .tl-ticket-foot { margin-left: 46px; font-size: 10px; }
+  .zine .tl-envelope { width: 100%; }
+  .zine .tl-pull { font-size: 30px; }
+}

@@ -88,6 +88,11 @@ export const DESIGNS: Record<string, Design> = {
     inks: [['blue', 'black'], ['yellow', 'black'], ['blue', 'black']],
     paper: ['bone', 'newsprint', 'bone'],
   },
+  'telephone-line': {
+    caps: [1300, 2800, 2600],
+    inks: [['red', 'black'], ['blue', 'black'], ['red', 'black']],
+    paper: ['newsprint', 'bone', 'newsprint'],
+  },
   ferrotype: {
     caps: [1100, 2300, 2400],
     inks: [['blue', 'black'], ['blue', 'black'], ['red', 'black']],
@@ -301,10 +306,11 @@ export function inline(md: string, marks = false): string {
             .replace(/\*\*(.*?)\*\*/g, '$1')
             .replace(/\*(.*?)\*/g, '$1')
             // underscores inside a word, as in snake_case, aren't emphasis
-            .replace(/(^|[^\w])__?(?=\S)(.*?\S)__?(?!\w)/g, '$1$2'),
+            .replace(/(^|[^\w])__?(?=\S)(.*?\S)__?(?!\w)/g, '$1$2')
+            // inline HTML goes; a code span's <pid> stays
+            .replace(/<[^>]+>/g, ''),
     )
     .join('')
-    .replace(/<[^>]+>/g, '')
     .trim();
 }
 
