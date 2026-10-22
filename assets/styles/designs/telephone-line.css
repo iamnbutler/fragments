@@ -32,7 +32,7 @@
 
 .tl-pull {
   flex: none; margin: 0; padding-top: 0.8cqw; border-top: 0.35cqw solid var(--red);
-  font: italic 400 clamp(20px, 2.9cqw, 46px)/1.04 var(--f-serif); color: var(--dk); text-wrap: balance;
+  font: italic 400 max(20px, 2.9cqw)/1.04 var(--f-serif); color: var(--dk); text-wrap: balance;
 }
 .tl-pull span { display: block; }
 

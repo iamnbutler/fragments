@@ -26,8 +26,8 @@
   --ease-roller: cubic-bezier(0.65, 0, 0.25, 1);
   --ease-paper: cubic-bezier(0.34, 1.45, 0.5, 1);
 
-  --fs-body: clamp(12px, 1.06cqw, 17px);
-  --fs-cap: clamp(10.5px, 0.8cqw, 13px);
+  --fs-body: max(12px, 1.06cqw);
+  --fs-cap: max(10.5px, 0.8cqw);
   color-scheme: light;
 }
 
@@ -53,10 +53,10 @@ body {
   overflow-x: hidden;
 }
 a { color: inherit; }
-/* Quiet links: names that are links but print as type. The underline only
-   comes up under the pointer or focus. */
-a.ql { text-decoration: none; }
-a.ql:hover, a.ql:focus-visible { text-decoration: underline; text-decoration-color: var(--dk, currentColor); text-decoration-thickness: 0.1em; text-underline-offset: 0.16em; }
+/* Quiet links: names that are links but print as type, marked by a hairline
+   of red that thickens under the pointer or focus. */
+a.ql, .margin-notes a { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--red) 75%, transparent); text-decoration-thickness: 1px; text-underline-offset: 0.18em; transition: text-decoration-color 0.15s; }
+a.ql:hover, a.ql:focus-visible, .margin-notes a:hover, .margin-notes a:focus-visible { text-decoration-color: var(--red); text-decoration-thickness: 0.12em; }
 img, video, svg { display: block; max-width: 100%; }
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
@@ -336,10 +336,10 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .cv-pencil {
   margin: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline;
   padding: 1.1cqw 3.4cqw 0.9cqw; border-bottom: 1px solid currentColor; margin-inline: 3.4cqw; padding-inline: 0;
-  font: 500 clamp(11px, 1.05cqw, 16px)/1 var(--f-display); letter-spacing: 0.08em; text-transform: uppercase;
+  font: 500 max(11px, 1.05cqw)/1 var(--f-display); letter-spacing: 0.08em; text-transform: uppercase;
 }
 .cv-ed { font-variant-numeric: tabular-nums; }
-.cv-title { text-align: center; font: 400 italic clamp(13px, 1.3cqw, 20px)/1 var(--f-serif); letter-spacing: 0; text-transform: none; }
+.cv-title { text-align: center; font: 400 italic max(13px, 1.3cqw)/1 var(--f-serif); letter-spacing: 0; text-transform: none; }
 .cv-sig { text-align: right; }
 .masthead {
   margin: auto 0 2.8cqw 2.6cqw;
@@ -348,7 +348,7 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 }
 .cv-issue {
   position: absolute; right: 3.4cqw; bottom: 5.2cqw; margin: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5cqw;
-  font: 500 clamp(11px, 1.05cqw, 16px)/1 var(--f-display); letter-spacing: 0.08em; text-transform: uppercase;
+  font: 500 max(11px, 1.05cqw)/1 var(--f-display); letter-spacing: 0.08em; text-transform: uppercase;
 }
 .cover-turn {
   position: absolute; right: 3.4cqw; bottom: 2.2cqw;
@@ -379,15 +379,15 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 }
 .bio-av:hover { rotate: -1deg; }
 .bio-av .plate { aspect-ratio: 1; }
-.bio-lede { margin: 0; max-width: 21ch; font: 500 clamp(18px, 2.55cqw, 40px)/1.12 var(--f-serif); letter-spacing: -0.01em; text-wrap: pretty; }
+.bio-lede { margin: 0; max-width: 21ch; font: 500 max(18px, 2.55cqw)/1.12 var(--f-serif); letter-spacing: -0.01em; text-wrap: pretty; }
 .bio-r { display: flex; flex-direction: column; gap: 1.5cqw; padding-top: 6cqw; position: relative; }
 .bio-from {
   margin: 0 0 1.2cqw; display: flex; justify-content: space-between; padding-top: 0.7cqw; border-top: 0.35cqw solid var(--black);
   font: 600 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.14em; text-transform: uppercase;
 }
 .bio-from span + span { color: var(--blue); }
-.bio-p { margin: 0; max-width: 30ch; font: 400 clamp(15px, 1.75cqw, 27px)/1.36 var(--f-serif); text-wrap: pretty; }
-.bio-first { font-size: clamp(17px, 2.05cqw, 32px); line-height: 1.28; max-width: 26ch; }
+.bio-p { margin: 0; max-width: 30ch; font: 400 max(15px, 1.75cqw)/1.36 var(--f-serif); text-wrap: pretty; }
+.bio-first { font-size: max(17px, 2.05cqw); line-height: 1.28; max-width: 26ch; }
 .bio-first::first-letter { font-weight: 700; color: var(--red); }
 /* struck across the letter like a postmark, overprinting what's under it */
 .bio-postmark {
@@ -405,11 +405,12 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .bio-cv { margin: auto 0 0; border-top: 0.3cqw solid var(--dk); }
 .bio-cv div { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 0.8em; align-items: baseline; padding: 0.7em 0; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
 .bio-cv dt { font: 500 var(--fs-cap)/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.18em; }
-.bio-cv dd { margin: 0; font: 400 clamp(13px, 1.25cqw, 19px)/1.3 var(--f-serif); }
+.bio-cv dd { margin: 0; font: 400 max(13px, 1.25cqw)/1.3 var(--f-serif); }
 .bio-cv b { font: 800 1.1em/1 var(--f-display); letter-spacing: -0.01em; margin-right: 0.4em; }
 .bio-now dt { color: var(--red); font-weight: 800; }
 .bio-now b { text-decoration: underline; text-decoration-color: var(--yellow); text-decoration-thickness: 0.35em; text-underline-offset: -0.08em; text-decoration-skip-ink: none; }
-.bio-bye { margin: 0; font: 400 italic clamp(14px, 1.45cqw, 22px)/1.4 var(--f-serif); }
+.bio-now a.ql { text-decoration: none; }
+.bio-bye { margin: 0; font: 400 italic max(14px, 1.45cqw)/1.4 var(--f-serif); }
 .bio-bye a { text-decoration-color: var(--red); text-decoration-thickness: 0.12em; text-underline-offset: 0.15em; }
 
 /* ─── end of the issue ─────────────────────────────────────────────── */
@@ -782,7 +783,7 @@ dialog.fold-ask::before {
 }
 .jt-slug {
   position: absolute; left: 4cqw; top: calc(100% + 0.7cqw); white-space: nowrap;
-  font: 600 clamp(8px, 0.62cqw, 11px)/1 var(--f-display); letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.7;
+  font: 600 max(8px, 0.62cqw)/1 var(--f-display); letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.7;
 }
 .jump-from { margin: 0 0 1.6cqw; display: flex; align-items: baseline; justify-content: space-between; gap: 2cqw; font: 700 var(--fs-cap)/1.2 var(--f-display); }
 .jump-from a { text-decoration: none; border-bottom: 0.25em solid var(--lt); }
@@ -790,14 +791,13 @@ dialog.fold-ask::before {
 .margin-notes {
   grid-column: 11 / 13; grid-row: 1 / 9; min-height: 0; overflow: hidden;
   padding: 5cqw 3.4cqw 5cqw 0;
-  font: 500 clamp(10px, 0.78cqw, 12.5px)/1.3 var(--f-display);
+  font: 500 max(10px, 0.78cqw)/1.3 var(--f-display);
 }
 .mn-head { margin: 0 0 1cqw; font-weight: 800; text-transform: uppercase; letter-spacing: 0.24em; color: var(--dk); }
 .margin-notes ol { margin: 0; padding: 0 0 0 1.9em; display: flex; flex-direction: column; gap: 0.9cqw; }
 .margin-notes li::marker { font-weight: 850; color: var(--lt); }
 .paper-newsprint .margin-notes li::marker, .paper-bone .margin-notes li::marker { color: color-mix(in srgb, var(--lt) 80%, #000); }
-.margin-notes a { display: block; font-weight: 650; text-decoration: none; overflow-wrap: anywhere; }
-.margin-notes a:hover { text-decoration: underline; text-decoration-color: var(--lt); text-decoration-thickness: 0.25em; }
+.margin-notes a { display: block; font-weight: 650; overflow-wrap: anywhere; }
 .mn-where { display: block; opacity: 0.6; overflow-wrap: anywhere; }
 sup.ref {
   font: 800 0.62em/0 var(--f-display); color: var(--dk);

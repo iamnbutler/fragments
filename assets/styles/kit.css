@@ -32,7 +32,7 @@
 }
 .pull {
   margin: 0 0 2cqw;
-  font: 400 italic clamp(17px, 2.25cqw, 34px)/1.12 var(--f-serif);
+  font: 400 italic max(17px, 2.25cqw)/1.12 var(--f-serif);
   font-variation-settings: 'opsz' 60;
   color: var(--dk);
   padding: 1.3cqw 0 0;
@@ -74,7 +74,7 @@
   padding: 0.35cqw 0.8cqw;
   border: 0.22cqw solid currentColor;
   color: var(--lt); rotate: -2.5deg;
-  font: 800 clamp(9px, 0.74cqw, 12px)/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.24em;
+  font: 800 max(9px, 0.74cqw)/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.24em;
   mix-blend-mode: multiply; filter: url(#rubber);
 }
 .paper-toner .archive-mark { mix-blend-mode: normal; }

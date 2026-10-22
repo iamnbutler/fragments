@@ -8,7 +8,7 @@
 .tk-state {
   position: relative; flex: 1 1 0; padding-top: 0.9cqw;
   border-top: 0.16cqw solid var(--dk);
-  font: 700 clamp(8px, 0.62cqw, 11px)/1 var(--f-display); letter-spacing: 0.06em; text-transform: uppercase;
+  font: 700 max(8px, 0.62cqw)/1 var(--f-display); letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--dk); opacity: 0.5;
 }
 .tk-state:last-child { flex: 0 0 0; border-top-color: transparent; }
@@ -28,7 +28,7 @@
 .tk-body { gap: 1.4cqw; }
 .tk-pull {
   flex: none; margin: 0; padding-top: 0.8cqw; border-top: 0.35cqw solid var(--lt);
-  font: italic 400 clamp(18px, 2.5cqw, 40px)/1.08 var(--f-serif); color: var(--dk); text-wrap: balance;
+  font: italic 400 max(18px, 2.5cqw)/1.08 var(--f-serif); color: var(--dk); text-wrap: balance;
 }
 .tk-pull span { display: block; }
 
