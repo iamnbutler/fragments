@@ -29,7 +29,6 @@
 .tl-phone { flex: 1 1 0; min-height: 0; }
 .tl-phone .inkfig-plates { height: 100%; aspect-ratio: auto; }
 .tl-fig { flex: none; }
-.tl-envelope { width: 86%; align-self: center; }
 
 .tl-pull {
   flex: none; margin: 0; padding-top: 0.8cqw; border-top: 0.35cqw solid var(--red);
@@ -46,6 +45,5 @@
   .zine .tl-ticket::before { left: 44px; }
   .zine .tl-ticket .dr-dek { padding-left: 46px; }
   .zine .tl-ticket-head, .zine .tl-ticket-foot { margin-left: 46px; font-size: 10px; }
-  .zine .tl-envelope { width: 100%; }
   .zine .tl-pull { font-size: 30px; }
 }

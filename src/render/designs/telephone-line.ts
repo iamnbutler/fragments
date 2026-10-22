@@ -4,7 +4,7 @@ import { img } from '../../lib/pieces';
 import { split, inkFig, prose, cont, type PieceSpread } from './kit';
 
 /**
- * telephone-line, "Do Not Acknowledge Acknowledgments". A manual exchange: a
+ * telephone-line, "Every Agent Gets a Number". A manual exchange: a
  * strip of jacks runs across the head of every spread, with one red patch
  * cord plugged in differently on each, and the dek is a call ticket. Red is
  * anything live; blue is the Codex side.
@@ -30,16 +30,16 @@ export function telephoneLine(spread: PieceSpread): Html {
       ${cont(spread)}
     </div>`}
   ${part === 1 && html`<div class="pg pg-l">
-      ${inkFig(img(d, 'fig-3-two-phones'), { class: 'tl-fig' })}
+      ${inkFig(img(d, 'fig-4-team'), { class: 'tl-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r">
-      ${prose(d.key, b, { cols: 2, end })}
-      ${inkFig(img(d, 'fig-4-envelope'), { class: 'tl-fig tl-envelope' })}
+      <p class="tl-pull" aria-hidden="true"><span>Telephone takes me</span> <span>out of the middle.</span></p>
+      ${prose(d.key, b, { cols: 2 })}
+      ${inkFig(img(d, 'fig-3-two-phones'), { class: 'tl-fig' })}
       ${cont(spread)}
     </div>`}
   ${part === 2 && html`<div class="pg pg-l">
-      <p class="tl-pull" aria-hidden="true"><span>Acceptance is not</span> <span>a read receipt.</span></p>
       ${inkFig(img(d, 'fig-1-route'), { class: 'tl-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
