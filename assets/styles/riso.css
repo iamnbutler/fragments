@@ -104,6 +104,13 @@ html:has(body.issue) { scroll-snap-type: y proximity; }
   transform-origin: 50% 100%;
 }
 
+/* On a wide screen a spread's size comes from its width alone, so nothing
+   inside it can move the page around it. Containing it lets copyfitting and
+   the print-in relayout one spread rather than the whole issue. */
+@media (min-width: 761px) {
+  .spread { contain: size layout paint; }
+}
+
 .gutter {
   position: absolute; z-index: 6; top: 0; bottom: 0; left: 50%; width: 9cqw;
   transform: translateX(-50%);
@@ -790,11 +797,10 @@ body:has(#agentation) .flats-toggle { right: 76px; }
 html.flats-open .flats-toggle { visibility: hidden; }
 
 .flats {
-  --fade: 0; --chrome: 0;
   position: fixed; inset: 0; z-index: 50;
   visibility: hidden; pointer-events: none;
-  background: color-mix(in srgb, var(--desk) calc(var(--fade) * 100%), transparent);
 }
+.flats-backdrop { position: absolute; inset: 0; background: var(--desk); opacity: 0; }
 html.flats-open .flats { visibility: visible; pointer-events: auto; }
 html.flats-open, html.flats-open body { overflow: hidden; }
 html.flats-rest .zine { visibility: hidden; }
@@ -806,9 +812,11 @@ html.flats-moving .flats-scroll { overflow: hidden; }
   padding: 28px clamp(16px, 3vw, 48px) 96px;
   max-width: 1760px; margin: 0 auto;
 }
-html.flats-moving .flats-board { will-change: transform; }
-.flats-slug, .sig-head, .flat-meta { opacity: var(--chrome); }
-.flat-frame { opacity: var(--fade); }
+html.flats-moving .flats-board { will-change: transform, opacity; }
+html.flats-moving .flats-backdrop { will-change: opacity; }
+/* the slug, labels and crop marks come up once the pasteboard has landed */
+.flats-slug, .sig-head, .flat-meta, .flat-marks, .flats-back { opacity: 0; }
+html.flats-rest :is(.flats-slug, .sig-head, .flat-meta, .flat-marks, .flats-back) { opacity: 1; transition: opacity 0.22s linear; }
 
 .flats-slug {
   display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 14px;
@@ -847,6 +855,8 @@ html.flats-moving .flats-board { will-change: transform; }
   position: absolute; left: 0; top: 0; width: 1280px; aspect-ratio: 1.45;
   transform: scale(var(--flat-s)); transform-origin: 0 0;
   overflow: hidden; pointer-events: none;
+  /* a clone never changes the page around it */
+  contain: strict;
 }
 /* crop marks at each corner, drawn just off the trim */
 .flat-marks {
@@ -862,7 +872,6 @@ html.flats-moving .flats-board { will-change: transform; }
     linear-gradient(var(--m), var(--m)) 100% calc(100% - 6px) / 5px 1px,
     linear-gradient(var(--m), var(--m)) calc(100% - 6px) 100% / 1px 5px;
   background-repeat: no-repeat;
-  opacity: var(--chrome);
 }
 .flat-meta {
   display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; margin-top: 7px;
@@ -890,7 +899,6 @@ html.flats-moving .flats-board { will-change: transform; }
   padding: 8px 12px; border: 0; border-radius: 2px;
   background: var(--black); color: var(--newsprint); cursor: pointer;
   font: 600 12px/1 var(--f-display); letter-spacing: 0.06em; text-transform: uppercase;
-  opacity: var(--chrome);
 }
 .flats-back kbd { font: inherit; font-weight: 400; opacity: 0.6; border: 1px solid currentColor; padding: 2px 4px; border-radius: 2px; }
 html:not(.flats-rest) .flats-back { pointer-events: none; }
