@@ -118,6 +118,8 @@ function fill(frames: HTMLElement[]) {
   if (cont) cont.textContent = queue.length ? 'The rest is on its own page' : 'Read on its own page';
 }
 
+const yieldTask = () => new Promise<void>((r) => setTimeout(r, 0));
+
 export function copyfit() {
   const chains = new Map<string, HTMLElement[]>();
   for (const el of document.querySelectorAll<HTMLElement>('[data-flow]')) {
@@ -125,10 +127,18 @@ export function copyfit() {
     if (!chains.has(k)) chains.set(k, []);
     chains.get(k)!.push(el);
   }
-  const run = () => {
+  // Each chain takes hundreds of measurements, so fit one per task: together
+  // they'd hold the page for a long frame just as the reader starts to scroll.
+  let gen = 0;
+  const run = async () => {
     // stacked pages on phones have no frame edges to fit to
     if (matchMedia('(max-width: 760px)').matches) return;
-    for (const frames of chains.values()) pour(frames);
+    const mine = ++gen;
+    for (const frames of chains.values()) {
+      if (gen !== mine) return;
+      pour(frames);
+      await yieldTask();
+    }
   };
   const go = () => (document.fonts?.ready ?? Promise.resolve()).then(run);
   go();

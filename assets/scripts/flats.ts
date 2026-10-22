@@ -8,7 +8,9 @@
  * Thumbnails are live clones of the spreads, laid out at a fixed design width
  * and scaled down, so they're the real pages rather than pictures of them.
  * The halftone SVG filters are swapped for cheap CSS duotones in the clones,
- * and the whole pasteboard moves as one transformed layer.
+ * and the whole pasteboard moves as one transformed layer. Nothing inside it
+ * changes while it moves: the pasteboard and its backdrop fade as layers, and
+ * the slug, labels and crop marks come up once it has landed.
  */
 
 import { reveal, shown } from './seen';
@@ -21,10 +23,13 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 interface Board {
   layer: HTMLElement;
+  backdrop: HTMLElement;
   scroller: HTMLElement;
   board: HTMLElement;
   cells: HTMLButtonElement[];
   back: HTMLButtonElement;
+  /** Clones still to be made, a cell at a time. */
+  pending: (() => void)[];
 }
 
 interface Geometry {
@@ -41,16 +46,29 @@ export function flats(sheets: HTMLElement[]) {
   let p = 0; // 0: reading the feed, 1: flats
   let v = 0;
   let raf = 0;
-  let anim: Animation | null = null;
+  let anims: Animation[] = [];
   let mode: 'feed' | 'flats' = 'feed';
   let target = 0; // spread index the current move is about
   let origin = 0; // spread index flats was opened from
 
   const build = () => (ui ??= buildBoard(sheets, (i) => zoomInto(i), () => zoomInto(origin)));
+  /** The pasteboard with every clone in it, finishing any that are left. */
+  const ready = () => {
+    const u = build();
+    if (u.pending.length) { u.pending.splice(0).forEach((f) => f()); sizeCells(u); }
+    return u;
+  };
 
-  // Build the pasteboard ahead of time so the first gesture doesn't wait.
-  const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 1500));
-  idle(() => build(), { timeout: 5000 });
+  // Build the pasteboard ahead of time so the first gesture doesn't wait,
+  // a few clones per idle slice: laying out every clone at once is a long
+  // frame on a slow machine, and the reader may be scrolling.
+  const idle = (window as any).requestIdleCallback ?? ((f: (d: { timeRemaining(): number }) => void) => setTimeout(() => f({ timeRemaining: () => 8 }), 200));
+  const fill = (d: { timeRemaining(): number }) => {
+    const u = build();
+    while (u.pending.length && d.timeRemaining() > 4) u.pending.shift()!();
+    if (u.pending.length) idle(fill, { timeout: 2000 });
+  };
+  idle(fill, { timeout: 5000 });
 
   // ── the visible control ────────────────────────────────────────────────
   const toggle = document.createElement('button');
@@ -78,7 +96,7 @@ export function flats(sheets: HTMLElement[]) {
 
   /** Measure the move between spread `i` in the feed and its cell. */
   const measure = (i: number, centreCell: boolean): Geometry => {
-    const u = build();
+    const u = ready();
     u.board.style.transform = 'none';
     sizeCells(u);
     const cell = u.cells[i].querySelector<HTMLElement>('.flat-frame')!;
@@ -114,30 +132,28 @@ export function flats(sheets: HTMLElement[]) {
     return `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale(${s.toFixed(5)})`;
   };
 
-  const fades = () => {
-    ui!.layer.style.setProperty('--fade', clamp(p / 0.14).toFixed(3));
-    ui!.layer.style.setProperty('--chrome', clamp((p - 0.55) / 0.45).toFixed(3));
-  };
+  /** How far the pasteboard and its backdrop have faded in at progress `at`. */
+  const fadeAt = (at: number) => clamp(at / 0.14).toFixed(3);
 
   const apply = () => {
     if (!ui || !geo) return;
     ui.board.style.transform = transformAt(p);
-    fades();
+    ui.board.style.opacity = ui.backdrop.style.opacity = fadeAt(p);
   };
 
   /** Stop a running move where it is. */
   const halt = () => {
     cancelAnimationFrame(raf);
     raf = 0;
-    if (!anim) return;
-    anim.cancel();
-    anim = null;
+    if (!anims.length) return;
+    for (const a of anims) a.cancel();
+    anims = [];
     apply();
   };
 
   /** Begin a move from rest. */
   const start = (from: 'feed' | 'flats', i: number) => {
-    const u = build();
+    const u = ready();
     halt();
     target = i;
     if (from === 'feed') {
@@ -168,8 +184,7 @@ export function flats(sheets: HTMLElement[]) {
     if (to === 1) {
       mode = 'flats';
       ui.board.style.transform = 'none';
-      ui.layer.style.setProperty('--fade', '1');
-      ui.layer.style.setProperty('--chrome', '1');
+      ui.board.style.opacity = ui.backdrop.style.opacity = '1';
       root.classList.add('flats-rest');
       ui.cells[target].focus({ preventScroll: true });
     } else {
@@ -185,8 +200,9 @@ export function flats(sheets: HTMLElement[]) {
   // transform animation. Scaling the pasteboard from script makes Chrome
   // re-raster the whole layer at every new scale, and on a large retina
   // screen that can't keep up: frames go out with the pasteboard blank.
-  // A compositor animation is rastered once for its whole run. Only the
-  // fades are stepped from script, and they don't touch the raster scale.
+  // A compositor animation is rastered once for its whole run, so the fades
+  // ride along as opacity on the same layers: nothing is restyled or
+  // repainted per frame. Script only follows the path to keep `p` current.
   const settle = (to: 0 | 1) => {
     halt();
     if (reduced() || !ui || !geo) { finish(to); return; }
@@ -199,7 +215,11 @@ export function flats(sheets: HTMLElement[]) {
       path.push({ p: sp, v: sv });
     }
     const duration = (path.length - 1) * FRAME;
-    anim = ui.board.animate(path.map((q) => ({ transform: transformAt(q.p) })), { duration, easing: 'linear' });
+    const timing = { duration, easing: 'linear' };
+    anims = [
+      ui.board.animate(path.map((q) => ({ transform: transformAt(q.p), opacity: fadeAt(q.p) })), timing),
+      ui.backdrop.animate(path.map((q) => ({ opacity: fadeAt(q.p) })), timing),
+    ];
     const t0 = performance.now();
     const step = (now: number) => {
       const at = Math.max(0, now - t0) / FRAME;
@@ -207,8 +227,7 @@ export function flats(sheets: HTMLElement[]) {
       const q = path[j], r = path[Math.min(path.length - 1, j + 1)];
       p = lerp(q.p, r.p, at - j);
       v = lerp(q.v, r.v, at - j);
-      fades();
-      if (j >= path.length - 1) { anim?.cancel(); anim = null; raf = 0; finish(to); return; }
+      if (j >= path.length - 1) { for (const a of anims) a.cancel(); anims = []; raf = 0; finish(to); return; }
       raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
@@ -323,6 +342,8 @@ function buildBoard(sheets: HTMLElement[], open: (i: number) => void, back: () =
   layer.className = 'flats';
   layer.setAttribute('role', 'dialog');
   layer.setAttribute('aria-label', 'Flats: every spread in this issue');
+  const backdrop = document.createElement('div');
+  backdrop.className = 'flats-backdrop';
 
   const scroller = document.createElement('div');
   scroller.className = 'flats-scroll';
@@ -349,6 +370,7 @@ function buildBoard(sheets: HTMLElement[], open: (i: number) => void, back: () =
     if (range) range.textContent = `Pages ${firstPage}–${lastPage + 1}`;
   };
   let sig = 0;
+  const pending: (() => void)[] = [];
   sheets.forEach((sheet, i) => {
     const key = sheet.dataset.section ?? 'front';
     const page = Number(sheet.id.replace('p-', ''));
@@ -374,7 +396,7 @@ function buildBoard(sheets: HTMLElement[], open: (i: number) => void, back: () =
     frame.className = 'flat-frame';
     const scale = document.createElement('div');
     scale.className = 'flat-scale';
-    scale.append(cloneSheet(sheet));
+    pending.push(() => scale.append(cloneSheet(sheet)));
     const marks = document.createElement('span');
     marks.className = 'flat-marks';
     marks.setAttribute('aria-hidden', 'true');
@@ -398,9 +420,9 @@ function buildBoard(sheets: HTMLElement[], open: (i: number) => void, back: () =
   backBtn.addEventListener('click', back);
 
   scroller.append(board);
-  layer.append(scroller, backBtn);
+  layer.append(backdrop, scroller, backBtn);
   document.body.append(layer);
-  const ui = { layer, scroller, board, cells, back: backBtn };
+  const ui = { layer, backdrop, scroller, board, cells, back: backBtn, pending };
   sizeCells(ui);
   return ui;
 }
