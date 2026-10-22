@@ -7,8 +7,9 @@ import type { TextPart } from '../lib/pieces';
 import { media } from '../lib/media';
 import { COVER_WORKS, COVER_MAPS } from '../lib/covers';
 import { ISSUE } from '../lib/issue';
+import { tokenize, langOf } from '../lib/code';
 import {
-  INK_HEX, rng, spreadTitle, domain, readingMinutes,
+  INK_HEX, CODE_MARK, rng, spreadTitle, domain, readingMinutes,
   type Block, type Ink, type PlateMedia, type Spread,
 } from '../lib/zine';
 
@@ -58,15 +59,24 @@ export function plate(p: {
 </figure>`;
 }
 
+/** A code listing, hand-highlighted in the spot inks. */
+export function listing(src: string, lang?: string): Html {
+  const label = lang ?? (langOf(lang, src) === 'rustc' ? 'rustc' : undefined);
+  return html`<pre${attr('class', 'b-code')}${attr('data-lang', label)}><code>${tokenize(src, lang).map((t) => (t.k ? html`<span${attr('class', `t-${t.k}`)}>${t.s}</span>` : t.s))}</code></pre>`;
+}
+
+/** Text with its marked code spans set in mono. */
+const spans = (t: string) => (t.includes(CODE_MARK) ? t.split(CODE_MARK).map((s, i) => (i % 2 ? html`<code class="ic">${s}</code>` : s)) : t);
+
 /** Running text as blocks. Reference markers become superscript notes when `refs`. */
 export function blocks(bs: Block[], o: { refs?: boolean; end?: boolean } = {}): Html {
   const last = bs.length - 1;
   return html`${bs.map((b, bi) => {
-    const body = b.text.split(/\u0001(\d+)\u0001/).map((t, i) => (i % 2 ? (o.refs ? html`<sup class="ref"><span class="sr">note </span>${t}</sup>` : null) : t));
+    const body = b.text.split(/\u0001(\d+)\u0001/).map((t, i) => (i % 2 ? (o.refs ? html`<sup class="ref"><span class="sr">note </span>${t}</sup>` : null) : spans(t)));
     const tail = o.end && bi === last ? html`<span class="end-mark" aria-hidden="true"></span>` : null;
     return b.t === 'h' ? html`<p class="b-h">${body}</p>`
       : b.t === 'li' ? html`<p class="b-li">${body}${tail}</p>`
-      : b.t === 'code' ? html`<pre class="b-code">${b.text}</pre>`
+      : b.t === 'code' ? listing(b.text, b.lang)
       : b.t === 'quote' ? html`<p class="b-q">${body}${tail}</p>`
       : html`<p>${body}${tail}</p>`;
   })}`;

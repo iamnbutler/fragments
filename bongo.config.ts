@@ -17,11 +17,13 @@ const dev = process.argv.includes('dev');
 
 // Variable Latin subsets of Archivo and Source Serif 4, served from media.
 // Archivo is preloaded; the roman serif only when a page asks, since on the
-// issue it would compete with the cover still for the first paint.
+// issue it would compete with the cover still for the first paint. IBM Plex
+// Mono, as in the figures, sets code and loads only where a listing appears.
 function head(params: { preloadSerif?: boolean }): string {
   const archivo = media('fonts/archivo').url;
   const serif = media('fonts/source-serif-4').url;
   const serifItalic = media('fonts/source-serif-4-italic').url;
+  const mono = (w: string) => media(`fonts/plex-mono-${w}`).url;
   return [
     `<link rel="preload" href="${archivo}" as="font" type="font/woff2" crossorigin />`,
     params.preloadSerif ? `<link rel="preload" href="${serif}" as="font" type="font/woff2" crossorigin />` : '',
@@ -29,12 +31,15 @@ function head(params: { preloadSerif?: boolean }): string {
 @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url(${archivo}) format('woff2'); }
 @font-face { font-family: 'Source Serif 4'; font-style: normal; font-weight: 300 700; font-display: swap; src: url(${serif}) format('woff2'); }
 @font-face { font-family: 'Source Serif 4'; font-style: italic; font-weight: 300 700; font-display: swap; src: url(${serifItalic}) format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(${mono('regular')}) format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500 700; font-display: swap; src: url(${mono('medium')}) format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-style: italic; font-weight: 400; font-display: swap; src: url(${mono('italic')}) format('woff2'); }
 </style>`,
   ].filter(Boolean).join('\n  ');
 }
 
 // a blue underscore on yellow, inline so it costs no request
-const ICON = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="#FCC135"/><rect x="3" y="11" width="10" height="2.5" fill="#4F77D6"/></svg>')}`;
+const ICON = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="#FBDF2F"/><rect x="3" y="11" width="10" height="2.5" fill="#1F6AB8"/></svg>')}`;
 
 // `dev` and `icon` are ours; templates read them as $site.dev and $site.icon.
 const site = { title: '_fragments', url: 'https://nate.rip/', lang: 'en', dev, icon: ICON };

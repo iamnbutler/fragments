@@ -20,6 +20,7 @@
 
   --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --f-serif: 'Source Serif 4', Georgia, serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --ease-press: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-roller: cubic-bezier(0.65, 0, 0.25, 1);
@@ -196,11 +197,34 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .prose-cols .b-li { text-indent: 0 !important; padding-left: 1.1em; position: relative; }
 .prose-cols .b-li::before { content: ''; position: absolute; left: 0.2em; top: 0.62em; width: 0.38em; height: 0.38em; background: var(--dk); border-radius: 50%; }
 .prose-cols .b-q { font-style: italic; text-indent: 0 !important; padding-left: 0.8em; border-left: 0.3em solid var(--lt); margin: 0.5em 0; }
-.prose-cols .b-code {
-  margin: 0.6em 0; padding: 0.7em 0.8em; background: var(--toner); color: var(--newsprint);
-  font: 500 0.72em/1.45 ui-monospace, 'SF Mono', Menlo, monospace; white-space: pre; overflow: hidden;
-  break-inside: avoid; box-shadow: 0.3em 0.3em 0 var(--lt);
+/* code: a listing printed on a yellow screen, whatever the spread's inks
+   (a red or blue screen would swallow tokens in that ink), under a key rule
+   tabbed with its language; tokens pick out in the spot inks */
+.b-code {
+  position: relative; margin: 0.8em 0 0.9em; padding: 1.2em 0.85em 0.7em;
+  background: color-mix(in srgb, var(--yellow) 34%, transparent);
+  border-top: 0.2em solid var(--black); color: var(--black);
+  font: 400 0.76em/1.5 var(--f-mono); tab-size: 2;
+  white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid;
+  text-indent: 0 !important;
 }
+.b-code[data-lang]::before, .prose-article pre[data-lang]::before {
+  content: attr(data-lang); position: absolute; top: 0; left: 0.85em;
+  padding: 0.2em 0.55em 0.25em; background: var(--black); color: var(--newsprint);
+  font: 700 0.74em/1 var(--f-display); letter-spacing: 0.16em; text-transform: uppercase;
+}
+.b-code code { font: inherit; background: none; padding: 0; }
+/* a code span in running text */
+.ic {
+  font: 400 0.84em/1 var(--f-mono); padding: 0 0.16em; border-radius: 0.1em;
+  background: color-mix(in srgb, var(--yellow) 22%, transparent); hyphens: none;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.t-kw, .t-key, .t-flag, .t-attr { color: var(--blue); }
+.t-str, .t-num, .t-err { color: var(--red); }
+.t-kw, .t-ty, .t-cmd, .t-err { font-weight: 600; }
+.t-attr, .t-com { font-style: italic; }
+.t-com, .t-dim, .t-pun { opacity: 0.58; }
 .cols-2 { columns: 2; column-gap: 2.4cqw; column-fill: auto; }
 .dropcap > p:first-child::first-letter {
   float: left;
@@ -680,11 +704,12 @@ dialog.fold-ask::before {
 .prose-article li { margin: 0.25em 0; }
 .prose-article li::marker { color: var(--dk); font-family: var(--f-display); font-weight: 800; }
 .prose-article img { max-width: 100%; height: auto; mix-blend-mode: multiply; margin: 1.6em 0; }
-.prose-article code { font-size: 0.86em; background: rgb(0 0 0 / 0.07); padding: 0.1em 0.3em; }
+.prose-article code { font: 400 0.84em var(--f-mono); background: color-mix(in srgb, var(--yellow) 34%, transparent); padding: 0.08em 0.3em; }
 .prose-article pre {
-  background: var(--toner) !important; color: var(--newsprint);
-  padding: 1.2em 1.4em; overflow-x: auto; font-size: 0.8em; line-height: 1.5;
-  margin: 1.6em 0; box-shadow: 6px 6px 0 var(--lt);
+  position: relative; margin: 1.8em 0; padding: 1.3em 1.3em 1.1em; overflow-x: auto;
+  background: color-mix(in srgb, var(--yellow) 34%, transparent) !important;
+  border-top: 4px solid var(--black); color: var(--black);
+  font: 400 0.8em/1.55 var(--f-mono); tab-size: 2;
 }
 .prose-article pre code { background: none; padding: 0; font-size: inherit; }
 .prose-article hr { border: 0; border-top: 4px solid var(--dk); margin: 2.4em 0; width: 30%; }

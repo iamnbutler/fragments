@@ -592,6 +592,21 @@
     "type": "font/woff2",
     "bytes": 90096
   },
+  "fonts/plex-mono-italic": {
+    "key": "fonts/plex-mono-italic.c024909521.woff2",
+    "type": "font/woff2",
+    "bytes": 15932
+  },
+  "fonts/plex-mono-medium": {
+    "key": "fonts/plex-mono-medium.f183ae2ee5.woff2",
+    "type": "font/woff2",
+    "bytes": 14288
+  },
+  "fonts/plex-mono-regular": {
+    "key": "fonts/plex-mono-regular.2ba869d8d8.woff2",
+    "type": "font/woff2",
+    "bytes": 13992
+  },
   "fonts/source-serif-4": {
     "key": "fonts/source-serif-4.2a24bad466.woff2",
     "type": "font/woff2",

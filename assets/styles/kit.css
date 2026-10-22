@@ -65,10 +65,6 @@
 .slip-body { max-height: 30cqw; overflow: hidden; }
 .slip-body p { margin: 0; }
 .slip-body p + p { text-indent: 1.3em; }
-.slip .b-code {
-  margin: 0.6em 0; padding: 0.7em 0.8em; background: var(--toner); color: var(--newsprint);
-  font: 500 0.72em/1.45 ui-monospace, 'SF Mono', Menlo, monospace; white-space: pre; overflow: hidden;
-}
 
 /* ─── from the archive ───────────────────────────────────────────────── */
 
