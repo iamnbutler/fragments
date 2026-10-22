@@ -1,34 +1,5 @@
 /* open-remote: its own spreads. */
 
-/* the one day it took, 08:00 to 20:00, across the head of the spread;
-   the hours this spread covers are inked in */
-.or-clock {
-  position: absolute; z-index: 3; top: 2.4cqw; left: 4.4cqw; right: 4.4cqw; height: 2.6cqw;
-  border-bottom: 0.16cqw solid var(--dk);
-}
-.or-clock-span {
-  position: absolute; bottom: 0; height: 1.1cqw;
-  left: calc(var(--s0) * 100%); width: max(0.6cqw, calc((var(--s1) - var(--s0)) * 100%));
-  background: var(--lt); mix-blend-mode: multiply;
-}
-.or-clock-h {
-  position: absolute; left: calc(var(--t) * 100%); top: 100%; translate: -50% 0; padding-top: 0.5cqw;
-  font: 700 max(7px, 0.56cqw)/1 var(--f-display); letter-spacing: 0.06em; font-variant-numeric: tabular-nums;
-  color: var(--dk); opacity: 0.55;
-}
-.or-clock-h::before { content: ''; position: absolute; left: 50%; top: -0.5cqw; width: 0.12cqw; height: 0.5cqw; background: var(--dk); }
-.or-clock-m { position: absolute; left: calc(var(--t) * 100%); bottom: 0; }
-.or-clock-m::before {
-  content: ''; position: absolute; left: 0; bottom: 0; width: 0.6cqw; height: 0.6cqw; translate: -50% 50%;
-  border-radius: 50%; background: var(--dk);
-}
-.or-clock-m i {
-  position: absolute; left: 0; bottom: 1.3cqw; translate: -50% 0; white-space: nowrap;
-  font: italic 400 max(8px, 0.68cqw)/1 var(--f-serif); color: var(--dk);
-}
-.or-clock-m:last-child i { translate: -100% 0; }
-
-.dr-open-remote .pg { padding-top: 7.2cqw; }
 .or-open { gap: 1.4cqw; }
 /* the title's picture, down the rest of the page and off its foot */
 .or-pocket { flex: 1 1 auto; min-height: 0; width: 112%; margin: 0 -6% -3.6cqw; }
@@ -39,9 +10,8 @@
 .or-body { gap: 1.3cqw; }
 .or-fig { flex: none; }
 /* the diagrams are wide; held a little narrower so the text gets the page */
-.dr-open-remote-1 .or-fig, .dr-open-remote-2 .pg-l .or-fig { width: 84%; }
-.dr-open-remote-3 .or-fig { width: 100%; }
-.dr-open-remote-2 .pg-r .or-fig { width: 78%; }
+.dr-open-remote-2 .pg-l .or-fig { width: 84%; }
+.dr-open-remote-2 .pg-r .or-fig { width: 84%; }
 
 /* the paywall, pulled out in yellow, with the word that matters marked up like a proof */
 .or-wall {
@@ -91,7 +61,7 @@
 .layout-dr .or-wall figcaption { max-width: 18cqw; }
 
 /* the last word: the same card, at the price it ended at, with the week struck out */
-.or-zero { position: absolute; right: 5.4cqw; bottom: 9cqw; width: 14cqw; rotate: 4deg; isolation: isolate; }
+.or-zero { position: relative; flex: none; align-self: flex-end; width: 14cqw; margin: 0 2.4cqw 1cqw 0; rotate: 4deg; isolation: isolate; }
 .or-zero .or-wall-price b { font-size: 9cqw; }
 .or-zero .or-wall-lock { white-space: nowrap; letter-spacing: 0.16em; }
 .or-zero .or-wall-price .or-wall-per { font-size: max(12px, 1.5cqw); font-weight: 700; color: #000; text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 0.22cqw; }
@@ -129,25 +99,8 @@
 }
 .or-pull span { display: block; }
 
-/* the papercuts, as a punch list, every box ticked */
-.or-cuts { flex: none; padding: 1cqw 1.2cqw 1.1cqw; border: 0.2cqw solid var(--dk); rotate: 0.8deg; }
-.or-cuts-head { margin: 0 0 0.7cqw; font: 900 max(14px, 1.7cqw)/1 var(--f-display); font-variation-settings: 'wdth' 62; text-transform: uppercase; color: var(--dk); }
-.or-cuts ul { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 1.6cqw; }
-.or-cuts li {
-  position: relative; break-inside: avoid; padding: 0 0 0.45cqw 1.6cqw;
-  font: 500 var(--fs-cap)/1.25 var(--f-display); font-variation-settings: 'wdth' 82;
-}
-.or-cuts li::before {
-  content: ''; position: absolute; left: 0; top: 0.05em; width: 0.95cqw; height: 0.95cqw; border: 0.14cqw solid var(--dk);
-}
-.or-cuts li::after {
-  content: '✓'; position: absolute; left: 0.1cqw; top: -0.35em; font: 900 1.6cqw/1 var(--f-display); color: var(--lt); mix-blend-mode: multiply;
-}
-
 /* phones: one page at a time */
 @media (max-width: 760px) {
-  .zine .or-clock { display: none; }
-  .zine .dr-open-remote .pg { padding-top: 20px; }
   .zine .or-title { --fs: 13vw; font-size: 13vw; }
   .zine .or-wall { width: auto; margin: 10px 8px 0; }
   .zine .dr-open-remote .or-fig { width: 100%; }
@@ -166,12 +119,6 @@
   .zine .or-pocket { width: 100%; margin: 12px 0 0; flex: none; }
   .zine .or-lines li { grid-template-columns: 38vw 1fr 44px; font-size: 12px; }
   .zine .or-lines-bar { height: 10px; }
-  .zine .or-cuts { padding: 14px 16px; }
-  .zine .or-zero { position: relative; inset: auto; width: 52vw; align-self: flex-end; margin: 8px 12px 18px 0; }
+  .zine .or-zero { width: 52vw; margin: 8px 12px 18px 0; }
   .zine .or-zero .or-wall-price b { font-size: 22vw; }
-  .zine .or-cuts-head { font-size: 22px; }
-  .zine .or-cuts ul { columns: 1; }
-  .zine .or-cuts li { font-size: 13px; padding-left: 22px; }
-  .zine .or-cuts li::before { width: 13px; height: 13px; }
-  .zine .or-cuts li::after { font-size: 20px; }
 }

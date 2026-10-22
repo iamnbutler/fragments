@@ -6,27 +6,13 @@ import { split, inkFig, prose, cont, type PieceSpread } from './kit';
 /**
  * open-remote, "The Remote in Your Pocket". The four spot inks: the paywall
  * pulled out on the opening spread in yellow, with the word that does the
- * damage marked up in red like a proof. A clock of the one day it took runs
- * across the head of every spread, with the hours that spread covers inked in.
+ * damage marked up in red like a proof. Three spreads; the last one holds the
+ * three diagrams and the tail of the text.
  */
 export function openRemote(spread: PieceSpread): Html {
   const { piece: d, part, blocks: bs } = spread;
   const end = !spread.jump && bs.length > 0;
   const [a, b] = split(bs, 0.5);
-
-  // the day, in hours from 08:00 to 20:00
-  const FROM = 8, TO = 20;
-  const at = (h: number, m: number) => (h + m / 60 - FROM) / (TO - FROM);
-  const hours = Array.from({ length: TO - FROM + 1 }, (_, i) => FROM + i);
-  const moments = [
-    { t: at(8, 39), label: 'the ask' },
-    { t: at(9, 23), label: 'on my phone' },
-    { t: at(12, 15), label: '“3-4 times”' },
-    { t: at(17, 44), label: 'Jellyfin' },
-    { t: at(20, 0), label: '1.1.0' },
-  ];
-  const spans = [[at(8, 39), at(9, 23)], [at(8, 39), at(9, 0)], [at(12, 15), at(19, 49)], [at(17, 44), at(20, 0)]];
-  const [s0, s1] = spans[part] ?? spans[0];
 
   // where the 6,303 lines of Swift go
   const lines = [
@@ -47,21 +33,7 @@ export function openRemote(spread: PieceSpread): Html {
     { tv: 'LG', makes: 'webOS', wire: 'WebSocket on 3001', key: 'A client key, after one Accept on the TV' },
   ];
 
-  const papercuts = [
-    'Bundle ID never registered',
-    'Xcode signed out: “Failed to Use Accounts”',
-    'A keychain prompt on every rebuild',
-    'An upload lost to | head',
-    'POSIX error 163',
-    'Every build said 1.0',
-  ];
-
-  return html`<div class="or-clock" aria-hidden="true"${attr('style', `--s0:${s0};--s1:${s1}`)}>
-  <span class="or-clock-span"></span>
-  ${hours.map((h) => html`<span class="or-clock-h"${attr('style', `--t:${(h - FROM) / (TO - FROM)}`)}>${String(h).padStart(2, '0')}</span>`)}
-  ${moments.map((m) => html`<span class="or-clock-m"${attr('style', `--t:${m.t}`)}><i>${m.label}</i></span>`)}
-</div>
-${part === 0 && html`<div class="pg pg-l or-open">
+  return html`${part === 0 && html`<div class="pg pg-l or-open">
       <div class="or-head">
         ${d.kicker && html`<p class="dr-kicker">${d.kicker}</p>`}
         ${reg({ as: 'h2', text: d.title, class: 't-tower or-title' })}
@@ -114,26 +86,12 @@ ${part === 1 && html`<div class="pg pg-l or-body">
     </div>`}
 ${part === 2 && html`<div class="pg pg-l or-body">
       ${inkFig(img(d, 'fig-2-subject'), { class: 'or-fig' })}
-      ${prose(d.key, a, { cols: 2 })}
-    </div>
-    <div class="pg pg-r or-body">
-      <p class="or-pull" aria-hidden="true"><span>“I’ve needed to put codes</span> <span>in 3-4 times.”</span></p>
-      ${prose(d.key, b, { cols: 2, end })}
       ${inkFig(img(d, 'fig-3-camera'), { class: 'or-fig' })}
-      ${cont(spread)}
-    </div>`}
-${part === 3 && html`<div class="pg pg-l or-body">
-      ${inkFig(img(d, 'fig-4-playnow'), { class: 'or-fig' })}
-      ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r or-body">
-      <div class="or-cuts">
-        <p class="or-cuts-head">Not the TV</p>
-        <ul>
-          ${papercuts.map((c) => html`<li>${c}</li>`)}
-        </ul>
-      </div>
-      ${prose(d.key, b, { cols: 2, end })}
+      <p class="or-pull" aria-hidden="true"><span>Nothing appears on the TV</span> <span>unless someone asked.</span></p>
+      ${inkFig(img(d, 'fig-4-playnow'), { class: 'or-fig' })}
+      ${prose(d.key, bs, { cols: 2, end })}
       <div class="or-zero" aria-hidden="true">
         <span class="or-wall-lt"></span>
         <div class="or-wall-card">
