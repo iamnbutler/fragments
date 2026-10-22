@@ -4,7 +4,6 @@ slug: open-remote
 date: 2026-10-10
 kicker: Open Remote
 dek: "[Open Remote](https://github.com/iamnbutler/open-tv-remote) is a good TV remote for your iPhone, iPad or Mac. It's free, it stays free, and it took a day to build."
-draft: true
 repo: https://github.com/iamnbutler/open-tv-remote
 links:
   - label: iamnbutler/open-tv-remote

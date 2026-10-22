@@ -1,0 +1,18 @@
+/* jev-demos: its own spreads. */
+
+.jv-open { gap: 1.4cqw; }
+.jv-ms { position: relative; flex: none; height: 3.2cqw; margin: 0.4cqw 1.2cqw 0 0; border-bottom: 0.2cqw solid var(--dk); }
+.jv-ms-band { position: absolute; left: 14%; right: 0; bottom: 0; height: 1.6cqw; background: var(--lt); mix-blend-mode: multiply; }
+.jv-ms-tick {
+  position: absolute; left: calc(var(--t) * 100%); bottom: 0; translate: -50% 0; padding-bottom: 1.9cqw;
+  font: 700 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.08em; color: var(--dk);
+}
+.jv-ms-tick::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 0.16cqw; height: 1.2cqw; background: var(--dk); }
+.jv-ms-tick:first-of-type { translate: 0 0; }
+.jv-ms-tick:first-of-type::after { left: 0; }
+.jv-ms-tick:last-of-type { translate: -100% 0; }
+.jv-ms-tick:last-of-type::after { left: auto; right: 0; }
+.jv-ms-unit { position: absolute; right: 0; top: 100%; margin-top: 0.4cqw; font: italic 400 var(--fs-cap)/1 var(--f-serif); }
+.jv-title { --fs: 7.4cqw; position: relative; z-index: 2; }
+.jv-deck { display: flex; flex-direction: column; gap: 0.8cqw; max-width: 88%; }
+.jv-fig { flex: none; }

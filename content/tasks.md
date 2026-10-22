@@ -4,7 +4,6 @@ slug: tasks
 date: 2026-10-08
 kicker: Tasks
 dek: "[Tasks](https://github.com/iamnbutler/tasks) turns a GitHub issue tracker into merged pull requests. The first version ran its agents side by side and drowned in conflicts. The second sends everything through one long conversation, on purpose."
-draft: true
 repo: https://github.com/iamnbutler/tasks
 links:
   - label: iamnbutler/tasks

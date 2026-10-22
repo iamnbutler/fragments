@@ -1,4 +1,8 @@
-/* Every page: the zine, the features, the essays. */
+/* Every page: the zine, its pieces and their designs. */
 @import "riso.css";
-@import "drafts.css";
-@import "essays.css";
+@import "kit.css";
+@import "pieces.css";
+@import "designs/desktop-tools.css";
+@import "designs/jev-demos.css";
+@import "designs/open-remote.css";
+@import "designs/tasks.css";

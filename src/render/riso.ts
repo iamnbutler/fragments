@@ -3,12 +3,12 @@
  * text blocks, and the spreads they print on.
  */
 import { html, raw, attr, cls, type Html } from './html';
-import type { TextPart } from '../lib/drafts';
+import type { TextPart } from '../lib/pieces';
 import { media } from '../lib/media';
 import { COVER_WORKS, COVER_MAPS } from '../lib/covers';
 import { ISSUE } from '../lib/issue';
 import {
-  INK_HEX, rng, spreadTitle, domain, readingMinutes, paragraphs, pullQuote, printDate,
+  INK_HEX, rng, spreadTitle, domain, readingMinutes,
   type Block, type Ink, type PlateMedia, type Spread,
 } from '../lib/zine';
 
@@ -156,7 +156,8 @@ export function bio(spread: Kind<'bio'>): Html {
 }
 
 /**
- * The rest of a long essay, jumped from its opener the way magazines do.
+ * The rest of a long piece, jumped from its designed spreads the way
+ * magazines do.
  * Outbound links become numbered notes in the outer margin.
  */
 export function jumpSpread(spread: Kind<'jump'>): Html {
@@ -171,7 +172,7 @@ export function jumpSpread(spread: Kind<'jump'>): Html {
   const left = bs.slice(0, split + 1);
   const right = bs.slice(split + 1);
   const mins = readingMinutes(item.text);
-  return sheet(spread, { label: `${item.title}, continued`, layout: hasNotes ? 'notes' : 'plain', running: `Essay, ${mins} min` }, html`<div class="pg pg-l jump-a">
+  return sheet(spread, { label: `${item.title}, continued`, layout: hasNotes ? 'notes' : 'plain', running: `${item.title}, ${mins} min` }, html`<div class="pg pg-l jump-a">
     <p class="jump-from">
       <a${attr('href', `#p-${from}`)}>Continued from page ${from}</a>
       <span class="jump-slug">${item.title}</span>
@@ -201,81 +202,10 @@ export function jumpSpread(spread: Kind<'jump'>): Html {
   </aside>`}`);
 }
 
-/**
- * An essay's opening spread, on one of three stock layouts: tower (a tall
- * title page facing the text), banner (a rule-width title over both pages)
- * or toner (a photocopied black spread with the text on a taped slip).
- */
-export function postSpread(spread: Kind<'post'>): Html {
-  const { item, layout } = spread;
-  const paras = paragraphs(item.text, item.title);
-  const mins = readingMinutes(item.text);
-  const date = printDate(item.date);
-  const year = new Date(item.date).getUTCFullYear();
-  const len = item.title.length;
-
-  // Title sizes in container-width units, fitted to the title's length.
-  // The tower's longest word has to clear its page; the banner stays within two lines.
-  const word = Math.max(...item.title.split(/\s+/).map((w) => w.length));
-  const towerSize = Math.min(12, 80 / word, Math.max(4.4, 112 / Math.pow(len, 0.72)));
-  const bannerSize = Math.min(5.6, Math.max(2.3, 120 / len));
-  const tonerSize = Math.min(9, Math.max(3.6, 70 / Math.pow(len, 0.62)));
-
-  const bs = spread.blocks;
-  const done = !spread.jump;
-  // banner sets the first ~60% of its text on the left page
-  let acc = 0;
-  const total = bs.reduce((n, b) => n + b.text.length, 0);
-  const split = Math.max(1, bs.findIndex((b) => (acc += b.text.length) > total * 0.6) + 1 || bs.length);
-  const bannerA = bs.slice(0, split);
-  const bannerB = bs.slice(split);
-  const quote = pullQuote(paras, spread.seed);
-  const tilt = ((spread.seed % 30) / 10 - 1.5).toFixed(2);
-  const slipTop = 8 + (spread.seed % 18);
-  const cont = spread.jump
-    ? html`<a class="cont"${attr('href', `#p-${spread.jump}`)}>Continued on page ${spread.jump}</a>`
-    : html`<a class="cont cont-single"${attr('href', item.href)}>Read on its own page</a>`;
-
-  return sheet(spread, { label: `Essay: ${item.title}`, layout, running: `Essay, ${mins} min` }, html`${spread.archive && html`<p class="archive-mark"${attr('aria-label', `From the archive: first printed ${year}`)}><span>From the archive</span><span class="archive-year">${year}</span></p>`}
-  ${layout === 'tower' && html`<div class="pg pg-l tower-title">
-      ${reg({ as: 'h2', text: item.title, href: item.href, class: 't-tower', style: `--fs:${towerSize.toFixed(2)}cqw` })}
-      ${quote && html`<blockquote class="pull pull-tower"><p>${quote}</p></blockquote>`}
-      <p class="cap">${date}. About ${mins} minute${mins > 1 ? 's' : ''} to read.</p>
-    </div>
-    <div class="pg pg-r tower-body">
-      <div class="prose-cols cols-2 dropcap"${attr('data-flow', item.key)}>
-        ${blocks(bs, { end: done })}
-      </div>
-      ${cont}
-    </div>`}
-  ${layout === 'banner' && html`<header class="banner-head">
-      ${reg({ as: 'h2', text: item.title, href: item.href, class: 't-spaced', style: `--fs:${bannerSize.toFixed(2)}cqw` })}
-      <p class="cap">${date}, ${mins} min.</p>
-    </header>
-    <div class="pg pg-l banner-a prose-cols cols-2 dropcap"${attr('data-flow', item.key)}>
-      ${blocks(bannerA, { end: done && !bannerB.length })}
-    </div>
-    <div class="pg pg-r banner-b">
-      ${quote && html`<blockquote class="pull"><p>${quote}</p></blockquote>`}
-      <div class="prose-cols cols-2"${attr('data-flow', item.key)}>
-        ${blocks(bannerB, { end: done })}
-      </div>
-      ${cont}
-    </div>`}
-  ${layout === 'toner' && html`<div class="pg pg-l toner-title">
-      <span class="toner-no" aria-hidden="true">${String(year).slice(2)}</span>
-      <h2 class="t-reverse"${attr('style', `--fs:${tonerSize.toFixed(2)}cqw`)}><a${attr('href', item.href)}>${item.title}</a></h2>
-      <p class="cap">${date}, ${mins} min read</p>
-    </div>
-    <div class="pg pg-r toner-slip-wrap">
-      <div class="slip"${attr('style', `--tilt:${tilt}deg;--top:${slipTop}%`)}>
-        <span class="tape" aria-hidden="true"></span>
-        <div class="slip-body"${attr('data-flow', item.key)}>
-          ${blocks(bs, { end: done })}
-        </div>
-        ${cont}
-      </div>
-    </div>`}`);
+/** A rubber stamp for pieces over three years old, with the year they were first printed. */
+export function archiveMark(date: string): Html {
+  const year = new Date(date).getUTCFullYear();
+  return html`<p class="archive-mark"${attr('aria-label', `From the archive: first printed ${year}`)}><span>From the archive</span><span class="archive-year">${year}</span></p>`;
 }
 
 // ── the print shop ──────────────────────────────────────────────────────────

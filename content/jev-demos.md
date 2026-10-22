@@ -3,7 +3,6 @@ title: "What does fast get us?"
 slug: jev-demos
 date: 2026-10-08
 dek: "Notes from the first few days of playing with Jev, a model that answers instead of writes, around three ideas: compression, tagging and ranking."
-draft: true
 repo: https://github.com/iamnbutler/jev-demos
 links:
   - label: iamnbutler/jev-demos
