@@ -1,17 +1,16 @@
 /**
  * _fragments, built by bongo. Pages render from TypeScript (src/render) as
- * partials and as the loader for content/e and content/d; layouts/html.hbs
+ * partials and as the loader for the pieces in content/; layouts/html.hbs
  * wraps every page in the document.
  */
 import './src/render/dev-media';
 import path from 'node:path';
 import type { Config } from 'bongo';
 import matter from 'gray-matter';
-import { issue, issueDescription, essayPage, draftPage } from './src/render/pages';
+import { issue, issueDescription, piecePage } from './src/render/pages';
 import { styleguide } from './src/render/styleguide';
 import { inks } from './src/render/riso';
-import { loadPosts } from './src/lib/posts';
-import { loadDrafts } from './src/lib/drafts';
+import { loadPieces } from './src/lib/pieces';
 import { media } from './src/lib/media';
 
 const dev = process.argv.includes('dev');
@@ -50,15 +49,12 @@ export default {
     inks: () => inks().value,
   },
   $loaders: {
-    // An essay (content/e) or a feature (content/d) on its own page.
+    // A piece (content/<slug>.md) on its own page.
     async md(file: string) {
       const slug = path.basename(file, '.md');
-      const section = path.basename(path.dirname(file));
-      const page =
-        section === 'e' ? await essayPage(loadPosts().find((p) => p.slug === slug)!)
-        : section === 'd' ? await draftPage(loadDrafts().find((d) => d.slug === slug)!)
-        : null;
-      if (!page) throw new Error(`${file}: Markdown pages live in content/e or content/d`);
+      const piece = loadPieces().find((p) => p.slug === slug);
+      if (!piece || path.basename(path.dirname(file)) !== 'content') throw new Error(`${file}: pieces live in content/<slug>.md`);
+      const page = await piecePage(piece);
       return {
         filename: file.replace(/\.md$/, '.html'),
         content: page.body.value,

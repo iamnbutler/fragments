@@ -3,11 +3,11 @@
  * motion and every part and spread layout, printed from the live issue so
  * the examples are the real thing. Tune the system here.
  */
+import { existsSync } from 'node:fs';
 import { html, attr, cls, type Html } from './html';
 import { reg, plate, blocks as blocksHtml } from './riso';
 import { spread as spreadHtml } from './pages';
-import { loadDrafts } from '../lib/drafts';
-import { loadPosts } from '../lib/posts';
+import { loadPieces } from '../lib/pieces';
 import { impose, blocks, INK_PAIRS, type Spread, type Ink, type Block } from '../lib/zine';
 import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
 import { COVER_MAPS, COVER_WORKS } from '../lib/covers';
@@ -16,16 +16,16 @@ import { ISSUE } from '../lib/issue';
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 
 export function styleguide(): Html {
-  const drafts = loadDrafts();
-  const spreads = impose(drafts, loadPosts());
+  const pieces = loadPieces();
+  const spreads = impose(pieces);
 
   // ── specimens: one of every spread in the issue ──
   type S = Spread;
-  /** Give each specimen its own copyfitting chain, apart from the feature it came from. */
+  /** Give each specimen its own copyfitting chain, apart from the piece it came from. */
   const own = (s: S): S => {
     const tag = `~sg${s.page}`;
-    if (s.kind === 'draft') return { ...s, draft: { ...s.draft, key: s.draft.key + tag } };
-    if (s.kind === 'jump' || s.kind === 'post') return { ...s, item: { ...s.item, key: s.item.key + tag } } as S;
+    if (s.kind === 'piece') return { ...s, piece: { ...s.piece, key: s.piece.key + tag } };
+    if (s.kind === 'jump') return { ...s, item: { ...s.item, key: s.item.key + tag } };
     return s;
   };
   const find = (pred: (s: S) => boolean) => spreads.find(pred);
@@ -37,7 +37,7 @@ export function styleguide(): Html {
     used.add(s.page);
     return [{ id, name, when, file, spread: own(s) }];
   };
-  const DESIGN_FILE: Record<string, string> = { 'desktop-tools': 'desktopTools', 'jev-demos': 'jevDemos', tasks: 'tasks', 'open-remote': 'openRemote' };
+  const designFile = (slug: string) => (existsSync(`src/render/designs/${slug}.ts`) ? `render/designs/${slug}.ts` : 'render/designs/generic.ts');
 
   const groups: { key: string; no: string; title: string; dek: string; specs: Spec[] }[] = [
     {
@@ -48,20 +48,12 @@ export function styleguide(): Html {
       ],
     },
     {
-      key: 'features', no: 'G2', title: 'Features', dek: 'Each piece prints as its own art-directed spreads with an ink pair from the ramp, then plain jumps for the text the design has no room for.',
+      key: 'pieces', no: 'G2', title: 'Pieces', dek: 'Newest first. Each piece prints as its own art-directed spreads with an ink pair from the ramp, then plain jumps for the text the design has no room for. Pieces over three years old wear a “from the archive” mark.',
       specs: [
-        ...drafts.flatMap((d) => spec(`draft-${d.slug}`, `${d.title}, opening`, `render/drafts.ts ${DESIGN_FILE[d.slug] ?? 'generic'}()`, `${d.kicker ? `${d.kicker}. ` : ''}Inks: ${(spreads.find((s) => s.kind === 'draft' && s.draft.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'draft' && s.draft.slug === d.slug && s.part === 0))),
-        ...spec('draft-later', 'A later spread of a feature', 'render/drafts.ts', 'Later spreads carry the same design further, under a running head with the part number.', find((s) => s.kind === 'draft' && s.part === 1)),
-        ...spec('jump-plain', 'Jump', 'render/riso.ts jumpSpread()', 'Where a feature continues. Four columns, a link back to where it came from.', find((s) => s.kind === 'jump' && !s.refs.length)),
+        ...pieces.flatMap((d) => spec(`piece-${d.slug}`, `${d.title}, opening`, designFile(d.slug), `${d.kicker ? `${d.kicker}. ` : ''}Inks: ${(spreads.find((s) => s.kind === 'piece' && s.piece.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'piece' && s.piece.slug === d.slug && s.part === 0))),
+        ...spec('piece-later', 'A later spread of a piece', 'render/designs/', 'Later spreads carry the same design further, under a running head with the part number.', find((s) => s.kind === 'piece' && s.part === 1)),
+        ...spec('jump-plain', 'Jump', 'render/riso.ts jumpSpread()', 'Where a piece continues. Four columns, a link back to where it came from.', find((s) => s.kind === 'jump' && !s.refs.length)),
         ...spec('jump-notes', 'Jump with margin notes', 'render/riso.ts jumpSpread()', 'When the text links out, the links are numbered in the copy and listed in the outer margin.', find((s) => s.kind === 'jump' && s.refs.length > 0)),
-      ],
-    },
-    {
-      key: 'essays', no: 'G3', title: 'Essays', dek: 'Finished pieces from content/e, newest first, after the features. Each opens on a stock layout, never the same one twice running, then jumps. Essays over three years old wear a “from the archive” mark.',
-      specs: [
-        ...spec('post-tower', 'Tower', 'render/riso.ts postSpread()', 'A tall title page with a pull quote, facing two columns of text.', find((s) => s.kind === 'post' && s.layout === 'tower')),
-        ...spec('post-banner', 'Banner', 'render/riso.ts postSpread()', 'A spaced title across both pages over a rule, text in four columns with a pull quote.', find((s) => s.kind === 'post' && s.layout === 'banner')),
-        ...spec('post-toner', 'Toner', 'render/riso.ts postSpread()', 'A photocopied black spread: the year huge in the light ink, the opening on a taped slip.', find((s) => s.kind === 'post' && s.layout === 'toner')),
       ],
     },
   ];
@@ -70,8 +62,8 @@ export function styleguide(): Html {
   // A plate specimen: the canonical cover render, printed through the plates.
   const cover = COVER_WORKS[ISSUE.cover - 1];
   const sample = { src: cover.still, alt: '', aspect: cover.aspect };
-  // Running text from the first feature, one of each kind of block it has.
-  const bs = drafts[0] ? blocks(drafts[0].text, drafts[0].title) : [];
+  // Running text from the first piece, one of each kind of block it has.
+  const bs = pieces[0] ? blocks(pieces[0].text, pieces[0].title) : [];
   const trim = (b: Block): Block => {
     if (b.text.length < 260) return b;
     const cut = b.text.slice(0, 260);
@@ -197,7 +189,7 @@ export function styleguide(): Html {
               <span class="sb-ink-var">.paper-${name}</span>
             </li>`)}
         </ul>
-        <p class="sb-note">Each feature’s design picks its papers; jumps print on newsprint.</p>
+        <p class="sb-note">Each piece’s design picks its papers; jumps print on newsprint.</p>
 
         <h3 class="sb-sub">Semantic tokens</h3>
         <table class="sb-table">
@@ -226,8 +218,8 @@ export function styleguide(): Html {
 
         <h3 class="sb-sub">Styles</h3>
         <dl class="sb-styles">
-          <dt><code>.reg .t-tower</code><span>Display titles: the greeting, feature titles, the outcome stamps. Width 62, weight 860, caps, line height 0.84. Size fitted to title length: <code>min(12, max(4.4, 112 / len^0.72))</code> cqw.</span></dt>
-          <dd>${reg({ as: 'p', text: drafts[0]?.title ?? 'Hi friends', class: 't-tower', style: '--fs:7cqw' })}</dd>
+          <dt><code>.reg .t-tower</code><span>Display titles: the greeting, piece titles, the outcome stamps. Width 62, weight 860, caps, line height 0.84. Size fitted to title length: <code>min(12, max(4.4, 112 / len^0.72))</code> cqw.</span></dt>
+          <dd>${reg({ as: 'p', text: pieces[0]?.title ?? 'Hi friends', class: 't-tower', style: '--fs:7cqw' })}</dd>
           <dt><code>.prose-cols .dropcap</code><span>Running text. <code>--fs-body: clamp(12px, 1.06cqw, 17px)</code>, line height 1.5, hyphenated, indented paragraphs, run-in heads and square bullets.</span></dt>
           <dd>
             <div class="prose-cols cols-2 dropcap sb-prose">
@@ -344,7 +336,7 @@ export function styleguide(): Html {
       <div class="sb-board paper-newsprint sb-parts">
         <figure class="sb-part-cell">
           <div class="sb-part-stage sb-stage-text">
-            <p class="jump-from"><a href="#parts">Continued from page 6</a><span class="jump-slug">${drafts[0]?.title ?? 'A feature'}</span></p>
+            <p class="jump-from"><a href="#parts">Continued from page 6</a><span class="jump-slug">${pieces[0]?.title ?? 'A piece'}</span></p>
             <a class="cont" href="#parts">Continued on page 10</a>
           </div>
           <figcaption class="cap"><b>Jump lines.</b> <code>.jump-from</code>, <code>.cont</code></figcaption>
@@ -388,7 +380,7 @@ export function styleguide(): Html {
     <section class="sb-part" id="flats" aria-labelledby="flats-h">
       <header class="sb-part-head"><span class="sb-part-no">H</span><h2 id="flats-h" class="sb-h">Flats</h2></header>
       <div class="sb-board paper-newsprint sb-flats-board">
-        <p class="sb-note">Press F, or the Flats button at the bottom right, to zoom out from the spread you’re on to every spread on the pasteboard, grouped by feature, with crop marks and a colour bar. Here it lays out the specimens above; in the issue, the whole issue. Click a spread to zoom back in; Escape returns to where you were.</p>
+        <p class="sb-note">Press F, or the Flats button at the bottom right, to zoom out from the spread you’re on to every spread on the pasteboard, grouped by piece, with crop marks and a colour bar. Here it lays out the specimens above; in the issue, the whole issue. Click a spread to zoom back in; Escape returns to where you were.</p>
         <button type="button" class="sb-btn" data-flats>Show the flats</button>
         <p class="cap">Thumbnails are live clones of the spreads at a 1280px design width, with the halftone filters swapped for cheap CSS duotones. <code>scripts/flats.ts</code></p>
       </div>

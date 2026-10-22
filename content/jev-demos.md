@@ -3,7 +3,6 @@ title: "What does fast get us?"
 slug: jev-demos
 date: 2026-10-08
 dek: "Notes from the first few days of playing with Jev, a model that answers instead of writes, around three ideas: compression, tagging and ranking."
-draft: true
 repo: https://github.com/iamnbutler/jev-demos
 links:
   - label: iamnbutler/jev-demos
@@ -56,14 +55,14 @@ Score is the obvious ranking tool, and I barely needed it. A probability already
 
 ## Compression
 
-Compression is choosing what to keep. The context demo asks two questions about each turn of an agent's thread: is it relevant, and would dropping it lose something? It blends the answers, ranks the turns, and keeps them until a token budget is full. Choice compresses too. For each bug report, the duplicates demo picks the one passage that best explains how it relates to yours.
+Compression is choosing what to keep. The context demo asks two questions about each turn of an agent's thread: is it relevant, and would dropping it lose something? It blends the answers, always keeps the two turns it can't do without, drops the ones with little signal, and fills a token budget from the top of the ranking down, skipping any turn too big for the room left. Choice compresses too. For each bug report, the duplicates demo picks the one passage that best explains how it relates to yours.
 
 ## Pairs
 
 The fun started when two of these met:
 
 - Tag and rank: review lenses tag each hunk of a diff by concern, with a probability. A threshold folds the quiet ones away.
-- Rank and compress: context selection ranks turns and then cuts at the budget. Moving the budget only moves the cut, so it doesn't need a new call.
+- Rank and compress: context selection ranks turns and then fills the budget from the top. A new budget only means choosing again from the same ranking, so it doesn't need a new call.
 - Tag and compress: for a changelog, Jev sorts the commits into categories, and a writing model gets the groups instead of the raw log.
 
 None of this makes the model smarter. Fast just makes a judgment cheap enough to treat like any other value: compute it, show it, throw it away when its input changes, and ask again.

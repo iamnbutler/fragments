@@ -1,19 +1,17 @@
-import type { Draft } from './drafts';
-import type { Post } from './posts';
+import type { Piece } from './pieces';
 import { SPOT, PAPERS } from './spectrum';
 
 /**
  * PRESS RUN: the issue, imposed as a printed zine.
  *
- * The cover and the bio open every issue; each feature follows as its own
- * art-directed spreads, then plain jump spreads for any text the design has
- * no room for. Essays come last, newest first, each on a stock opener. Every spread gets an ink pair, a paper and a seed for its
- * misregistration, so the same content always prints the same way.
+ * The cover and the bio open every issue; then each piece, newest first, on
+ * its own art-directed spreads, then plain jump spreads for any text the
+ * design has no room for. Every spread gets an ink pair, a paper and a seed
+ * for its misregistration, so the same content always prints the same way.
  */
 
 export type Ink = 'yellow' | 'blue' | 'teal' | 'black';
 export type Paper = 'newsprint' | 'bone' | 'toner';
-export type PostLayout = 'tower' | 'banner' | 'toner';
 
 interface SpreadBase {
   n: number; // spread index in the issue
@@ -21,7 +19,7 @@ interface SpreadBase {
   seed: number;
   inks: [Ink, Ink]; // [light plate, key plate]
   paper: Paper;
-  /** the feature a spread belongs to; flats group by it */
+  /** the piece a spread belongs to; flats group by it */
   group?: { key: string; title: string };
 }
 
@@ -48,15 +46,16 @@ export interface JumpItem {
 }
 
 /**
- * Art direction for each feature: how many designed spreads it gets,
- * roughly how much running text each one holds, and its inks and paper.
+ * Art direction for each piece: how many designed spreads it gets, roughly
+ * how much running text each one holds, and its inks and paper. The spreads
+ * themselves are drawn in src/render/designs/<slug>.ts.
  */
-export interface DraftDesign {
+export interface Design {
   caps: number[];
   inks: [Ink, Ink][];
   paper: Paper[];
 }
-export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
+export const DESIGNS: Record<string, Design> = {
   'desktop-tools': {
     caps: [1500, 2300],
     inks: [['blue', 'teal'], ['blue', 'teal']],
@@ -78,22 +77,23 @@ export const DRAFT_DESIGNS: Record<string, DraftDesign> = {
     paper: ['newsprint', 'bone', 'newsprint', 'bone'],
   },
 };
-const GENERIC_DRAFT: DraftDesign = { caps: [2600], inks: [['yellow', 'black']], paper: ['newsprint'] };
-export const draftDesign = (slug: string) => DRAFT_DESIGNS[slug] ?? GENERIC_DRAFT;
+const GENERIC: Design = { caps: [2600], inks: [['yellow', 'black']], paper: ['newsprint'] };
+export const design = (slug: string) => DESIGNS[slug] ?? GENERIC;
 
 export type Spread =
   | (SpreadBase & { kind: 'cover' })
   | (SpreadBase & { kind: 'bio' })
-  | (SpreadBase & { kind: 'post'; layout: PostLayout; item: Post; blocks: Block[]; jump?: number; archive: boolean })
   | (SpreadBase & { kind: 'jump'; item: JumpItem; blocks: Block[]; refs: Ref[]; from: number; jump?: number; part: number; last: boolean })
   | (SpreadBase & {
-      kind: 'draft';
-      draft: Draft;
+      kind: 'piece';
+      piece: Piece;
       part: number;
       parts: number;
       blocks: Block[];
       jump?: number;
       first: number;
+      /** older than three years: the opening wears a "from the archive" mark */
+      archive: boolean;
     });
 
 // --- seeded randomness --------------------------------------------------------
@@ -140,14 +140,10 @@ const NOTE_CHARS = 150;
 /** A remainder this small rides along rather than open a near-empty spread. */
 const MIN_TAIL = 300;
 
-/** How much set text each essay opener holds. */
-const OPENER_CHARS: Record<PostLayout, number> = { tower: 1900, banner: 2900, toner: 1050 };
-/** Less than this left over isn't worth a jump; pick a roomier opener. */
-const MIN_JUMP = 1000;
-/** Essays older than this wear a "from the archive" mark. */
+/** Pieces older than this wear a "from the archive" mark. */
 const ARCHIVE_MS = 3 * 365 * 24 * 3600 * 1000;
 
-export function impose(drafts: Draft[] = [], posts: Post[] = [], now = Date.now()): Spread[] {
+export function impose(pieces: Piece[] = [], now = Date.now()): Spread[] {
   const spreads: Spread[] = [];
   const base = (seedKey: string, inks: [Ink, Ink], paper: Paper, group?: SpreadBase['group']): SpreadBase => ({
     n: spreads.length,
@@ -161,63 +157,35 @@ export function impose(drafts: Draft[] = [], posts: Post[] = [], now = Date.now(
   spreads.push({ ...base('cover', ['yellow', 'teal'], 'newsprint'), kind: 'cover' });
   spreads.push({ ...base('bio', ['yellow', 'blue'], 'bone'), kind: 'bio' });
 
-  for (const d of drafts) {
-    const design = draftDesign(d.slug);
+  for (const d of pieces) {
+    const look = design(d.slug);
     const group = { key: d.slug, title: d.title };
     const bs = blocks(d.text, d.title, { refs: true });
     let next = 0;
     let prev: { jump?: number } | null = null;
     let from = 0;
     let first = -1;
-    const parts = design.caps.length;
+    const parts = look.caps.length;
     for (let part = 0; part < parts; part++) {
-      const cut = design.caps[part] ? takeBlocks(bs, design.caps[part], next) : { blocks: [], next };
+      const cut = look.caps[part] ? takeBlocks(bs, look.caps[part], next) : { blocks: [], next };
       next = cut.next;
-      const b = base(`${d.key}-${part}`, design.inks[part] ?? design.inks[0], design.paper[part] ?? design.paper[0], group);
-      const s: Extract<Spread, { kind: 'draft' }> = {
+      const b = base(`${d.key}-${part}`, look.inks[part] ?? look.inks[0], look.paper[part] ?? look.paper[0], group);
+      const s: Extract<Spread, { kind: 'piece' }> = {
         ...b,
-        kind: 'draft',
-        draft: d,
+        kind: 'piece',
+        piece: d,
         part,
         parts,
         blocks: cut.blocks,
         first: first < 0 ? b.page : first,
+        archive: part === 0 && now - Date.parse(d.date) > ARCHIVE_MS,
       };
       spreads.push(s);
       if (first < 0) first = s.page;
       if (prev && cut.blocks.length) prev.jump = s.page;
       if (cut.blocks.length) { prev = s; from = s.page; }
     }
-    jumps(d, bs, next, prev, from, design.inks[design.inks.length - 1], group);
-  }
-
-  // Essays: a stock opener each, never the same layout or ink pair twice running.
-  let lastLayout: PostLayout | undefined;
-  let lastInks = -1;
-  for (const p of posts) {
-    const group = { key: p.slug, title: p.title };
-    const bs = blocks(p.text, p.title, { refs: true });
-    const total = bs.reduce((n, b) => n + size(b), 0);
-    const r = rng(hash(p.key));
-    const all: PostLayout[] = ['tower', 'banner', 'toner'];
-    const fits = all.filter((l) => l !== lastLayout && (OPENER_CHARS[l] >= total || total - OPENER_CHARS[l] > MIN_JUMP));
-    const layout = r.pick(fits.length ? fits : all.filter((l) => l !== lastLayout));
-    let pi = Math.floor(r.next() * INK_PAIRS.length);
-    if (pi === lastInks) pi = (pi + 1) % INK_PAIRS.length;
-    lastLayout = layout;
-    lastInks = pi;
-    const cut = takeBlocks(bs, OPENER_CHARS[layout]);
-    const paper: Paper = layout === 'toner' ? 'toner' : r.pick(['newsprint', 'newsprint', 'bone'] as const);
-    const s: Extract<Spread, { kind: 'post' }> = {
-      ...base(p.key, INK_PAIRS[pi], paper, group),
-      kind: 'post',
-      layout,
-      item: p,
-      blocks: cut.blocks,
-      archive: now - Date.parse(p.date) > ARCHIVE_MS,
-    };
-    spreads.push(s);
-    jumps(p, bs, cut.next, s, s.page, INK_PAIRS[pi], group);
+    jumps(d, bs, next, prev, from, look.inks[look.inks.length - 1], group);
   }
   return spreads;
 
@@ -333,10 +301,8 @@ export function spreadTitle(s: Spread): string {
       return 'Hi friends';
     case 'jump':
       return `${s.item.title} (continued)`;
-    case 'draft':
-      return s.part === 0 ? s.draft.title : `${s.draft.title} (continued)`;
-    case 'post':
-      return s.item.title;
+    case 'piece':
+      return s.part === 0 ? s.piece.title : `${s.piece.title} (continued)`;
   }
 }
 

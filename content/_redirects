@@ -1,0 +1,5 @@
+# Pieces used to live at /d/<slug>/ (features) and /e/<slug>/ (essays).
+/d/:slug/ /:slug/ 301
+/d/:slug /:slug/ 301
+/e/:slug/ /:slug/ 301
+/e/:slug /:slug/ 301
