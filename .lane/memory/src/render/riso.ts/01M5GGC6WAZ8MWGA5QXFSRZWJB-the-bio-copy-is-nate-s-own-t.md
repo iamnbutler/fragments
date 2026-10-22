@@ -4,8 +4,9 @@ anchor: function bio
 created: 2026-10-22T00:32:32Z
 norm: '1'
 sig: d4cf056b7d4f84f0
-body_hash: ee0e44fbe0b0f807
-raw_hash: a8c722cf2b5ce6a9
+body_hash: 02358088c8391e7d
+raw_hash: bbca29b193dd8ded
+vouched: 2026-10-22T02:21:07Z
 lines: 132-156
 ---
 
