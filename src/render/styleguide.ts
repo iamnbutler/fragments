@@ -43,7 +43,7 @@ export function styleguide(): Html {
     {
       key: 'front', no: 'G1', title: 'Front matter', dek: 'The two spreads every issue opens on.',
       specs: [
-        ...spec('cover', 'Cover', 'render/riso.ts cover() + scripts/cover-press.ts', 'Always spread 0. One of Nate’s 2017 renders pulled as a stepped gradient-map proof across the spread, numbered and signed on the line beneath it, then the name and the issue.', find((s) => s.kind === 'cover')),
+        ...spec('cover', 'Cover', 'render/riso.ts cover()', 'Always spread 0. The central reactor from Nate’s 2017 render 062817, redrawn in the plates across the spread, credited on the line beneath it, then the name and the issue.', find((s) => s.kind === 'cover')),
         ...spec('bio', 'Hi friends', 'render/riso.ts bio()', 'Always spread 1. Who Nate is, in his words: a greeting overprinted on a yellow flood, then where he works and has worked.', find((s) => s.kind === 'bio')),
       ],
     },
@@ -254,7 +254,7 @@ export function styleguide(): Html {
       <header class="sb-part-head"><span class="sb-part-no">D</span><h2 id="print-h" class="sb-h">Print</h2></header>
       <div class="sb-board paper-newsprint">
         <h3 class="sb-sub">Cover proofs</h3>
-        <p class="sb-note">The cover pulls one of Nate's 2017 renders as a gradient-map proof: its luminance is cut into flat steps of one of these maps, and grain decides every pixel at a step's edge. The pointer sets the step count across the plate; a click pulls another render. Gradients belong to images like this, never to type or controls. In <code>scripts/cover-press.ts</code>, with the works in <code>lib/covers.ts</code>.</p>
+        <p class="sb-note">Nate's 2017 renders, mapped through the inks: luminance cut into flat steps of one of these maps, with grain deciding every pixel at a step's edge. Issue 1's cover is drawn after one of them instead (<code>COVER_ART</code>); the press that pulled these live is <code>scripts/cover-press.ts</code>, kept for a later issue. Gradients belong to images like this, never to type or controls.</p>
         <ul class="sb-maps">
           ${Object.entries(COVER_MAPS).map(([name, stops]) => html`<li>
               <span class="sb-map" aria-hidden="true">${stops.map((h) => html`<i${attr('style', `--c:${h}`)}></i>`)}</span>

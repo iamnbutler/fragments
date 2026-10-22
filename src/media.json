@@ -118,6 +118,20 @@
     "width": 800,
     "height": 335
   },
+  "covers/reactor": {
+    "key": "covers/reactor.4136ed6299.webp",
+    "type": "image/webp",
+    "bytes": 220066,
+    "width": 1600,
+    "height": 1032
+  },
+  "covers/reactor-1600": {
+    "key": "covers/reactor-1600.e504a59df5.webp",
+    "type": "image/webp",
+    "bytes": 216960,
+    "width": 1600,
+    "height": 1032
+  },
   "drafts/desktop-tools/fig-1-boundary": {
     "key": "drafts/desktop-tools/fig-1-boundary.bc1f6ecf6d.svg",
     "type": "image/svg+xml",

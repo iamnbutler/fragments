@@ -59,3 +59,20 @@ export const COVER_WORKS: CoverWork[] = SPECS.map(({ video, ...w }) => {
     aspect: still.width! / still.height!,
   };
 });
+
+/**
+ * The cover as printed: the central reactor of 062817 redrawn in the zine's
+ * plates (a perspective drawing generated from a 3D model, then baked to the
+ * spot inks), rasterized because the drawing is megabytes of paths.
+ */
+export const COVER_ART = (() => {
+  const still = media('covers/reactor');
+  return {
+    after: '062817',
+    date: 'June 2017',
+    still: still.url,
+    small: media('covers/reactor-1600').url,
+    aspect: still.width! / still.height!,
+    alt: 'The central reactor: a machined core towering over a field of lit blocks, struts radiating from it, glowing red at its foot',
+  };
+})();

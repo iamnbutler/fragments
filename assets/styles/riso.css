@@ -328,6 +328,9 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .cv-gl { opacity: 0; }
 .cv.is-live .cv-gl { opacity: 1; }
 .cv.is-live .cv-img { visibility: hidden; }
+.cv-drawn .cv-plate { background: var(--black); cursor: default; }
+/* the core sits left of the fold; keep it there as the plate crops */
+.cv-drawn .cv-img { object-position: 30% 60%; }
 .cv-plate:focus-visible { outline: 3px solid var(--blue); outline-offset: -6px; }
 /* the caption line under the image, where an edition is numbered and signed */
 .cv-pencil {
@@ -377,9 +380,28 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .bio-av:hover { rotate: -1deg; }
 .bio-av .plate { aspect-ratio: 1; }
 .bio-lede { margin: 0; max-width: 21ch; font: 500 clamp(18px, 2.55cqw, 40px)/1.12 var(--f-serif); letter-spacing: -0.01em; text-wrap: pretty; }
-.bio-r { display: flex; flex-direction: column; gap: 1.5cqw; padding-top: 6cqw; }
-.bio-p { margin: 0; max-width: 34ch; font: 400 clamp(14px, 1.45cqw, 22px)/1.4 var(--f-serif); text-wrap: pretty; }
-.bio-first::first-letter { font-weight: 700; }
+.bio-r { display: flex; flex-direction: column; gap: 1.5cqw; padding-top: 6cqw; position: relative; }
+.bio-from {
+  margin: 0 0 1.2cqw; display: flex; justify-content: space-between; padding-top: 0.7cqw; border-top: 0.35cqw solid var(--black);
+  font: 600 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.14em; text-transform: uppercase;
+}
+.bio-from span + span { color: var(--blue); }
+.bio-p { margin: 0; max-width: 30ch; font: 400 clamp(15px, 1.75cqw, 27px)/1.36 var(--f-serif); text-wrap: pretty; }
+.bio-first { font-size: clamp(17px, 2.05cqw, 32px); line-height: 1.28; max-width: 26ch; }
+.bio-first::first-letter { font-weight: 700; color: var(--red); }
+/* struck across the letter like a postmark, overprinting what's under it */
+.bio-postmark {
+  position: absolute; right: 0.4cqw; top: 31cqw; width: 30cqw; height: auto; z-index: 1; pointer-events: none;
+  color: var(--red); mix-blend-mode: multiply; rotate: -9deg; opacity: 0.88;
+}
+.bio-postmark .pm-wave, .bio-postmark .pm-rule { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; }
+.bio-postmark .pm-thin { stroke-width: 1.6; }
+.bio-postmark text { fill: currentColor; font-family: var(--f-display); font-weight: 700; }
+.bio-postmark .pm-ring { font-size: 15.5px; letter-spacing: 0.16em; }
+.bio-postmark .pm-mid { font-size: 22px; letter-spacing: 0.12em; }
+.bio-postmark .pm-yr { font-size: 30px; letter-spacing: 0.04em; font-weight: 800; }
+.js-press .sheet:not(.is-printed) .bio-postmark { opacity: 0; scale: 1.15; }
+.js-press .sheet .bio-postmark { transition: opacity 0.25s 1.2s, scale 0.25s 1.2s var(--ease-press); }
 .bio-cv { margin: auto 0 0; border-top: 0.3cqw solid var(--dk); }
 .bio-cv div { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 0.8em; align-items: baseline; padding: 0.7em 0; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
 .bio-cv dt { font: 500 var(--fs-cap)/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.18em; }
@@ -622,6 +644,8 @@ dialog.fold-ask::before {
   .zine .bio-lede { font-size: 24px; }
   .zine .bio-av { position: relative; inset: auto; order: 3; align-self: flex-end; width: 30vw; margin-top: -8px; }
   .zine .bio-r { padding-top: 32px; gap: 18px; }
+  .zine .bio-postmark { position: relative; inset: auto; width: 76vw; align-self: flex-end; margin: -10px -8px -14px 0; }
+  .zine .bio-first { font-size: 21px; }
   .zine .bio-p, .zine .bio-bye { font-size: 18px; }
   .zine .bio-cv { margin-top: 10px; border-top-width: 3px; }
   .zine .bio-cv dd { font-size: 16px; }
