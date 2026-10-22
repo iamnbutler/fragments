@@ -47,7 +47,7 @@ for (const page of pages) {
 const css = [...home.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
 const markup = home.replace(/<style[^>]*>[\s\S]*?<\/style>/g, '').replace(/<script[^>]*>[\s\S]*?<\/script>/g, '');
 const used = new Set([...markup.matchAll(/class="([^"]*)"/g)].flatMap((m) => m[1].split(/\s+/)));
-const missing = [...used].filter((c) => /^(dt|jv|tk|gen|inkfig)-/.test(c) && !new RegExp(`\\.${c}(?![\\w-])`).test(css));
+const missing = [...used].filter((c) => /^(dt|jv|tk|tl|gen|inkfig)-/.test(c) && !new RegExp(`\\.${c}(?![\\w-])`).test(css));
 assert.deepEqual(missing, [], `classes without CSS rules: ${missing.join(', ')}`);
 
 // A piece's own page, and cache headers for hashed bundles.
