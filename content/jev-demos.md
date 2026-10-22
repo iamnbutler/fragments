@@ -31,7 +31,7 @@ images:
     alt: "A pocket stopwatch on a fine chain, its second hand only a sliver past twelve."
 ---
 
-[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) doesn't write anything. You give it some state and a list of narrow questions, and it gives back numbers. TypeSafe puts its response time at 70–500 ms, and most of my calls came back in under half a second.
+[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) doesn't write anything. You give it some state and a list of narrow questions, and it gives back numbers. [TypeSafe](https://typesafe.ai) puts its response time at 70–500 ms, and most of my calls came back in under half a second.
 
 I wanted to know what that speed is good for. If a judgment costs about as much as a network request, where does it go? I spent the first few days [playing around](https://github.com/iamnbutler/jev-demos), and the same three things kept turning up: compression, tagging and ranking.
 
@@ -39,9 +39,9 @@ I wanted to know what that speed is good for. If a judgment costs about as much 
 
 Jev takes three kinds of question:
 
-- Yes or no, which the API calls noul, comes back as a probability that the answer is yes.
-- Choice picks one of the options you name, with odds for each and a confidence.
-- Score puts the answer on an ordered scale you write, like none, some, most, all. It returns a position between the ends.
+- Yes or no, which the API calls [noul](https://docs.typesafe.ai/primitives/noul), comes back as a probability that the answer is yes.
+- [Choice](https://docs.typesafe.ai/primitives/choice) picks one of the options you name, with odds for each and a confidence.
+- [Score](https://docs.typesafe.ai/primitives/score) puts the answer on an ordered scale you write, like none, some, most, all. It returns a position between the ends.
 
 Every answer is a number or a spread of numbers, never prose. That's the whole trick. The model makes the judgment, and plain code can sort, threshold, group and count it.
 
@@ -51,7 +51,7 @@ A choice is a tag. In one demo, every post in a long discussion gets a role: pro
 
 ## Ranking
 
-A yes-or-no probability is a sort key. Semantic Search asks one question of each of 2,414 functions from Hono, TanStack Query and Vite: does this catch an error and carry on? The list reorders as each batch comes back. The first results showed up in about 300 ms, and the whole corpus in under nine seconds.
+A yes-or-no probability is a sort key. Semantic Search asks one question of each of 2,414 functions from [Hono](https://hono.dev), [TanStack Query](https://tanstack.com/query) and [Vite](https://vite.dev): does this catch an error and carry on? The list reorders as each batch comes back. The first results showed up in about 300 ms, and the whole corpus in under nine seconds.
 
 Score is the obvious ranking tool, and I barely needed it. A probability already sorts.
 

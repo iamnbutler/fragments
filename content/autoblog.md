@@ -48,7 +48,7 @@ images:
 
 I build a lot with agents now, and I've noticed I forget more of it than I used to. Not just details, whole projects. Something ships, I move on, and two weeks later I'm asking an agent to work out something we already worked out.
 
-Signing and TestFlight are the clearest case. I set up macOS signing and TestFlight six or seven times in two months, for different apps, and every time the agent started from scratch, hit the same walls, and found the same fixes. Each of those sessions knew everything it needed. None of them could see the others.
+Signing and [TestFlight](https://developer.apple.com/testflight/) are the clearest case. I set up macOS signing and TestFlight six or seven times in two months, for different apps, and every time the agent started from scratch, hit the same walls, and found the same fixes. Each of those sessions knew everything it needed. None of them could see the others.
 
 So on a Saturday evening in October I opened a fresh project and wrote this to Claude:
 
@@ -66,7 +66,7 @@ I asked what model did the writing, and the answer made the problem obvious. The
 
 > I'm not sure why we wouldn't have the agent running the conversation write it? that is kind of the point - WHAT makes something worth writing up might be tokens 1~8000 and tokens 5300000+. sometimes I have sessions running for days.
 
-So the agent doing the work became the one that decides. Claude Code and Codex both have a Stop hook that runs at the end of every turn. autoblog's hook counts tool calls since the session's last checkpoint, reading only the bytes appended to the transcript since then, so it's cheap even on a 40 MB transcript. After 40, it asks the agent to reflect before it stops. The prompt is short and leads with the default: "Most checkpoints produce nothing." It also gives the agent the path to its own transcript, so it can grep for whatever compaction dropped.
+So the agent doing the work became the one that decides. [Claude Code](https://claude.com/product/claude-code) and [Codex](https://developers.openai.com/codex) both have a Stop hook that runs at the end of every turn. autoblog's hook counts tool calls since the session's last checkpoint, reading only the bytes appended to the transcript since then, so it's cheap even on a 40 MB transcript. After 40, it asks the agent to reflect before it stops. The prompt is short and leads with the default: "Most checkpoints produce nothing." It also gives the agent the path to its own transcript, so it can grep for whatever compaction dropped.
 
 The outside reviewer is still there, but only for transcripts no hook ever claimed.
 
@@ -107,9 +107,9 @@ The timeline is also where "when did I do that?" gets answered. It goes back to 
 
 ## Reading it back
 
-The journal is an Obsidian vault in a private repo. GitHub Pages can build from a private repo, but the site it publishes is public, so the readable version is a small static site on a Cloudflare Worker. It started behind a password. That meant a password prompt every time the browser forgot it, so it's behind Cloudflare Access now, with a login that lasts 30 days.
+The journal is an [Obsidian](https://obsidian.md/) vault in a private repo. [GitHub Pages](https://pages.github.com/) can build from a private repo, but the site it publishes is public, so the readable version is a small static site on a [Cloudflare Worker](https://workers.cloudflare.com/). It started behind a password. That meant a password prompt every time the browser forgot it, so it's behind [Cloudflare Access](https://www.cloudflare.com/zero-trust/products/access/) now, with a login that lasts 30 days.
 
-I wanted to be able to add to a page from the site, so every page has an annotation box now. The first two notes were about `cl`, a color library plugin for VS Code that was my design challenge for joining GitHub Next. An agent folded both into the project's description, in the page's own wording, and the page marks them "folded in". Normally the sweep does this once a page's newest annotation is ten minutes old, so a few in a row land together. Annotations are the one thing allowed to extend a post, because they come from me.
+I wanted to be able to add to a page from the site, so every page has an annotation box now. The first two notes were about `cl`, a color library plugin for VS Code that was my design challenge for joining [GitHub Next](https://githubnext.com/). An agent folded both into the project's description, in the page's own wording, and the page marks them "folded in". Normally the sweep does this once a page's newest annotation is ten minutes old, so a few in a row land together. Annotations are the one thing allowed to extend a post, because they come from me.
 
 ## Recall
 
@@ -121,7 +121,7 @@ This is the point of the whole thing. The seventh time I set up TestFlight, the 
 
 ## Backfilling years
 
-Once the journal had a shape, I went back further. Claude Code deletes transcripts after 30 days unless you change `cleanupPeriodDays`, and I never had, so most of the year existed only as my side of the conversation in prompt history. Backups added 370 sessions the first pass never saw. For February to May, the agents paired about 5,500 of my prompts with the git history of the repos they were about. After that came my own messages from Zed's Discord and my issues and pull requests on Zed's GitHub from 2021 to 2025, which is where entries like "How we did design at Zed" came from.
+Once the journal had a shape, I went back further. Claude Code deletes transcripts after 30 days unless you change `cleanupPeriodDays`, and I never had, so most of the year existed only as my side of the conversation in prompt history. Backups added 370 sessions the first pass never saw. For February to May, the agents paired about 5,500 of my prompts with the git history of the repos they were about. After that came my own messages from [Zed](https://zed.dev/)'s Discord and my issues and pull requests on [Zed's GitHub](https://github.com/zed-industries/zed) from 2021 to 2025, which is where entries like "How we did design at Zed" came from.
 
 Agents writing entries skipped about 95% of what they read. That seems right to me.
 

@@ -50,17 +50,17 @@ One Saturday morning in October I went looking for a TV remote app. The one I fo
 
 Nobody means to pay that for a remote, and that's how it works. Monthly and yearly are what people expect, so a weekly price slips past. It's set for the people who won't stop to read the last word: someone busy, a parent with a kid on their hip, an older person who taps Continue because they just want the TV to work. And behind the paywall is shovelware, a few buttons that send a few bytes over Wi-Fi to a TV you already own.
 
-Apple reviews every app on the App Store. Catching this kind of bad-faith pricing should be the job, and it isn't being done.
+Apple [reviews every app](https://developer.apple.com/app-store/review/guidelines/) on the App Store. Catching this kind of bad-faith pricing should be the job, and it isn't being done.
 
-So I asked Claude to build one we could give away. No in-app purchases, no paywalls, iPhone and Mac. By 09:23 it was on my phone through TestFlight, and it worked great. By the end of the day it was [Open Remote](https://github.com/iamnbutler/open-tv-remote), open source and on its way to the App Store.
+So I asked Claude to build one we could give away. No in-app purchases, no paywalls, iPhone and Mac. By 09:23 it was on my phone through [TestFlight](https://developer.apple.com/testflight/), and it worked great. By the end of the day it was [Open Remote](https://github.com/iamnbutler/open-tv-remote), open source and on its way to the App Store.
 
 "Free" grew over the day. It ended up meaning no purchases, no ads, no analytics, no accounts, no third-party code and no servers. The app talks to the TVs and the media server on your network and to nothing else, and that's written into the repo's rules. Making it open source came about an hour in, and it's part of the point: you can read the code and see that it doesn't phone home.
 
 ## Nothing on the TV
 
-At 08:39 Claude started looking around my network. It found a Sony XR-55A80J Google TV in the living room, a 32-inch Samsung Frame, and Lula, our Jellyfin media server.
+At 08:39 Claude started looking around my network. It found a Sony XR-55A80J Google TV in the living room, a 32-inch Samsung Frame, and Lula, our [Jellyfin](https://jellyfin.org/) media server.
 
-The Sony was busy. My kids were watching it, so I said: "family is using the tv so don't put up any prompts on screen or anything right now." That became the first rule in the repo and the strictest one. Nothing may appear on the TV unless someone asked for it, and nothing gets paired, pressed or launched without asking first. Discovery is built around it. It listens for Bonjour and SSDP, and when it probes a port it connects and drops without sending a byte a TV would show.
+The Sony was busy. My kids were watching it, so I said: "family is using the tv so don't put up any prompts on screen or anything right now." That became the first rule in the repo and the strictest one. Nothing may appear on the TV unless someone asked for it, and nothing gets paired, pressed or launched without asking first. Discovery is built around it. It listens for [Bonjour](https://developer.apple.com/bonjour/) and SSDP, and when it probes a port it connects and drops without sending a byte a TV would show.
 
 The TV stayed a shared, live thing all day: a family's TV that an agent was writing a remote for, mostly without being allowed to touch it.
 
@@ -68,7 +68,7 @@ The TV stayed a shared, live thing all day: a family's TV that an agent was writ
 
 TV protocols sound like the hard part. They aren't big. Each family of TVs speaks its own, and the app speaks four.
 
-There are no dependencies. Instead of pulling in libraries, Claude wrote a small protobuf reader and writer and an ASN.1 encoder that mints X.509 certificates, on top of Apple's Network and Security frameworks. All four TV drivers together are 1,134 lines. By 08:56 both apps built and the remote was running in the iPhone simulator.
+There are no dependencies. Instead of pulling in libraries, Claude wrote a small [protobuf](https://protobuf.dev/) reader and writer and an ASN.1 encoder that mints X.509 certificates, on top of Apple's [Network](https://developer.apple.com/documentation/network) and [Security](https://developer.apple.com/documentation/security) frameworks. All four TV drivers together are 1,134 lines. By 08:56 both apps built and the remote was running in the iPhone simulator.
 
 Pairing is the clever bit. The TV shows a six-character code. The client proves it saw the code by hashing both certificates' RSA modulus and exponent together with the code's last four characters. The first two are a check: they have to match the first byte of that hash, so a typo is caught before anything reaches the TV. At 09:00 a command-line harness paired with the Sony and opened YouTube.
 
@@ -76,9 +76,9 @@ The protocol also tells the client which app is in front. That's how the harness
 
 ## Three or four codes
 
-At 12:15 I reported the first real bug: "I've needed to put codes in 3-4 times." Every time another device paired with the TV, the ones before it had to pair again.
+At 12:15 I reported [the first real bug](https://github.com/iamnbutler/open-tv-remote/issues/1): "I've needed to put codes in 3-4 times." Every time another device paired with the TV, the ones before it had to pair again.
 
-The first diagnosis was partly right. Every install sent the TV the same client name, and another open-source project had hit the same wall, in an issue that says the client name needs to be unique. So the name got a short tag from each device's certificate. That pass also fixed a real problem: any TLS error, even a Wi-Fi blip, was being read as "the TV forgot us" and the pairing thrown away. Now only a real certificate rejection counts. And some of my code-typing was self-inflicted: Claude's own debug builds on the Mac kept their keys in different places, so each one needed its own code.
+The first diagnosis was partly right. Every install sent the TV the same client name, and another open-source project had hit the same wall, in [an issue](https://github.com/unfoldedcircle/integration-androidtv/issues/39) that says the client name needs to be unique. So the name got a short tag from each device's certificate. That pass also fixed a real problem: any TLS error, even a Wi-Fi blip, was being read as "the TV forgot us" and the pairing thrown away. Now only a real certificate rejection counts. And some of my code-typing was self-inflicted: Claude's own debug builds on the Mac kept their keys in different places, so each one needed its own code.
 
 The next TestFlight build had the same bug. I said so: "I downloded the most recet test flight and I'm still seeing it."
 
@@ -106,18 +106,18 @@ The fix matches the TV's session by IP address, launches the app only when nothi
 
 The protocols took the first twenty minutes. Most of the rest of the day went to things that weren't the TV.
 
-Claude can't click around App Store Connect from a terminal, so every step there was a prompt I pasted into Claude in Chrome. The first one failed because the bundle ID had never been registered: the build was signed with Xcode's wildcard profile, so Apple had no record of the app. Xcode's sign-in expired while I was away, and every upload failed with "Failed to Use Accounts". The test harness looked new to macOS after every rebuild, so the keychain asked for access each time until the harness was signed properly. One upload was lost because piping the release script through `head` killed the Mac export when the pipe closed. iCloud sync needs an entitlement, the entitlement needs a provisioning profile, and the profile didn't list this Mac, so local builds failed to launch with POSIX error 163. And every TestFlight build said 1.0, because the build number was bumped and the version never was. Releases now start at 1.1.0, and tagging one uploads it to TestFlight from CI. The first one went up on the first try.
+Claude can't click around App Store Connect from a terminal, so every step there was a prompt I pasted into [Claude in Chrome](https://claude.com/chrome). The first one failed because the bundle ID had never been registered: the build was signed with Xcode's wildcard profile, so Apple had no record of the app. Xcode's sign-in expired while I was away, and every upload failed with "Failed to Use Accounts". The test harness looked new to macOS after every rebuild, so the keychain asked for access each time until the harness was signed properly. One upload was lost because piping the release script through `head` killed the Mac export when the pipe closed. iCloud sync needs an entitlement, the entitlement needs a provisioning profile, and the profile didn't list this Mac, so local builds failed to launch with POSIX error 163. And every TestFlight build said 1.0, because the build number was bumped and the version never was. Releases now start at 1.1.0, and tagging one uploads it to TestFlight from CI. The first one went up on the first try.
 
 None of that is about TVs. Most of what makes an app an app is the paperwork around it.
 
 ## Three agents, one repo
 
-For a while in the evening three agents worked in the repo at once. Claude, in the main session, built iCloud sync. A Claude sub-agent it forked built hardware volume buttons and live typing in its own worktree. Codex, separately, added app logos and more streaming shortcuts.
+For a while in the evening three agents worked in the repo at once. Claude, in the main session, built iCloud sync. A Claude sub-agent it forked built hardware volume buttons and live typing in its own worktree. [Codex](https://developers.openai.com/codex), separately, added app logos and more streaming shortcuts.
 
-It was uneventful, which is worth a sentence. Main is locked: changes need a pull request, both platforms have to build, merges are squashed, and the rules apply to me too. Each task gets its own worktree, and notes attached to the code keep the non-obvious things, like the TV keying pairings by certificate subject. CI caught the one real collision: the sync change broke the harness, which compiles some of the app's files on its own, so the harness is built in CI now.
+It was uneventful, which is worth a sentence. Main is locked: changes need a pull request, both platforms have to build, merges are squashed, and the rules apply to me too. Each task gets its own worktree, and [notes attached to the code](https://lane.lukeed.com/usage/) keep the non-obvious things, like the TV keying pairings by certificate subject. CI caught the one real collision: the sync change broke the harness, which compiles some of the app's files on its own, so the harness is built in CI now.
 
 ## Still to try
 
-Some of this has only been tested on paper. The Roku and LG drivers follow their documented protocols and have never met real hardware. Wake-on-LAN for the Samsung Frame has only been checked against a local listener, and a Frame's power button toggles Art Mode, so turning it fully off takes a three-second hold, like the physical remote. On the first test, volume up and down didn't move the Sony's speaker level, probably because the sound goes to a soundbar.
+Some of this has only been tested on paper. The [Roku](https://developer.roku.com/docs/developer-program/dev-tools/external-control-api.md) and LG drivers follow their documented protocols and have never met real hardware. Wake-on-LAN for the Samsung Frame has only been checked against a local listener, and a Frame's power button toggles Art Mode, so turning it fully off takes a three-second hold, like the physical remote. On the first test, volume up and down didn't move the Sony's speaker level, probably because the sound goes to a soundbar.
 
 If you have one of those TVs, try it and tell me. It's free, and it's going to stay free.

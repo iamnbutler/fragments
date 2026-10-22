@@ -62,7 +62,7 @@ spool add 'Fix the thing' -p p0 -t bug
 
 Tasks should live where the code lives. When project tracking is a SaaS product, you're one acquisition or pricing change away from losing your history. Worse, the tracking is cut off from the work: tasks sit in a web app while the context is in the repo, the branches and the commits. In Spool the history travels with the code. Clone the repo and you have it.
 
-Spool came out of exploring agentic orchestration. In January I spent about two weeks running several projects through Gas Town, a multi-agent setup where a coordinating agent files work for a pool of workers. Its issues are [Beads](https://beads.dev), another tracker for agents. Tools like that exist, but I wanted something more opinionated and more mine: build it, use it every day, see what works.
+Spool came out of exploring agentic orchestration. In January I spent about two weeks running several projects through [Gas Town](https://github.com/gastownhall/gastown), a multi-agent setup where a coordinating agent files work for a pool of workers. Its issues are [Beads](https://github.com/gastownhall/beads), another tracker for agents. Tools like that exist, but I wanted something more opinionated and more mine: build it, use it every day, see what works.
 
 The spec that started it, on January 13, was called Fabric. It asked for a tracker that was git-native, conflict-resistant, auditable, and "agent-scale," handling 50 to 200 tasks a day from automated agents. Fittingly, the first day's code was written by Gas Town's worker agents, from epics in Beads. The commit authors are named eventsmith and rustsmith. Three days later Fabric was renamed Spool, and it reached 1.0 on January 24.
 
@@ -85,10 +85,10 @@ The January version of this post said conflicts would be rare, because two peopl
 
 When I came back to Spool, the agent I asked to audit it found more:
 
-- `spool claim` didn't claim anything. It assigned the task to the Git user, unconditionally. Every agent on my machine was me, so a claim couldn't tell two agents apart, and nothing stopped a second one claiming the same task. On the board for Luna, my design tool, all 226 January events are by `@iamnbutler`.
+- `spool claim` didn't claim anything. It assigned the task to the Git user, unconditionally. Every agent on my machine was me, so a claim couldn't tell two agents apart, and nothing stopped a second one claiming the same task. On the board for [Luna](https://github.com/iamnbutler/luna), my design tool, all 226 January events are by `@iamnbutler`.
 - The code had a concurrency module, but ordinary writes didn't use it.
 - Reads could trust a cached snapshot, `.state.json`, long after the events had changed. The fix in January's README was a post-merge hook that ran `spool rebuild`.
-- Each Git worktree found its own `.spool` folder, so agents in two worktrees had two boards and couldn't see each other's work.
+- Each [Git worktree](https://git-scm.com/docs/git-worktree) found its own `.spool` folder, so agents in two worktrees had two boards and couldn't see each other's work.
 
 None of that bit hard while I was the only one using it, one agent at a time. It would all have bitten the moment several agents shared a board, which was the point.
 
@@ -98,7 +98,7 @@ The January post ended on two open questions. Agents wouldn't use the tracker co
 
 Then I stopped using it. The last feature work landed on February 14, with live reload in the TUI. Through early March an automated repo assistant kept adding tests and updating dependencies, and after that the repository sat for six months.
 
-On September 14 I started [Telephone](https://nate.rip/telephone/), a small tool for passing messages between Claude Code and Codex sessions on one machine. The next afternoon I gave Codex this prompt:
+On September 14 I started [Telephone](https://nate.rip/telephone/), a small tool for passing messages between [Claude Code](https://claude.com/product/claude-code) and [Codex](https://developers.openai.com/codex) sessions on one machine. The next afternoon I gave Codex this prompt:
 
 > so, we sort of explored spool for a while then dropped it.
 >
@@ -106,7 +106,7 @@ On September 14 I started [Telephone](https://nate.rip/telephone/), a small tool
 >
 > why don't you investigate the current state of spool and pull out a branch and go take a chainsaw to it, reforging it into a really solid tool for agents to use for task management.
 
-That was at 13:57. It tracked its own work in Spool as it went, in a stream called `agent-coordination`. The pull request added 3,794 lines and removed 2,133. It merged at 15:15, and version 2.0.0 was published at 15:38.
+That was at 13:57. It tracked its own work in Spool as it went, in a stream called `agent-coordination`. [The pull request](https://github.com/iamnbutler/spool/pull/120) added 3,794 lines and removed 2,133. It merged at 15:15, and [version 2.0.0](https://github.com/iamnbutler/spool/releases/tag/v2.0.0) was published at 15:38.
 
 ## One board per repository
 
@@ -144,7 +144,7 @@ Reads always replay the events. No read trusts a cache, so there's nothing to go
 
 ## Streams and dependencies
 
-Streams group tasks into a project or an epic. The agent guide asks for scope, acceptance criteria, file ownership and expected output in each task's description, because the description is what the next agent reads.
+Streams group tasks into a project or an epic. [The agent guide](https://github.com/iamnbutler/spool/blob/main/skills/spool.md) asks for scope, acceptance criteria, file ownership and expected output in each task's description, because the description is what the next agent reads.
 
 Tasks can block each other. A task is ready when it's open, nobody holds a live claim on it, its prerequisites are complete, and any reservation on it matches the agent asking. "Ready" depends on who's asking. A missing prerequisite blocks too. Spool checks for cycles when an edge is added, under the same lock, so two agents adding opposite edges at once can't make one. Completing a prerequisite makes its dependents ready; it never completes them.
 
@@ -191,4 +191,4 @@ The hard part wasn't the log. Append-only events were right on the first day, an
 
 This site used Spool for its own tasks; the January post said so. The `.spool/` folder went when the site moved to Cloudflare in October. I'm not using it day to day now. We might pick it back up, for real or in spirit: what I'd want is a local, lightweight replacement for GitHub, and that would need to be a good deal more full-featured than Spool is.
 
-The boundary is written down. Atomic claims cover one repository and its worktrees on one machine. Older Spool binaries don't take part in the lock, so every agent on a board has to run 2.0. It's open source and on crates.io, and it's small enough to read in an afternoon, which is about how long the rebuild took.
+The boundary is written down. Atomic claims cover one repository and its worktrees on one machine. Older Spool binaries don't take part in the lock, so every agent on a board has to run 2.0. It's open source and on [crates.io](https://crates.io/crates/spool-cli), and it's small enough to read in an afternoon, which is about how long the rebuild took.
