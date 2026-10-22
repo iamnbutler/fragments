@@ -2,8 +2,11 @@
  * The site's worker. Static pages come from the build (Workers static
  * assets); /m/<key> is media from R2. Media keys are content-hashed, so
  * every response is cacheable for a year. Range requests are honoured so
- * video can seek and Safari will play it.
+ * video can seek and Safari will play it. Project sites under nate.rip pass
+ * through to GitHub Pages (pages.ts).
  */
+import { project, proxyPages } from './pages';
+
 interface Env {
   ASSETS: Fetcher;
   MEDIA: R2Bucket;
@@ -15,6 +18,7 @@ const YEAR = 'public, max-age=31536000, immutable';
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (project(url.pathname)) return proxyPages(request);
     if (!url.pathname.startsWith(PREFIX)) return env.ASSETS.fetch(request);
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method not allowed', { status: 405, headers: { allow: 'GET, HEAD' } });
