@@ -3,6 +3,10 @@ id: 01M5GRTGK5EAA6075Y0NJ4AWY0
 anchor: function openRemote
 created: 2026-10-22T03:00:09Z
 norm: '1'
+sig: cab237abb4ba79f6
+body_hash: 981616fb6033a7ca
+raw_hash: 1d3b924f7f2ee81b
+lines: 12-146
 supersedes: 01M5GMSV0K68QWTWQK2WH89X9X
 ---
 
