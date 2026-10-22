@@ -63,7 +63,7 @@ TV protocols sound like the hard part. They aren't big. Each family of TVs speak
 
 There are no dependencies. Instead of pulling in libraries, Claude wrote a small protobuf reader and writer and an ASN.1 encoder that mints X.509 certificates, on top of Apple's Network and Security frameworks. All four TV drivers together are 1,134 lines. By 08:56 both apps built and the remote was running in the iPhone simulator.
 
-Pairing is the clever bit. The TV shows a six-character code. The client proves it saw the code by hashing both certificates' RSA modulus and exponent together with it, and the first byte of that hash has to match the code's first byte, which is how the TV catches a typo. At 09:00 a command-line harness paired with the Sony and opened YouTube.
+Pairing is the clever bit. The TV shows a six-character code. The client proves it saw the code by hashing both certificates' RSA modulus and exponent together with the code's last four characters. The first two are a check: they have to match the first byte of that hash, so a typo is caught before anything reaches the TV. At 09:00 a command-line harness paired with the Sony and opened YouTube.
 
 The protocol also tells the client which app is in front. That's how the harness's logs knew the TV was on the Projectivy launcher, and when the pairing dialog was up.
 

@@ -63,7 +63,7 @@ An empty journal doesn't tell you much, so about forty minutes in I asked for su
 
 They weren't wrong, exactly. They were stories about incidents, titled after the incident: "Sixty PRs shipped overnight against a locked screen were sixty unverified PRs." That's a true thing that happened. It's not something I'll ever search for. What I wanted was the topic it belonged to: a note called "Keeping long-running work alive when the screen locks". A post about summing token usage became a note called "Counting tokens: pitfalls", to be added to as more turned up. The bar I pointed at was the posts on this site.
 
-So we archived all 91 entries and started over, "slower and more intentional". The journal got two kinds of entry, both titled by topic:
+By then there were 91. We archived all of them and started over, "slower and more intentional". The journal got two kinds of entry, both titled by topic:
 
 - **Notes** are short reference pages that answer "what do I need to know about X?" They're the common case.
 - **Posts** are rare. Each is either a project or a way of working, something I could put here with light editing.

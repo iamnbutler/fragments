@@ -24,7 +24,7 @@ facts:
   - label: History
     value: 78 commits, 39 of them on January 11; last commit March 19
   - label: Published
-    value: ferro-type, ferro-type-derive and ferro-type-gen, five versions in nine hours, now 0.2.0
+    value: ferro-type, ferro-type-derive and ferro-type-gen, five versions in under nine hours, now 0.2.0
   - label: Size
     value: About 4,900 lines of Rust in the three published crates, tests included
   - label: Tests
