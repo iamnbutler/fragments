@@ -4,3 +4,5 @@ public
 .env
 .DS_Store
 _ref/
+dist/
+.astro/
