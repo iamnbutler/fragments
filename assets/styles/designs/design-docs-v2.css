@@ -1,0 +1,10 @@
+/* design-docs-v2: its own spreads. */
+
+/* a ruled guide: a red margin line down the left page */
+.dr-design-docs-v2 .pg-l { border-left: 0.2cqw solid var(--red); padding-left: 1.6cqw; }
+.dd-open { gap: 1.2cqw; }
+.dd-title { --fs: 6.6cqw; position: relative; z-index: 2; }
+.dd-road { flex: 1 1 0; min-height: 0; }
+.dd-road .inkfig-plates { height: 100%; aspect-ratio: auto; }
+.dd-fig { flex: none; }
+.dd-hands { flex: none; width: 46%; align-self: flex-end; }

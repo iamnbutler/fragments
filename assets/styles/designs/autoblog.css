@@ -1,0 +1,12 @@
+/* autoblog: its own spreads. */
+
+.ab-open { gap: 1.2cqw; }
+.ab-tab {
+  align-self: flex-start; margin: 0 0 1cqw; padding: 0.5cqw 1.2cqw 0.4cqw;
+  background: var(--lt); mix-blend-mode: multiply; border-radius: 0.5cqw 0.5cqw 0 0;
+  font: 800 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.18em; text-transform: uppercase;
+}
+.ab-title { --fs: 7cqw; position: relative; z-index: 2; }
+.ab-card { flex: 1 1 0; min-height: 0; rotate: -3deg; }
+.ab-card .inkfig-plates { height: 100%; aspect-ratio: auto; }
+.ab-fig { flex: none; }

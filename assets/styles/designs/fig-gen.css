@@ -1,0 +1,10 @@
+/* fig-gen: its own spreads. */
+
+.fg-open { gap: 1.2cqw; }
+.fg-title { --fs: 7cqw; position: relative; z-index: 2; }
+/* one generation, as it came out of Figma: black, with one-pixel marks */
+.fg-gen { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.fg-gen .inkfig-plates { flex: 1 1 0; min-height: 0; aspect-ratio: auto; }
+.fg-gen .inkfig-key { mix-blend-mode: normal; }
+.fg-calc { justify-content: center; align-items: center; }
+.fg-calc .inkfig { width: 70%; }

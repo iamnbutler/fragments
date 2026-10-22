@@ -1,0 +1,13 @@
+/* writing-with-adhd: its own spreads. */
+
+.wa-open { gap: 1.2cqw; }
+.wa-title { --fs: 7.4cqw; position: relative; z-index: 2; }
+/* highlighted like a note to self */
+.wa-title::after {
+  content: ''; position: absolute; z-index: -1; left: -0.6cqw; right: 12%; bottom: 0.4cqw; height: 42%;
+  background: var(--yellow); mix-blend-mode: multiply; rotate: -1.2deg;
+}
+.wa-odd { flex: 1 1 0; min-height: 0; rotate: 2.5deg; }
+.wa-odd .inkfig-plates { height: 100%; aspect-ratio: auto; }
+.wa-fig { flex: none; }
+.wa-sent { flex: none; width: 44%; align-self: flex-end; rotate: -2deg; }

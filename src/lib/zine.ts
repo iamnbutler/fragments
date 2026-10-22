@@ -76,6 +76,36 @@ export const DESIGNS: Record<string, Design> = {
     inks: [['blue', 'black'], ['blue', 'black'], ['red', 'black'], ['blue', 'black']],
     paper: ['newsprint', 'bone', 'newsprint', 'bone'],
   },
+  autoblog: {
+    caps: [1300, 2400, 2400],
+    inks: [['yellow', 'black'], ['blue', 'black'], ['yellow', 'black']],
+    paper: ['newsprint', 'bone', 'newsprint'],
+  },
+  spool: {
+    caps: [1300, 2400, 2400],
+    inks: [['blue', 'black'], ['yellow', 'black'], ['blue', 'black']],
+    paper: ['bone', 'newsprint', 'bone'],
+  },
+  ferrotype: {
+    caps: [1100, 2300, 2400],
+    inks: [['blue', 'black'], ['blue', 'black'], ['red', 'black']],
+    paper: ['newsprint', 'bone', 'newsprint'],
+  },
+  'design-docs-v2': {
+    caps: [1300, 2400],
+    inks: [['red', 'black'], ['blue', 'black']],
+    paper: ['bone', 'bone'],
+  },
+  'fig-gen': {
+    caps: [1300, 2800],
+    inks: [['yellow', 'black'], ['blue', 'black']],
+    paper: ['newsprint', 'newsprint'],
+  },
+  'writing-with-adhd': {
+    caps: [1600, 3200],
+    inks: [['yellow', 'red'], ['yellow', 'red']],
+    paper: ['newsprint', 'bone'],
+  },
 };
 const GENERIC: Design = { caps: [2600], inks: [['yellow', 'black']], paper: ['newsprint'] };
 export const design = (slug: string) => DESIGNS[slug] ?? GENERIC;

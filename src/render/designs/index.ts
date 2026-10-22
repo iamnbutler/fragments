@@ -13,12 +13,24 @@ import { desktopTools } from './desktop-tools';
 import { jevDemos } from './jev-demos';
 import { openRemote } from './open-remote';
 import { tasks } from './tasks';
+import { autoblog } from './autoblog';
+import { spool } from './spool';
+import { ferrotype } from './ferrotype';
+import { designDocsV2 } from './design-docs-v2';
+import { figGen } from './fig-gen';
+import { writingWithAdhd } from './writing-with-adhd';
 
 const DESIGNS: Record<string, (s: PieceSpread) => Html> = {
   'desktop-tools': desktopTools,
   'jev-demos': jevDemos,
   'open-remote': openRemote,
   tasks,
+  autoblog,
+  spool,
+  ferrotype,
+  'design-docs-v2': designDocsV2,
+  'fig-gen': figGen,
+  'writing-with-adhd': writingWithAdhd,
 };
 
 /** One spread of a piece, on its own design. */
