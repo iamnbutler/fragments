@@ -40,15 +40,20 @@ facts:
   - label: License
     value: MIT
 images:
-  - src: drafts/desktop-tools/fig-1-boundary
-    alt: "PLACEHOLDER. Patent-style line drawing: an agent process starts desktop-tools-mcp, drawn as a small part tucked inside the Desktop Tools app bundle, which holds one open line through a Unix socket drawn as a plug and receptacle to the signed host. The host carries three keys labeled Accessibility, Screen Recording and Event Synthesizing, and a gate with an Allow / Don't Allow card. An arrow runs down to a dashed box labeled any other app's window."
-    caption: "PLACEHOLDER. Fig. 1. Who holds the permission. macOS grants it to the app, so the work happens inside the app, and agents reach it over a socket, one approved agent at a time."
-  - src: drafts/desktop-tools/fig-2-loop
-    alt: "PLACEHOLDER. Three-step line drawing: an eye over a window labeled inspect, a ticket stub labeled snapshot_id, and a pointer labeled act once, which branches into three boxes: completed, refused, and a dashed box for unknown. A small tag on the pointer reads expect. All three paths return to inspect."
-    caption: "PLACEHOLDER. Fig. 2. Observe, act once, observe again. The dashed box is the one that matters."
-  - src: drafts/desktop-tools/fig-3-patch-stack
-    alt: "PLACEHOLDER. Three stages left to right. A thin stack of fifteen sheets on a block labeled Peekaboo 4.8.0, dated October 8. A tall stack of sixty-four sheets on the same block, dated October 19, with a clamp labeled vendored. Then one plain block labeled native2, about 19,000 lines of Swift, dated October 20, with dotted lines from a few of the old sheets labeled ported."
-    caption: "PLACEHOLDER. Fig. 3. Fifteen patches, then sixty-four, then none. The changes that mattered were carried into the rewrite as ports."
+  - src: figs/desktop-tools/fig-1-boundary
+    alt: "Line drawing of the Desktop Tools app as a large box. An agent outside it, such as Claude Code or Codex, starts desktop-tools-mcp, which ships inside the app and holds one open connection through a plug and socket labeled desktop.sock. The line passes a double-circle gate tied to an alert card reading 'Allow claude-code to control this Mac?' with Don't Allow and Allow buttons, noted 'asked once per agent; refused until allowed'. It reaches the host, which accepts only its own signed client, checked by audit token, and holds three keys: Accessibility, Screen Recording and event synthesis. From the host an arrow labeled input and captures runs out of the app to a dashed box, any other app's window; a crossed dashed arrow from the host back to the alert reads no input to itself."
+    caption: "Fig. 1. Who holds the permission. macOS grants it to the app, so the work happens inside the app. Agents reach it through one connection, and each agent is asked about once."
+  - src: figs/desktop-tools/fig-2-loop
+    alt: "Three steps in a row: 1 inspect, an eye over a window, noted accessibility text and a screenshot, never steals focus; 2 snapshot, a ticket labeled snapshot_id, noted the window and the controls it saw, single use; 3 act once, a pointer with an optional tag reading expect. The action branches into three boxes: completed (reached that window), a dashed unknown (may have landed) and refused (nothing was sent). An arrow from unknown to completed reads expected change seen. Lines from all three boxes join a rail labeled every outcome returns to inspect."
+    caption: "Fig. 2. Observe, act once, observe again. The dashed box is the one that matters."
+  - src: figs/desktop-tools/fig-3-stack-to-port
+    alt: "Three stages left to right under the dates Oct 8, Oct 19 and Oct 20. First, a thin stack of fifteen sheets on a block labeled Peekaboo 4.8.0, pinned at 4d43dc9. Second, a tall stack of sixty-four sheets on the same block, held by a clamp labeled vendored, noted more than 15,000 lines of patches, never moved to a newer Peekaboo. Four sheets are highlighted and labeled secure-fill, stale-click, insert and click under the word ported, and dotted arrows run from them into the third stage: one plain, taller block labeled native2, about 19,000 lines of Swift, no dependencies."
+    caption: "Fig. 3. Fifteen patches, then sixty-four, then none. The changes that mattered were carried into the rewrite as ports."
+  - src: figs/desktop-tools/fig-4-handover
+    alt: "Three rows. Before, 0.16.1 and earlier: agent, then node dist/mcp.js, often through npx, then a stack of desktop-client pills, a fresh signed client for every call, then a socket, then the Peekaboo Bridge inside Desktop Tools.app. After, 0.17: agent, then desktop-tools-mcp inside Desktop Tools.app, one connection kept open through a socket to the Swift host; beneath it, desktop_windows: 6 ms at the median, down from 115. An existing npx setup: at 0.17.0 or later an arrow runs up into desktop-tools-mcp labeled hands over; pinned earlier, it reaches desktop-client, now the new client, which answers with a slip reading CLIENT_OUTDATED that names the server to set up instead."
+    caption: "Fig. 4. The handover. New setups talk to the server in the app, current npx setups are handed to it, and old pinned ones are told how to update."
+  - src: figs/desktop-tools/ill-1-ticket
+    alt: "A pointer clicks a ticket, which tears along its perforation; the stub drifts away to the left."
 ---
 
 [Ace](https://github.com/githubnext/ace) has a rule that all Ace development happens in Ace. That rule hits a wall as soon as the thing you're building is a desktop app. To check a native change, an agent has to look at real windows, click real buttons and work through real dialogs.

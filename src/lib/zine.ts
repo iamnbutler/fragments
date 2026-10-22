@@ -10,7 +10,7 @@ import { SPOT, PAPERS } from './spectrum';
  * for its misregistration, so the same content always prints the same way.
  */
 
-export type Ink = 'yellow' | 'blue' | 'teal' | 'black';
+export type Ink = 'yellow' | 'blue' | 'red' | 'black';
 export type Paper = 'newsprint' | 'bone' | 'toner';
 
 interface SpreadBase {
@@ -58,22 +58,22 @@ export interface Design {
 export const DESIGNS: Record<string, Design> = {
   'desktop-tools': {
     caps: [1500, 2300],
-    inks: [['blue', 'teal'], ['blue', 'teal']],
+    inks: [['blue', 'red'], ['blue', 'red']],
     paper: ['newsprint', 'bone'],
   },
   'jev-demos': {
     caps: [1300, 1700],
-    inks: [['yellow', 'black'], ['yellow', 'teal']],
+    inks: [['yellow', 'black'], ['yellow', 'red']],
     paper: ['newsprint', 'newsprint'],
   },
   'open-remote': {
     caps: [1900, 3000, 2700, 3000],
-    inks: [['yellow', 'black'], ['blue', 'black'], ['teal', 'black'], ['yellow', 'teal']],
+    inks: [['yellow', 'black'], ['blue', 'black'], ['red', 'black'], ['yellow', 'red']],
     paper: ['newsprint', 'bone', 'newsprint', 'bone'],
   },
   tasks: {
     caps: [1300, 2600, 2400, 2000],
-    inks: [['blue', 'black'], ['blue', 'black'], ['teal', 'black'], ['blue', 'black']],
+    inks: [['blue', 'black'], ['blue', 'black'], ['red', 'black'], ['blue', 'black']],
     paper: ['newsprint', 'bone', 'newsprint', 'bone'],
   },
 };
@@ -128,7 +128,7 @@ export const INK_PAIRS: [Ink, Ink][] = [
   ['yellow', 'black'],
   ['yellow', 'blue'],
   ['blue', 'black'],
-  ['yellow', 'teal'],
+  ['yellow', 'red'],
 ];
 
 // --- imposition --------------------------------------------------------------
@@ -154,7 +154,7 @@ export function impose(pieces: Piece[] = [], now = Date.now()): Spread[] {
     group,
   });
 
-  spreads.push({ ...base('cover', ['yellow', 'teal'], 'newsprint'), kind: 'cover' });
+  spreads.push({ ...base('cover', ['yellow', 'red'], 'newsprint'), kind: 'cover' });
   spreads.push({ ...base('bio', ['yellow', 'blue'], 'bone'), kind: 'bio' });
 
   for (const d of pieces) {

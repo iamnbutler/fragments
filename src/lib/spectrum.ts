@@ -1,45 +1,29 @@
 /**
- * The colourway: PRESS RUN printed in the Printmaking Challenge spectrum.
- * One ramp runs cream → yellow → orange → red → pink → lilac → blue → teal →
- * deep green → black; the four spot inks and the papers are cut from it.
- * The zine's inks (`INK_HEX`), the halftone filters and the styleguide all
+ * The colourway: PRESS RUN printed in the inks of The Color Printer
+ * (J. F. Earhart, 1892), a printer's manual of colour combinations: lemon,
+ * printer's blue, vermilion and a near-black, on white stock. The zine's
+ * inks (`INK_HEX`), the halftone filters, the covers and the styleguide all
  * read their values from here.
  */
 
-/** The full ramp, 39 steps, light to dark (swatch sheet, bottom row). */
-export const RAMP = [
-  '#F1E9DD', '#F3E0BA', '#F5DA9F', '#F6D485', '#F9CB61', '#FAC547', '#FDBC23', '#FEB609', '#FFAB00',
-  '#FF8600', '#FF6000', '#FF3B00', '#FF3C11', '#FF4F34', '#FF6257', '#FF757A', '#FF889D', '#FF9BBF',
-  '#ED9CC9', '#C192CD', '#9587D0', '#6A7DD4', '#3E72D7', '#1268DB', '#0063D3', '#0060B8', '#005EA6',
-  '#005B8B', '#005979', '#00565E', '#005343', '#005131', '#005028', '#004623', '#003C1E', '#003219',
-  '#002814', '#00140A', '#000000',
-] as const;
-
-/** The swatch sheet's middle row: every other step. */
-export const MID = [
-  '#F2E5CB', '#F6D68E', '#F9C958', '#FDBA1B', '#FF9800', '#FF4E00', '#FF4523', '#FF6B68', '#FF92AE',
-  '#D396CB', '#7B81D2', '#236CD9', '#0062CA', '#005D9D', '#005767', '#00523A', '#004623', '#001E0F',
-] as const;
-
-/** The main row: the nine named swatches of the sheet. */
-export const MAIN = ['#F3DEB1', '#FCC135', '#FF5846', '#FFA0C8', '#4F77D6', '#005FAF', '#005555', '#003C1E', '#000000'] as const;
-
 /**
- * The four spot inks, all from the main row: yellow is the light plate,
- * blue sits between, teal and black key. Teal is also the accent for
- * stamps and marks. They replace pink and red from the earlier printing.
+ * The four spot inks: yellow is the light plate, blue sits between, red and
+ * black key. Red is also the accent for stamps and marks.
  */
 export const SPOT = {
-  yellow: '#FCC135',
-  blue: '#4F77D6',
-  teal: '#005555',
-  black: '#000000',
+  yellow: '#FBDF2F',
+  blue: '#1F6AB8',
+  red: '#FF2925',
+  black: '#242627',
 } as const;
 
 export const PAPERS = {
-  newsprint: '#ECE9E3',
-  bone: '#F1E9DD',
+  newsprint: '#F0EDE6',
+  bone: '#FAF8F4',
 } as const;
+
+/** Screens each ink is printed at, solid to lightest. */
+export const TINTS = [1, 0.7, 0.4, 0.2] as const;
 
 /** Relative luminance of a hex colour (WCAG). */
 export function luminance(hex: string): number {

@@ -30,12 +30,12 @@ export interface CoverWork extends Omit<CoverSpec, 'video'> {
   aspect: number;
 }
 
-/** Gradient maps, dark to light: each is a run of the spectrum. */
+/** Gradient maps, dark to light, through the spot inks to bone. */
 export const COVER_MAPS = {
-  spectrum: ['#000000', '#003C1E', '#005555', '#4F77D6', '#FFA0C8', '#FF5846', '#FCC135', '#F1E9DD'],
-  night: ['#000000', '#00140A', '#005FAF', '#9587D0', '#FFA0C8', '#F3DEB1'],
-  heat: ['#000000', '#003C1E', '#FF3B00', '#FF8600', '#FCC135', '#F1E9DD'],
-  sea: ['#000000', '#005131', '#005B8B', '#3E72D7', '#FF9BBF', '#F1E9DD'],
+  spectrum: ['#242627', '#1F6AB8', '#FF2925', '#FBDF2F', '#FAF8F4'],
+  night: ['#242627', '#1F6AB8', '#FAF8F4'],
+  heat: ['#242627', '#FF2925', '#FBDF2F', '#FAF8F4'],
+  sea: ['#242627', '#1F6AB8', '#FBDF2F', '#FAF8F4'],
 } as const;
 export type CoverMap = keyof typeof COVER_MAPS;
 

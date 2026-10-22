@@ -29,6 +29,21 @@ facts:
     value: 47 posts, 189 notes, and a work log of 770 days going back to 2012
   - label: Where it lives
     value: A private GitHub repo, an Obsidian vault, and a Cloudflare Worker behind Access
+images:
+  - src: figs/autoblog/fig-1-checkpoint
+    alt: "One session's transcript runs into the Stop hook at the end of every turn; only the bytes after the last checkpoint are read, and once 40 tool calls have piled up the hook asks the agent that did the work to reflect, while under 40 it stops as usual. The agent can grep its own transcript, then skips, revises or writes: on this Mac from October 19 to 21 that was 49 skips, 28 revisions and 15 new entries. Revisions and writes go to the vault, which is synced to a private repo, linked and redeployed as the site; a dashed fallback sweep, every 20 minutes, covers transcripts no hook ever claimed."
+    caption: "Fig. 1. The agent that did the work decides, and most checkpoints end in a skip."
+  - src: figs/autoblog/fig-2-two-passes
+    alt: "Two columns from the same 229 transcripts. The first pass: eight agents, one writer per slice of history, about ten minutes, 77 posts (90 with the test runs), titled after incidents such as 'Sixty PRs shipped overnight against a locked screen were sixty unverified PRs', struck through because all 91 entries were archived. The second pass: harvest (about 145 candidates), curate (52 in the plan, merged across projects, thin ones cut), write (18 posts, 35 notes), titled by topic such as 'Keeping long-running work alive when the screen locks'."
+    caption: "Fig. 2. The same history, written twice: once as incidents, then as topics."
+  - src: figs/autoblog/fig-3-recall
+    alt: "The prompt 'set up testflight for this project' loses its common words (set, up, for, this); 'testflight' names one entry and 'project' names two, both rare, since a word is rare if it names at most 7 of 238 entries in their titles or tags. Ranked by title 5, tags 3, headings 2 and body half a use up to 4, each times the word's rarity, 'Shipping to TestFlight from the command line and CI' is the only entry above half the top score, so the agent is told it exists and to read it first, once per conversation. A post and a note also matched but fall below the line. A second prompt, 'update the tests and push, make the button blue', keeps tests (names 13 entries), button and blue (none), and reaches nothing."
+    caption: "Fig. 3. Recall. One rare word, one note."
+  - src: figs/autoblog/fig-4-timeline
+    alt: "Fifteen rows, 2012 to 2026, each a year from January to December with a tick for every day that has a line in the timeline; taller ticks mean more lines, capped at 11. The log starts on 2012-02-01, is sparse through 2020 (2 to 31 days a year), fills in from 2021 (54, 56, 163, 111, 132 days) and is densest in 2026 (155 days), ending today, October 21."
+    caption: "Fig. 4. The timeline goes back to 2012: 770 days with something worth a line."
+  - src: figs/autoblog/ill-1-card
+    alt: "A card-file drawer of index cards with one card lifted out above the others, its tab marked."
 ---
 
 I build a lot with agents now, and I've noticed I forget more of it than I used to. Not just details, whole projects. Something ships, I move on, and two weeks later I'm asking an agent to work out something we already worked out.

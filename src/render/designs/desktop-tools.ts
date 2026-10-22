@@ -4,7 +4,7 @@ import { img } from '../../lib/pieces';
 import { split, inkFig, prose, cont, type PieceSpread } from './kit';
 
 /**
- * desktop-tools. Blue and teal on off-white, no yellow, so it reads as
+ * desktop-tools. Blue and red on off-white, no yellow, so it reads as
  * Ace's sibling rather than its next chapter. Black is only for the patent
  * line work and the three outcome words.
  */
@@ -19,7 +19,7 @@ export function desktopTools(spread: PieceSpread): Html {
         <span class="dt-screen"></span>
         <span class="dt-cursor"></span>
       </div>
-      ${reg({ as: 'h2', text: d.title, class: 't-tower dt-title', style: '--lt:var(--blue);--dk:var(--teal)' })}
+      ${reg({ as: 'h2', text: d.title, class: 't-tower dt-title', style: '--lt:var(--blue);--dk:var(--red)' })}
       <div class="dt-deck">
         ${d.kicker && html`<p class="dr-kicker">${d.kicker}</p>`}
         <p class="dr-dek">${linked(d.dekParts)}</p>
@@ -27,7 +27,7 @@ export function desktopTools(spread: PieceSpread): Html {
       ${prose(d.key, a, { cols: 2, dropcap: true })}
     </div>
     <div class="pg pg-r dt-manual">
-      ${inkFig(img(d, 'fig-1-boundary'), { ink: 'dk', class: 'dt-fig1' })}
+      ${inkFig(img(d, 'fig-1-boundary'), { class: 'dt-fig1' })}
       <div class="dt-hook" role="group" aria-label="The three macOS grants, held by the app">
         <span class="dt-hook-bar" aria-hidden="true"></span>
         ${keys.map((k, i) => html`<span class="dt-key"${attr('style', `--i:${i}`)}>
@@ -39,7 +39,7 @@ export function desktopTools(spread: PieceSpread): Html {
       ${cont(spread)}
     </div>`}
   ${part === 1 && html`<div class="dt-strip">
-      ${inkFig(img(d, 'fig-2-loop'), { ink: 'black', caption: false })}
+      ${inkFig(img(d, 'fig-2-loop'), { caption: false })}
     </div>
     <div class="dt-stamps" role="group" aria-label="The three outcomes">
       <span class="dt-out out-done">Completed</span>
@@ -47,12 +47,12 @@ export function desktopTools(spread: PieceSpread): Html {
       <span class="dt-out out-unknown" data-text="Unknown">Unknown</span>
     </div>
     <div class="dt-body">
-      <p class="cap">${`${img(d, 'fig-2-loop')?.caption ?? ''} ${img(d, 'fig-3-patch-stack')?.caption ?? ''}`.trim()}</p>
+      <p class="cap">${`${img(d, 'fig-2-loop')?.caption ?? ''} ${img(d, 'fig-3-stack-to-port')?.caption ?? ''}`.trim()}</p>
       ${prose(d.key, bs, { cols: 3, end })}
       ${cont(spread)}
     </div>
     <div class="dt-stack">
-      ${inkFig(img(d, 'fig-3-patch-stack'), { ink: 'dk', caption: false })}
+      ${inkFig(img(d, 'fig-3-stack-to-port'), { caption: false })}
       <div class="dt-war">
         <p class="dt-war-note"><span class="dt-war-no">Sheet 02, insert</span>Typing a newline into a web composer would press Return and send it.</p>
         <p class="dt-war-note"><span class="dt-war-no">Sheet 04, quit</span>A normal quit can leave an app waiting on an unsaved-changes dialog. Now it’s one dispatched operation, outcome unknown, unsafe to retry.</p>

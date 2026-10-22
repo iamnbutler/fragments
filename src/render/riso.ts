@@ -125,7 +125,7 @@ export function cover(spread: Kind<'cover'>): Html {
 
 /**
  * Hi friends: who Nate is, right after the cover. The left page is a yellow
- * flood with the greeting overprinted in blue and teal, and his avatar
+ * flood with the greeting overprinted in blue and red, and his avatar
  * printed small in the corner; the right page is the rest of the letter,
  * where he's been, and where to find him.
  */
@@ -135,7 +135,7 @@ export function bio(spread: Kind<'bio'>): Html {
   return sheet(spread, { label: 'About Nate' }, html`<div class="pg pg-l bio-l">
     <span class="bio-flood" aria-hidden="true"></span>
     <h2 class="bio-hi">
-      ${reg({ as: 'span', text: 'Hi friends', class: 't-tower', style: '--fs:13.4cqw;--lt:var(--teal);--dk:var(--blue)' })}
+      ${reg({ as: 'span', text: 'Hi friends', class: 't-tower', style: '--fs:13.4cqw;--lt:var(--red);--dk:var(--blue)' })}
       <span class="bio-wave" aria-hidden="true">👋</span>
     </h2>
     <a class="bio-av" href="https://github.com/iamnbutler" aria-label="Nate on GitHub">
@@ -255,7 +255,7 @@ const curve = (role: Role) =>
  */
 export function inks(): Html {
   const filters: { id: string; role: Role; color: string }[] = [];
-  for (const ink of ['yellow', 'teal', 'blue', 'black'] as const) {
+  for (const ink of ['yellow', 'red', 'blue', 'black'] as const) {
     filters.push({ id: `ht-lt-${ink}`, role: ROLES.lt, color: INK_HEX[ink] });
     filters.push({ id: `ht-dk-${ink}`, role: ROLES.dk, color: INK_HEX[ink] });
   }

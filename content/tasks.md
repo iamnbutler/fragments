@@ -26,21 +26,25 @@ facts:
   - label: Agent engine
     value: Claude Code, headless
 images:
-  - src: drafts/tasks/fig-1-shapes
-    alt: "Line drawing in two halves. On the left, labeled version one, five issue cards each feed their own agent, and five pull request arrows converge on a line labeled main, where crosses mark conflicts. On the right, labeled version two, three issue cards feed three scouts side by side; each scout hands over a folded document labeled SPEC.md, the documents stack into a single file, and one builder carries them down a single lane into main."
+  - src: figs/tasks/fig-1-shapes
+    alt: "Two-column line drawing. Left, version one: four issue cards each feed their own agent, and four pull-request arrows converge on a line labeled main, with crosses marking conflicts; a dashed arrow runs from main back up to a new dashed issue card, noted as the poller reading agent PRs as new tasks. Right, version two: two issue cards feed two scouts side by side (two at a time by default), each scout writes a SPEC document (text, not code), the specs stack into one batch inside a single lane, and one builder carries the batch to main as one branch and one PR."
     caption: "Fig. 1. Two shapes. Version one ran N agents on N tasks. Version two explores side by side and builds in single file."
-  - src: drafts/tasks/fig-2-barrier
-    alt: "Line drawing of two VMs separated by a wall. In the left VM a scout writes code and two documents, NOTES.md and SPEC.md; the code goes into a bin labeled thrown away. Only SPEC.md passes through a slot in the wall, to a review stamp and then into the right VM, where a builder writes new code. Under the drawing, a rail of task states runs backlog, queued, scouting, in review, ready to build, building, awaiting merge, done, with rejected branching off below."
+  - src: figs/tasks/fig-2-barrier
+    alt: "Line drawing of two VMs separated by a hatched wall with one slot. In the scout VM, a scout writes code, which goes to a waste bin (thrown away), NOTES.md (read every 30 seconds, never a spec) and SPEC.md. Only SPEC passes through the slot, to a review, then into the builder VM, where the builder, which never sees the scout's code, writes new code from the text. Below, a rail of task states runs backlog, queued, scouting, in review, ready to build, building, awaiting merge and done, with brackets marking the scout and the builder (one at a time), backlog noted as never dispatched, and a dashed drop from in review to rejected, noted: after a verdict, after three strikes, or when its issue is closed as not planned."
     caption: "Fig. 2. The barrier. A Scout's code never leaves its VM; only the spec crosses, and the Builder starts over from the text."
-  - src: drafts/tasks/fig-3-tick
-    alt: "Line drawing of the orchestrator's turn. Four voices on the left, labeled you, pipeline, agent and worker, and a stack labeled obligations, flow with a computed brief into a single oval labeled one Claude Code session, resumed. A single arrow labeled curl leaves it for the HTTP API, which passes through a gate marked charter, with off, shadow and live, before reaching GitHub and the pipeline. Every crossing is written to a long strip labeled decisions ledger."
+  - src: figs/tasks/fig-3-tick
+    alt: "Line drawing of the orchestrator's turn. Four voices on the left (the human, [pipeline], [agent <name>], [worker <job>]; notices are batched and can be dropped) and a stack of obligations (recomputed every 60 s, reminded until done) point into one double oval, one Claude Code session, resumed every second if anything is waiting. A computed brief (silence means unchecked) feeds it from below. A single arrow labeled curl leaves for the API, which passes a charter gate with off, shadow and live rows before reaching GitHub and the pipeline; a dashed arrow carries every write down into a long strip labeled decisions ledger, append-only, read afterwards."
     caption: "Fig. 3. One turn. Everything waiting is folded into one prompt for one long conversation, and every write it makes passes the charter and lands in the ledger."
-  - src: drafts/tasks/fig-4-charter
-    alt: "A printed table with eleven rows, one per capability: capture work, retire work, queue tasks, dispatch builds, auto review specs, comment on work, land builds, curate work, cancel runs, enroll agents and dispatch workers. Three columns are labeled off, shadow and live, and every row is ticked live. A hand-drawn note in the margin reads human-writable only."
+  - src: figs/tasks/fig-4-charter
+    alt: "A printed table with eleven rows, one per capability, in the code's order: capture_work, comment_on_work, retire_work, queue_tasks, dispatch_workers, dispatch_builds, cancel_runs, auto_review_specs, land_builds, curate_work and enroll_agents. Columns are off, shadow and live, and every row is ticked live. Dashed, struck circles in the shadow column for retire_work and auto_review_specs mark that they were first seeded in shadow. A brace beside the table reads human-writable only."
     caption: "Fig. 4. The charter. Eleven capabilities, every one shipped live. Shadow is kept for demotion."
-  - src: drafts/tasks/fig-5-merged
-    alt: "Line drawing of a branch graph. A main line runs left to right. Branch A leaves main and merges back. Branch B, stacked on A, merges into A only after A has already merged, so its commits end on a dead branch. A stamp reading merged sits on B. Beneath it, a check reads: merged, and the merge commit is an ancestor of main."
+  - src: figs/tasks/fig-5-merged
+    alt: "Line drawing of a branch graph. A main line runs left to right. Branch A leaves main and merges back. A's branch lives on as a dashed line; branch B, #863, stacked on A, merges into A's branch after A had landed, and the dashed line ends at a cross: never reaches main. A stamp reading MERGED sits beside B. Beneath a rule: done means the pull request is merged and its merge commit is an ancestor of main; only that check closes the issue."
     caption: "Fig. 5. Merged is not shipped. #863 merged into a branch that had already landed, so its work never reached main."
+  - src: figs/tasks/ill-1-lid
+    alt: "A laptop seen from the side with its lid open only a crack, a sliver of light between lid and base, under a crescent moon and three small stars."
+  - src: figs/tasks/ill-2-scroll
+    alt: "A long paper scroll unrolling from a roll at the top, curving down the page and covered in short lines of writing, with one dashed seam across it."
 ---
 
 Tasks is a server that runs on my Mac. It reads a repository's GitHub issues, hands them to Claude Code agents working in throwaway VMs, and turns what they make into merged pull requests. Beside that pipeline sits an orchestrator: one Claude Code conversation that doesn't end. It reviews the agents' plans, starts builds, lands them and talks to me.

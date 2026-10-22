@@ -27,6 +27,14 @@ facts:
     value: Nuxt 3, built October 31 to November 4, 2021
   - label: Version two
     value: Next.js, Tailwind and MDX, rebuilt May 20 to 28, 2022
+images:
+  - src: figs/design-docs-v2/fig-1-words-in-files
+    alt: "Two columns divided by a dashed rule. Left, version one (Nuxt, November 2021): a pages folder of eight Vue files, and portfolio.vue opened to show the paragraph 'Don't over-invest in your website… Try spending no more than a week on your first portfolio' wrapped in template, article, h2 and p tags; a contributor reaches it by a dashed arrow labelled 'edits a component', and a note says the words live in each page's markup. Right, version two (Next.js and MDX, May 2022): a content folder of seven MDX files, and portfolio.mdx opened to show the same words with only a Markdown heading mark; a contributor reaches it by a solid arrow labelled 'edits a text file', and an arrow leads from the file to one template, pages/posts/[slug].jsx, which renders all seven."
+    caption: "Fig. 1. The same paragraph in both versions. In version one it sat inside a Vue component; in version two it is a text file that one template renders."
+  - src: figs/design-docs-v2/ill-1-branching-road
+    alt: "A wide landscape: a road comes toward the viewer and forks into three branches that run off to low hills under a pale sun, with a blank signpost at the fork, a few trees, and a dotted footpath in teal that leaves the road and wanders off across the field on its own."
+  - src: figs/design-docs-v2/ill-2-many-hands
+    alt: "A cup holding a brush, a fountain pen, a pencil and a ballpoint, with one more pencil, drawn in teal, just being dropped in."
 ---
 
 Design Docs is a guide for early-career designers. It's meant to give them a roadmap: how to improve their craft, put a portfolio together, and get their first job in the industry, or the job they're chasing.

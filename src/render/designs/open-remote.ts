@@ -4,9 +4,9 @@ import { img } from '../../lib/pieces';
 import { split, inkFig, prose, cont, type PieceSpread } from './kit';
 
 /**
- * open-remote, "The Remote in Your Pocket". The four spot inks, plus an
- * orange for the paywall pulled out on the opening spread, with the word that
- * does the damage marked up like a proof. A clock of the one day it took runs
+ * open-remote, "The Remote in Your Pocket". The four spot inks: the paywall
+ * pulled out on the opening spread in yellow, with the word that does the
+ * damage marked up in red like a proof. A clock of the one day it took runs
  * across the head of every spread, with the hours that spread covers inked in.
  */
 export function openRemote(spread: PieceSpread): Html {
@@ -66,7 +66,7 @@ ${part === 0 && html`<div class="pg pg-l or-open">
         ${d.kicker && html`<p class="dr-kicker">${d.kicker}</p>`}
         ${reg({ as: 'h2', text: d.title, class: 't-tower or-title' })}
       </div>
-      <figure class="or-wall" aria-label="A paywall redrawn: Go Premium, $12.00, a Continue button and fine print saying it renews automatically. The small word week after the price is circled in teal, with a note in the margin: a week, not a month, not a year.">
+      <figure class="or-wall" aria-label="A paywall redrawn: Go Premium, $12.00, a Continue button and fine print saying it renews automatically. The small word week after the price is circled in red, with a note in the margin: a week, not a month, not a year.">
         <div class="or-wall-print" aria-hidden="true">
           <span class="or-wall-lt"></span>
           <div class="or-wall-card">
@@ -110,17 +110,17 @@ ${part === 1 && html`<div class="pg pg-l or-body">
       ${cont(spread)}
     </div>`}
 ${part === 2 && html`<div class="pg pg-l or-body">
-      ${inkFig(img(d, 'fig-3-subject'), { ink: 'dk', class: 'or-fig' })}
+      ${inkFig(img(d, 'fig-2-subject'), { class: 'or-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r or-body">
       <p class="or-pull" aria-hidden="true"><span>“I’ve needed to put codes</span> <span>in 3-4 times.”</span></p>
       ${prose(d.key, b, { cols: 2, end })}
-      ${inkFig(img(d, 'fig-4-camera'), { ink: 'dk', class: 'or-fig' })}
+      ${inkFig(img(d, 'fig-3-camera'), { class: 'or-fig' })}
       ${cont(spread)}
     </div>`}
 ${part === 3 && html`<div class="pg pg-l or-body">
-      ${inkFig(img(d, 'fig-5-playnow'), { ink: 'dk', class: 'or-fig' })}
+      ${inkFig(img(d, 'fig-4-playnow'), { class: 'or-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r or-body">

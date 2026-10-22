@@ -4,7 +4,7 @@ import { img } from '../../lib/pieces';
 import { split, inkFig, prose, cont, type PieceSpread } from './kit';
 
 /**
- * tasks, "Serial by Design". Blue and black, with teal for the stretch about
+ * tasks, "Serial by Design". Blue and black, with red for the stretch about
  * the orchestrator. A task's states run across the head of every spread and
  * advance one stage per spread, so the feature reads like a task moving
  * through the pipeline it describes.
@@ -24,14 +24,14 @@ ${part === 0 && html`<div class="pg pg-l tk-open">
         ${reg({ as: 'h2', text: d.title, class: 't-tower tk-title' })}
         <p class="dr-dek">${linked(d.dekParts)}</p>
       </div>
-      ${inkFig(img(d, 'fig-1-shapes'), { ink: 'dk', class: 'tk-fig' })}
+      ${inkFig(img(d, 'fig-1-shapes'), { class: 'tk-fig' })}
     </div>
     <div class="pg pg-r tk-body">
       ${prose(d.key, bs, { cols: 2, dropcap: true, end })}
       ${cont(spread)}
     </div>`}
 ${part === 1 && html`<div class="pg pg-l tk-body">
-      ${inkFig(img(d, 'fig-2-barrier'), { ink: 'dk', class: 'tk-fig' })}
+      ${inkFig(img(d, 'fig-2-barrier'), { class: 'tk-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r tk-body">
@@ -39,7 +39,7 @@ ${part === 1 && html`<div class="pg pg-l tk-body">
       ${cont(spread)}
     </div>`}
 ${part === 2 && html`<div class="pg pg-l tk-body">
-      ${inkFig(img(d, 'fig-3-tick'), { ink: 'dk', class: 'tk-fig' })}
+      ${inkFig(img(d, 'fig-3-tick'), { class: 'tk-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r tk-body">
@@ -48,11 +48,11 @@ ${part === 2 && html`<div class="pg pg-l tk-body">
       ${cont(spread)}
     </div>`}
 ${part === 3 && html`<div class="pg pg-l tk-body">
-      ${inkFig(img(d, 'fig-4-charter'), { ink: 'dk', class: 'tk-fig' })}
+      ${inkFig(img(d, 'fig-4-charter'), { class: 'tk-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r tk-body">
-      ${inkFig(img(d, 'fig-5-merged'), { ink: 'dk', class: 'tk-fig' })}
+      ${inkFig(img(d, 'fig-5-merged'), { class: 'tk-fig' })}
       ${prose(d.key, b, { cols: 2, end })}
       ${cont(spread)}
     </div>`}`;

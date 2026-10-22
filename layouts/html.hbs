@@ -6,7 +6,7 @@
   <title>{{ $page.params.title ? `${$page.params.title} | _fragments` : '_fragments' }}</title>
   {{#var description = $page.path === '/' ? $utils.issueDescription() : $page.params.description}}
   {{#if description}}<meta name="description" content="{{ description }}" />{{/if}}
-  <meta name="theme-color" content="#ece9e3" />
+  <meta name="theme-color" content="#f0ede6" />
   <link rel="icon" href="{{ $site.icon }}" />
   {{#if $page.params.noindex}}<meta name="robots" content="noindex" />{{/if}}
   {{{ $utils.head($page.params) }}}

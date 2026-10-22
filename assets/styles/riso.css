@@ -1,21 +1,21 @@
 /* PRESS RUN — nate.rip as a risograph zine.
-   Spot inks only: yellow, blue, teal and black from the Printmaking Challenge
-   spectrum (src/lib/spectrum.ts), on warm newsprint.
+   Spot inks only: yellow, blue, red and black from The Color Printer
+   (src/lib/spectrum.ts), on warm newsprint.
    Everything inside a spread is sized in container units, so a spread
    composes the same way at every desktop size, like a printed page would. */
 
 :root {
-  --yellow: #fcc135;
-  --teal: #005555;
-  --blue: #4f77d6;
-  --black: #000;
+  --yellow: #fbdf2f;
+  --red: #ff2925;
+  --blue: #1f6ab8;
+  --black: #242627;
 
-  --newsprint: #ece9e3;
-  --bone: #f1e9dd;
+  --newsprint: #f0ede6;
+  --bone: #faf8f4;
   --toner: #1a1a1a; /* code blocks */
   --copy: #f5f4ef;
 
-  --desk: #bdb9b0;
+  --desk: #bdb9b3;
   --desk-ink: #2b2a28;
 
   --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
@@ -361,10 +361,10 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .bio-cv dt { font: 500 var(--fs-cap)/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.18em; }
 .bio-cv dd { margin: 0; font: 400 clamp(13px, 1.25cqw, 19px)/1.3 var(--f-serif); }
 .bio-cv b { font: 800 1.1em/1 var(--f-display); letter-spacing: -0.01em; margin-right: 0.4em; }
-.bio-now dt { color: var(--teal); font-weight: 800; }
+.bio-now dt { color: var(--red); font-weight: 800; }
 .bio-now b { text-decoration: underline; text-decoration-color: var(--yellow); text-decoration-thickness: 0.35em; text-underline-offset: -0.08em; text-decoration-skip-ink: none; }
 .bio-bye { margin: 0; font: 400 italic clamp(14px, 1.45cqw, 22px)/1.4 var(--f-serif); }
-.bio-bye a { text-decoration-color: var(--teal); text-decoration-thickness: 0.12em; text-underline-offset: 0.15em; }
+.bio-bye a { text-decoration-color: var(--red); text-decoration-thickness: 0.12em; text-underline-offset: 0.15em; }
 
 /* ─── end of the issue ─────────────────────────────────────────────── */
 
@@ -519,12 +519,12 @@ dialog.fold-ask::before {
   background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 -.3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)'/%3E%3C/svg%3E");
   mix-blend-mode: normal;
 }
-/* the key line printed again in teal, off register */
-.fa-no::before { border: 2px solid var(--teal); translate: 7px 6px; }
+/* the key line printed again in red, off register */
+.fa-no::before { border: 2px solid var(--red); translate: 7px 6px; }
 .fa-no::after { border: 2px solid #000; }
 .fa-path:hover::before, .fa-path:focus-visible::before { translate: 2px 2px; }
 .fa-path:active::before { translate: 0 0; }
-.fa-path:focus-visible { outline: 3px solid var(--teal); outline-offset: 6px; }
+.fa-path:focus-visible { outline: 3px solid var(--red); outline-offset: 6px; }
 /* the perforation between them */
 .fa-fold { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .fa-fold::before, .fa-fold::after {
@@ -793,7 +793,7 @@ html.flats-open .pagerail { display: none; }
 body:has(#agentation) .flats-toggle { right: 76px; }
 .flats-toggle svg { width: 18px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.2; }
 .flats-toggle:hover, .flats-toggle:focus-visible { background: var(--blue); }
-.flats-toggle:focus-visible, .flats-back:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.flats-toggle:focus-visible, .flats-back:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 html.flats-open .flats-toggle { visibility: hidden; }
 
 .flats {

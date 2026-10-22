@@ -9,7 +9,7 @@ import { reg, plate, blocks as blocksHtml } from './riso';
 import { spread as spreadHtml } from './pages';
 import { loadPieces } from '../lib/pieces';
 import { impose, blocks, INK_PAIRS, type Spread, type Ink, type Block } from '../lib/zine';
-import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
+import { SPOT, PAPERS, TINTS, contrast } from '../lib/spectrum';
 import { COVER_MAPS, COVER_WORKS } from '../lib/covers';
 import { ISSUE } from '../lib/issue';
 
@@ -75,18 +75,17 @@ export function styleguide(): Html {
     .filter((b): b is Block => !!b)
     .map(trim);
   const paper = PAPERS.newsprint;
-  const pct = (i: number, n: number) => `${((i / (n - 1)) * 100).toFixed(1)}%`;
   const SPOT_ROLE: Record<string, string> = {
     yellow: 'Light plate. Floods and halftone highlights. Too pale for small type.',
-    blue: 'Light plate under teal or black, key plate on yellow.',
-    teal: 'Key plate and the accent: rules and the PROOF stamp.',
+    blue: 'Light plate under red or black, key plate on yellow.',
+    red: 'Key plate and the accent: rules and the PROOF stamp.',
     black: 'Key plate. Type, rules, shadows.',
   };
   const TOKENS: [string, string, string][] = [
     ['--lt', 'per spread', 'The light plate of the spread’s ink pair.'],
     ['--dk', 'per spread', 'The key plate: shadows, type in ink, page numbers.'],
     ['--sheet', 'per paper', 'The paper colour of the spread.'],
-    ['--desk', '#BDB9B0 / #1D1C1B', 'The pasteboard behind the spreads, light and dark.'],
+    ['--desk', '#BDB9B3 / #1D1C1B', 'The pasteboard behind the spreads, light and dark.'],
     ['--desk-ink', '#2B2A28 / #B7B2A7', 'Type set on the desk.'],
     ['--mx, --my', '±2.4px, ±1.8px', 'Each spread’s seeded misregistration.'],
     ['--lx, --ly', '±26px, ±18px', 'Where a spread’s plates come from as they land.'],
@@ -138,7 +137,7 @@ export function styleguide(): Html {
 
       <div class="sb-board paper-newsprint">
         <h3 class="sb-sub">Spot inks</h3>
-        <p class="sb-note">Four inks from the main row of the swatch sheet. Each spread prints in a pair: a light plate and a key plate. Contrast is against newsprint.</p>
+        <p class="sb-note">Four inks from The Color Printer. Each spread prints in a pair: a light plate and a key plate. Contrast is against newsprint.</p>
         <ul class="sb-inks">
           ${Object.entries(SPOT).map(([name, hex]) => html`<li class="sb-ink"${attr('style', `--c:var(--${name})`)}>
               <span class="sb-ink-chip" aria-hidden="true"></span>
@@ -162,20 +161,13 @@ export function styleguide(): Html {
       </div>
 
       <div class="sb-board paper-newsprint sb-swatchbook">
-        <h3 class="sb-sub">The ramp</h3>
-        <p class="sb-note">The whole spectrum, light to dark, as the swatch sheet sets it: the nine named swatches, every other step, and all 39. The spot inks are marked.</p>
+        <h3 class="sb-sub">Screens</h3>
+        <p class="sb-note">Each ink solid and screened back to 70, 40 and 20 percent on newsprint, as The Color Printer sets its tint plates. Lighter steps come from screening an ink, never from a fifth colour.</p>
         <div class="sb-sheet-rows">
-          <ol class="sb-row sb-row-main">
-            ${MAIN.map((h) => html`<li${attr('style', `--c:${h}`)}${attr('class', cls(Object.values(SPOT).includes(h as any) && 'is-spot') || undefined)}><span>${h.slice(1)}</span></li>`)}
-          </ol>
-          <ol class="sb-row sb-row-mid">
-            ${MID.map((h) => html`<li${attr('style', `--c:${h}`)}><span>${h.slice(1)}</span></li>`)}
-          </ol>
-          <ol class="sb-row sb-row-ramp">
-            ${RAMP.map((h) => html`<li${attr('style', `--c:${h}`)}><span>${h.slice(1)}</span></li>`)}
-          </ol>
-          <div class="sb-sweep" aria-hidden="true"${attr('style', `background:linear-gradient(90deg, ${RAMP.map((h, i) => `${h} ${pct(i, RAMP.length)}`).join(', ')})`)}></div>
-          <p class="sb-sheet-cap cap">Printmaking Challenge<br />the Wonderful Spectrum<br />Src: src/lib/spectrum.ts</p>
+          ${Object.entries(SPOT).map(([name, hex]) => html`<ol class="sb-row sb-row-screen"${attr('aria-label', name)}>
+            ${TINTS.map((k) => html`<li${attr('style', `--c:color-mix(in srgb, ${hex} ${k * 100}%, ${paper})`)}${attr('class', k === 1 ? 'is-solid' : undefined)}><span>${name} ${k * 100}</span></li>`)}
+          </ol>`)}
+          <p class="sb-sheet-cap cap">The Color Printer<br />J. F. Earhart, 1892<br />Src: src/lib/spectrum.ts</p>
         </div>
       </div>
 
@@ -274,7 +266,7 @@ export function styleguide(): Html {
         <p class="sb-note">Photos are separated at build time by SVG filters in <code>render/riso.ts</code>: each plate is a halftone of one ink on transparent, stacked and multiplied, and knocked out of register by the spread’s <code>--mx</code>/<code>--my</code> and the pointer.</p>
         <div class="sb-plates">
           <figure class="sb-plate">${plate({ media: sample, inks: ['yellow', 'black'], alt: '', proof: true })}<figcaption class="cap">Duotone, yellow + black <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>
-          <figure class="sb-plate" style="--lt:var(--blue);--dk:var(--teal)">${plate({ media: sample, inks: ['blue', 'teal'], alt: '' })}<figcaption class="cap">Duotone, blue + teal</figcaption></figure>
+          <figure class="sb-plate" style="--lt:var(--blue);--dk:var(--red)">${plate({ media: sample, inks: ['blue', 'red'], alt: '' })}<figcaption class="cap">Duotone, blue + red</figcaption></figure>
           <figure class="sb-plate">${plate({ media: sample, inks: ['yellow', 'blue'], mode: 'key', alt: '' })}<figcaption class="cap">Key plate only, blue</figcaption></figure>
           <figure class="sb-plate">${plate({ media: sample, inks: ['black', 'black'], mode: 'mono', alt: '' })}<figcaption class="cap">Mono, black</figcaption></figure>
         </div>
@@ -286,7 +278,7 @@ export function styleguide(): Html {
         <h3 class="sb-sub">Registration</h3>
         <p class="sb-note">Display type prints twice: the light plate is a pseudo-element offset by 1.8 × the misregistration, the key plate is the text. Move the pointer over a spread to push the plates apart; the Misregistration dial above scales every spread’s offset.</p>
         <div class="sb-reg-row">
-          ${(['yellow', 'teal'] as Ink[]).map((lt) => reg({ as: 'p', text: 'Out of register', class: 't-tower', style: `--fs:6cqw;--lt:var(--${lt});--mx:3px;--my:-2px` }))}
+          ${(['yellow', 'red'] as Ink[]).map((lt) => reg({ as: 'p', text: 'Out of register', class: 't-tower', style: `--fs:6cqw;--lt:var(--${lt});--mx:3px;--my:-2px` }))}
         </div>
 
         <h3 class="sb-sub">Texture</h3>

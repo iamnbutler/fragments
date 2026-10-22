@@ -5,7 +5,7 @@ import { split, inkFig, prose, cont, type PieceSpread } from './kit';
 
 /**
  * jev-demos, "What does fast get us?". Yellow and black, then yellow and
- * teal: a signal ink for a piece about speed. The figures carry the
+ * red: a signal ink for a piece about speed. The figures carry the
  * explanation; a millisecond rule across the opening is the only ornament.
  */
 export function jevDemos(spread: PieceSpread): Html {
@@ -24,19 +24,19 @@ export function jevDemos(spread: PieceSpread): Html {
         ${d.kicker && html`<p class="dr-kicker">${d.kicker}</p>`}
         <p class="dr-dek">${linked(d.dekParts)}</p>
       </div>
-      ${inkFig(img(d, 'fig-1-call'), { ink: 'dk', class: 'jv-fig' })}
+      ${inkFig(img(d, 'fig-1-call'), { class: 'jv-fig' })}
     </div>
     <div class="pg pg-r">
       ${prose(d.key, bs, { cols: 2, dropcap: true, end })}
-      ${inkFig(img(d, 'fig-2-modes'), { ink: 'dk', class: 'jv-fig' })}
+      ${inkFig(img(d, 'fig-2-modes'), { class: 'jv-fig' })}
       ${cont(spread)}
     </div>`}
   ${part === 1 && html`<div class="pg pg-l">
-      ${inkFig(img(d, 'fig-3-budget'), { ink: 'dk', class: 'jv-fig' })}
+      ${inkFig(img(d, 'fig-3-budget'), { class: 'jv-fig' })}
       ${prose(d.key, a, { cols: 2 })}
     </div>
     <div class="pg pg-r">
-      ${inkFig(img(d, 'fig-4-pairs'), { ink: 'dk', class: 'jv-fig' })}
+      ${inkFig(img(d, 'fig-4-pairs'), { class: 'jv-fig' })}
       ${prose(d.key, b, { cols: 2, end })}
       ${cont(spread)}
     </div>`}`;
