@@ -3,3 +3,6 @@
 /d/:slug /:slug/ 301
 /e/:slug/ /:slug/ 301
 /e/:slug /:slug/ 301
+# The old nate.rip (GitHub Pages) kept links at /f/<n>; they weren't carried
+# over. 302, not 301, so they can come back.
+/f/* / 302

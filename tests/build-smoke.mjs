@@ -24,6 +24,7 @@ for (const slug of slugs) assert.match(home, new RegExp(`class="[^"]*\\bdr-${slu
 assert.match(home, /class="[^"]*\barchive-mark\b/);
 assert.ok(!existsSync('public/d') && !existsSync('public/e'), 'no /d/ or /e/ pages');
 assert.match(read('_redirects'), /^\/d\/:slug\/ \/:slug\/ 301$/m);
+assert.match(read('_redirects'), /^\/f\/\* \/ 302$/m);
 // Cover loops are made in JS when the cover is on screen, never autoplayed in the HTML.
 assert.doesNotMatch(home, /<video\b/);
 assert.ok(!existsSync('public/f'), 'no /f/ pages');
