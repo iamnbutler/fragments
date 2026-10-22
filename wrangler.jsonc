@@ -5,5 +5,10 @@
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "fragments-media", "remote": true }],
+  // nate.rip is this site; the zone is on this account.
+  "routes": [
+    { "pattern": "nate.rip", "custom_domain": true },
+    { "pattern": "www.nate.rip", "custom_domain": true }
+  ],
   "observability": { "enabled": true }
 }
