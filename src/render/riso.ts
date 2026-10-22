@@ -5,10 +5,11 @@
 import { html, raw, attr, cls, type Html } from './html';
 import type { TextPart } from '../lib/pieces';
 import { media } from '../lib/media';
-import { COVER_WORKS, COVER_MAPS } from '../lib/covers';
+import { COVER_ART } from '../lib/covers';
 import { ISSUE } from '../lib/issue';
+import { tokenize, langOf } from '../lib/code';
 import {
-  INK_HEX, rng, spreadTitle, domain, readingMinutes,
+  INK_HEX, CODE_MARK, rng, spreadTitle, domain, readingMinutes,
   type Block, type Ink, type PlateMedia, type Spread,
 } from '../lib/zine';
 
@@ -58,15 +59,24 @@ export function plate(p: {
 </figure>`;
 }
 
+/** A code listing, hand-highlighted in the spot inks. */
+export function listing(src: string, lang?: string): Html {
+  const label = lang ?? (langOf(lang, src) === 'rustc' ? 'rustc' : undefined);
+  return html`<pre${attr('class', 'b-code')}${attr('data-lang', label)}><code>${tokenize(src, lang).map((t) => (t.k ? html`<span${attr('class', `t-${t.k}`)}>${t.s}</span>` : t.s))}</code></pre>`;
+}
+
+/** Text with its marked code spans set in mono. */
+const spans = (t: string) => (t.includes(CODE_MARK) ? t.split(CODE_MARK).map((s, i) => (i % 2 ? html`<code class="ic">${s}</code>` : s)) : t);
+
 /** Running text as blocks. Reference markers become superscript notes when `refs`. */
 export function blocks(bs: Block[], o: { refs?: boolean; end?: boolean } = {}): Html {
   const last = bs.length - 1;
   return html`${bs.map((b, bi) => {
-    const body = b.text.split(/\u0001(\d+)\u0001/).map((t, i) => (i % 2 ? (o.refs ? html`<sup class="ref"><span class="sr">note </span>${t}</sup>` : null) : t));
+    const body = b.text.split(/\u0001(\d+)\u0001/).map((t, i) => (i % 2 ? (o.refs ? html`<sup class="ref"><span class="sr">note </span>${t}</sup>` : null) : spans(t)));
     const tail = o.end && bi === last ? html`<span class="end-mark" aria-hidden="true"></span>` : null;
     return b.t === 'h' ? html`<p class="b-h">${body}</p>`
       : b.t === 'li' ? html`<p class="b-li">${body}${tail}</p>`
-      : b.t === 'code' ? html`<pre class="b-code">${b.text}</pre>`
+      : b.t === 'code' ? listing(b.text, b.lang)
       : b.t === 'quote' ? html`<p class="b-q">${body}${tail}</p>`
       : html`<p>${body}${tail}</p>`;
   })}`;
@@ -98,23 +108,19 @@ export function sheet(spread: Spread, p: { label: string; layout?: string; folio
 }
 
 /**
- * The cover of _fragments: one of Nate's own renders, pulled as a stepped,
- * grainy gradient-map proof across the whole spread, with a margin under it
- * captioned like an edition print. The issue's own render prints first;
- * click the plate for a proof of another. Without WebGL the render shows as it is.
+ * The cover of _fragments: the central reactor from one of Nate's 2017
+ * renders, redrawn in the zine's own plates across the whole spread, with a
+ * margin under it captioned like an edition print and credited to the render.
  */
 export function cover(spread: Kind<'cover'>): Html {
-  const at = ISSUE.cover - 1;
-  const first = COVER_WORKS[at];
-  const n = COVER_WORKS.length;
-  return sheet(spread, { label: 'Cover', folio: false }, html`<div class="cv"${attr('data-issue', ISSUE.number)}${attr('data-start', at)}${attr('data-works', JSON.stringify(COVER_WORKS))}${attr('data-maps', JSON.stringify(COVER_MAPS))}>
-    <button class="cv-plate" type="button" aria-label="Pull a proof of another render">
-      <img class="cv-img"${attr('src', first.still)}${attr('srcset', `${first.small} 800w, ${first.still} 1600w`)} sizes="(max-width: 760px) 100vw, 92vw" width="1600"${attr('height', Math.round(1600 / first.aspect))} alt="" fetchpriority="high"${attr('style', `object-position:${first.focus[0] * 100}% ${first.focus[1] * 100}%`)} />
-      <canvas class="cv-gl" aria-hidden="true"></canvas>
-    </button>
-    <p class="cv-pencil" aria-live="polite">
-      <span class="cv-ed">${ISSUE.cover}/${n}</span>
-      <span class="cv-title">Untitled, ${first.date}</span>
+  const art = COVER_ART;
+  return sheet(spread, { label: 'Cover', folio: false }, html`<div class="cv cv-drawn"${attr('data-issue', ISSUE.number)}>
+    <div class="cv-plate">
+      <img class="cv-img"${attr('src', art.still)}${attr('srcset', `${art.small} 1600w, ${art.still} 3200w`)} sizes="(max-width: 760px) 100vw, 92vw" width="3200"${attr('height', Math.round(3200 / art.aspect))}${attr('alt', art.alt)} fetchpriority="high" />
+    </div>
+    <p class="cv-pencil">
+      <span class="cv-ed">Drawn after</span>
+      <span class="cv-title">Untitled, ${art.date}</span>
       <span class="cv-sig">Nate Butler</span>
     </p>
     <h1 class="masthead">_fragments</h1>
@@ -144,6 +150,8 @@ export function bio(spread: Kind<'bio'>): Html {
     <p class="bio-lede">I'm a software designer &amp; maker enabling people's creativity and ability to share knowledge. Chances are you have probably used something I've built.</p>
   </div>
   <div class="pg pg-r bio-r">
+    <p class="bio-from"><span>From the editor</span> <span>Issue ${ISSUE.number}, ${ISSUE.season}</span></p>
+    ${postmark()}
     <p class="bio-p bio-first">I want to help people create the things important to them&thinsp;&mdash;&thinsp;to empower them to create something themselves and feel the euphoria it brings.</p>
     <p class="bio-p">I'm interested in local &amp; open source software, and finding ways to reclaim our applications from the web and our daily lives from large corporations.</p>
     <dl class="bio-cv">
@@ -153,6 +161,28 @@ export function bio(spread: Kind<'bio'>): Html {
     </dl>
     <p class="bio-bye">Say hi on <a href="https://bsky.app/profile/nate.rip">Bluesky</a> or come visit <a href="https://nate.rip">nate.rip</a>!</p>
   </div>`);
+}
+
+/**
+ * A postmark struck across the letter's empty middle in red: a ring with the
+ * site round it and cancellation waves trailing off to the left.
+ */
+function postmark(): Html {
+  const waves = [0, 1, 2, 3, 4].map((i) => {
+    const y = 70 + i * 13;
+    let d = `M0 ${y}`;
+    for (let x = 0; x < 192; x += 24) d += ` q6 -6 12 0 t12 0`;
+    return d;
+  });
+  return html`<svg class="bio-postmark" viewBox="0 0 420 200" aria-hidden="true">
+    <defs><path id="pm-ring" d="M310 100 m-74 0 a74 74 0 1 1 148 0 a74 74 0 1 1 -148 0" /></defs>
+    ${raw(waves.map((d) => `<path class="pm-wave" d="${d}" />`).join(''))}
+    <circle class="pm-rule" cx="310" cy="100" r="92" />
+    <circle class="pm-rule pm-thin" cx="310" cy="100" r="58" />
+    <text class="pm-ring"><textPath href="#pm-ring" startOffset="0" textLength="458" lengthAdjust="spacing">NATE.RIP ✶ SAY HI ✶ ISSUE ${ISSUE.number} ✶ FRAGMENTS ✶</textPath></text>
+    <text class="pm-mid" x="310" y="94" text-anchor="middle">${ISSUE.season.split(' ')[0].toUpperCase()}</text>
+    <text class="pm-mid pm-yr" x="310" y="124" text-anchor="middle">${ISSUE.season.split(' ')[1] ?? ''}</text>
+  </svg>`;
 }
 
 /**
@@ -191,6 +221,7 @@ export function jumpSpread(spread: Kind<'jump'>): Html {
         ? html`<a class="cont cont-single"${attr('href', item.href)}>Read on its own page</a>`
         : html`<a class="cont"${attr('href', item.href)}>The rest is on its own page</a>`}
   </div>
+  ${last && jumpTail(spread)}
   ${hasNotes && html`<aside class="margin-notes" aria-label="Notes">
     <p class="mn-head">Notes</p>
     <ol>
@@ -200,6 +231,29 @@ export function jumpSpread(spread: Kind<'jump'>): Html {
       </li>`)}
     </ol>
   </aside>`}`);
+}
+
+/**
+ * The foot of a piece's last jump, shown only when the text ends high enough
+ * to leave the room (flow.ts marks the sheet): its title illustration again,
+ * stuck on at an angle, and a press sheet's colour bar and slug in the
+ * spread's two inks.
+ */
+function jumpTail(spread: Kind<'jump'>): Html {
+  const { item } = spread;
+  const ill = item.images?.find((i) => /\/ill-/.test(i.name));
+  const [lt, dk] = spread.inks;
+  const steps = [100, 70, 40, 15];
+  return html`<div class="jump-tail" aria-hidden="true">
+    ${ill && html`<span class="jt-ill"${attr('style', `--fig:url("${ill.src}");--ar:${(ill.aspect ?? 1.4).toFixed(4)}`)}></span>`}
+    <div class="jt-bar">
+      <span class="jt-reg"></span>
+      ${['lt', 'dk'].map((k) => steps.map((n) => html`<i${attr('style', `--c:color-mix(in srgb, var(--${k}) ${n}%, transparent)`)}></i>`))}
+      <i class="jt-over"></i>
+      <span class="jt-slug">_fragments ${ISSUE.number} \u00b7 ${item.title} \u00b7 ${lt} + ${dk}</span>
+      <span class="jt-reg"></span>
+    </div>
+  </div>`;
 }
 
 /** A rubber stamp for pieces over three years old, with the year they were first printed. */

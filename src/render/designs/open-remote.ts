@@ -66,6 +66,10 @@ ${part === 0 && html`<div class="pg pg-l or-open">
         ${d.kicker && html`<p class="dr-kicker">${d.kicker}</p>`}
         ${reg({ as: 'h2', text: d.title, class: 't-tower or-title' })}
       </div>
+      ${inkFig(img(d, 'ill-2-pocket'), { class: 'or-pocket', caption: false })}
+    </div>
+    <div class="pg pg-r or-body">
+      <p class="dr-dek">${linked(d.dekParts)}</p>
       <figure class="or-wall" aria-label="A paywall redrawn: Go Premium, $12.00, a Continue button and fine print saying it renews automatically. The small word week after the price is circled in red, with a note in the margin: a week, not a month, not a year.">
         <div class="or-wall-print" aria-hidden="true">
           <span class="or-wall-lt"></span>
@@ -76,12 +80,11 @@ ${part === 0 && html`<div class="pg pg-l or-open">
             <span class="or-wall-fine">Renews automatically until you cancel.</span>
           </div>
         </div>
-        <p class="or-note" aria-hidden="true">A <b>week.</b> Not a month, not a year.</p>
-        <figcaption class="cap">A paywall like the one I saw, redrawn without its branding. The price is the one it asked for.</figcaption>
+        <div class="or-wall-side">
+          <p class="or-note" aria-hidden="true">A <b>week.</b> Not a month, not a year.</p>
+          <figcaption class="cap">A paywall like the one I saw, redrawn without its branding. The price is the one it asked for.</figcaption>
+        </div>
       </figure>
-    </div>
-    <div class="pg pg-r or-body">
-      <p class="dr-dek">${linked(d.dekParts)}</p>
       ${prose(d.key, bs, { cols: 2, dropcap: true, end })}
       ${cont(spread)}
     </div>`}
@@ -131,6 +134,13 @@ ${part === 3 && html`<div class="pg pg-l or-body">
         </ul>
       </div>
       ${prose(d.key, b, { cols: 2, end })}
+      <div class="or-zero" aria-hidden="true">
+        <span class="or-wall-lt"></span>
+        <div class="or-wall-card">
+          <span class="or-wall-lock">Open Remote 1.1.0</span>
+          <span class="or-wall-price"><b>$0</b><span class="or-wall-per">/week</span></span>
+        </div>
+      </div>
       ${cont(spread)}
     </div>`}`;
 }

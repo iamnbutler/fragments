@@ -20,6 +20,7 @@
 
   --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --f-serif: 'Source Serif 4', Georgia, serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --ease-press: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-roller: cubic-bezier(0.65, 0, 0.25, 1);
@@ -196,11 +197,34 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .prose-cols .b-li { text-indent: 0 !important; padding-left: 1.1em; position: relative; }
 .prose-cols .b-li::before { content: ''; position: absolute; left: 0.2em; top: 0.62em; width: 0.38em; height: 0.38em; background: var(--dk); border-radius: 50%; }
 .prose-cols .b-q { font-style: italic; text-indent: 0 !important; padding-left: 0.8em; border-left: 0.3em solid var(--lt); margin: 0.5em 0; }
-.prose-cols .b-code {
-  margin: 0.6em 0; padding: 0.7em 0.8em; background: var(--toner); color: var(--newsprint);
-  font: 500 0.72em/1.45 ui-monospace, 'SF Mono', Menlo, monospace; white-space: pre; overflow: hidden;
-  break-inside: avoid; box-shadow: 0.3em 0.3em 0 var(--lt);
+/* code: a listing printed on a yellow screen, whatever the spread's inks
+   (a red or blue screen would swallow tokens in that ink), under a key rule
+   tabbed with its language; tokens pick out in the spot inks */
+.b-code {
+  position: relative; margin: 0.8em 0 0.9em; padding: 1.2em 0.85em 0.7em;
+  background: color-mix(in srgb, var(--yellow) 34%, transparent);
+  border-top: 0.2em solid var(--black); color: var(--black);
+  font: 400 0.76em/1.5 var(--f-mono); tab-size: 2;
+  white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid;
+  text-indent: 0 !important;
 }
+.b-code[data-lang]::before, .prose-article pre[data-lang]::before {
+  content: attr(data-lang); position: absolute; top: 0; left: 0.85em;
+  padding: 0.2em 0.55em 0.25em; background: var(--black); color: var(--newsprint);
+  font: 700 0.74em/1 var(--f-display); letter-spacing: 0.16em; text-transform: uppercase;
+}
+.b-code code { font: inherit; background: none; padding: 0; }
+/* a code span in running text */
+.ic {
+  font: 400 0.84em/1 var(--f-mono); padding: 0 0.16em; border-radius: 0.1em;
+  background: color-mix(in srgb, var(--yellow) 22%, transparent); hyphens: none;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.t-kw, .t-key, .t-flag, .t-attr { color: var(--blue); }
+.t-str, .t-num, .t-err { color: var(--red); }
+.t-kw, .t-ty, .t-cmd, .t-err { font-weight: 600; }
+.t-attr, .t-com { font-style: italic; }
+.t-com, .t-dim, .t-pun { opacity: 0.58; }
 .cols-2 { columns: 2; column-gap: 2.4cqw; column-fill: auto; }
 .dropcap > p:first-child::first-letter {
   float: left;
@@ -304,6 +328,9 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .cv-gl { opacity: 0; }
 .cv.is-live .cv-gl { opacity: 1; }
 .cv.is-live .cv-img { visibility: hidden; }
+.cv-drawn .cv-plate { background: var(--black); cursor: default; }
+/* the core sits left of the fold; keep it there as the plate crops */
+.cv-drawn .cv-img { object-position: 30% 60%; }
 .cv-plate:focus-visible { outline: 3px solid var(--blue); outline-offset: -6px; }
 /* the caption line under the image, where an edition is numbered and signed */
 .cv-pencil {
@@ -353,9 +380,28 @@ a.reg-in:hover::before { transform: translate(calc(var(--mx) * 4), calc(var(--my
 .bio-av:hover { rotate: -1deg; }
 .bio-av .plate { aspect-ratio: 1; }
 .bio-lede { margin: 0; max-width: 21ch; font: 500 clamp(18px, 2.55cqw, 40px)/1.12 var(--f-serif); letter-spacing: -0.01em; text-wrap: pretty; }
-.bio-r { display: flex; flex-direction: column; gap: 1.5cqw; padding-top: 6cqw; }
-.bio-p { margin: 0; max-width: 34ch; font: 400 clamp(14px, 1.45cqw, 22px)/1.4 var(--f-serif); text-wrap: pretty; }
-.bio-first::first-letter { font-weight: 700; }
+.bio-r { display: flex; flex-direction: column; gap: 1.5cqw; padding-top: 6cqw; position: relative; }
+.bio-from {
+  margin: 0 0 1.2cqw; display: flex; justify-content: space-between; padding-top: 0.7cqw; border-top: 0.35cqw solid var(--black);
+  font: 600 var(--fs-cap)/1 var(--f-display); letter-spacing: 0.14em; text-transform: uppercase;
+}
+.bio-from span + span { color: var(--blue); }
+.bio-p { margin: 0; max-width: 30ch; font: 400 clamp(15px, 1.75cqw, 27px)/1.36 var(--f-serif); text-wrap: pretty; }
+.bio-first { font-size: clamp(17px, 2.05cqw, 32px); line-height: 1.28; max-width: 26ch; }
+.bio-first::first-letter { font-weight: 700; color: var(--red); }
+/* struck across the letter like a postmark, overprinting what's under it */
+.bio-postmark {
+  position: absolute; right: 0.4cqw; top: 31cqw; width: 30cqw; height: auto; z-index: 1; pointer-events: none;
+  color: var(--red); mix-blend-mode: multiply; rotate: -9deg; opacity: 0.88;
+}
+.bio-postmark .pm-wave, .bio-postmark .pm-rule { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; }
+.bio-postmark .pm-thin { stroke-width: 1.6; }
+.bio-postmark text { fill: currentColor; font-family: var(--f-display); font-weight: 700; }
+.bio-postmark .pm-ring { font-size: 15.5px; letter-spacing: 0.16em; }
+.bio-postmark .pm-mid { font-size: 22px; letter-spacing: 0.12em; }
+.bio-postmark .pm-yr { font-size: 30px; letter-spacing: 0.04em; font-weight: 800; }
+.js-press .sheet:not(.is-printed) .bio-postmark { opacity: 0; scale: 1.15; }
+.js-press .sheet .bio-postmark { transition: opacity 0.25s 1.2s, scale 0.25s 1.2s var(--ease-press); }
 .bio-cv { margin: auto 0 0; border-top: 0.3cqw solid var(--dk); }
 .bio-cv div { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 0.8em; align-items: baseline; padding: 0.7em 0; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
 .bio-cv dt { font: 500 var(--fs-cap)/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.18em; }
@@ -598,6 +644,8 @@ dialog.fold-ask::before {
   .zine .bio-lede { font-size: 24px; }
   .zine .bio-av { position: relative; inset: auto; order: 3; align-self: flex-end; width: 30vw; margin-top: -8px; }
   .zine .bio-r { padding-top: 32px; gap: 18px; }
+  .zine .bio-postmark { position: relative; inset: auto; width: 76vw; align-self: flex-end; margin: -10px -8px -14px 0; }
+  .zine .bio-first { font-size: 21px; }
   .zine .bio-p, .zine .bio-bye { font-size: 18px; }
   .zine .bio-cv { margin-top: 10px; border-top-width: 3px; }
   .zine .bio-cv dd { font-size: 16px; }
@@ -680,11 +728,12 @@ dialog.fold-ask::before {
 .prose-article li { margin: 0.25em 0; }
 .prose-article li::marker { color: var(--dk); font-family: var(--f-display); font-weight: 800; }
 .prose-article img { max-width: 100%; height: auto; mix-blend-mode: multiply; margin: 1.6em 0; }
-.prose-article code { font-size: 0.86em; background: rgb(0 0 0 / 0.07); padding: 0.1em 0.3em; }
+.prose-article code { font: 400 0.84em var(--f-mono); background: color-mix(in srgb, var(--yellow) 34%, transparent); padding: 0.08em 0.3em; }
 .prose-article pre {
-  background: var(--toner) !important; color: var(--newsprint);
-  padding: 1.2em 1.4em; overflow-x: auto; font-size: 0.8em; line-height: 1.5;
-  margin: 1.6em 0; box-shadow: 6px 6px 0 var(--lt);
+  position: relative; margin: 1.8em 0; padding: 1.3em 1.3em 1.1em; overflow-x: auto;
+  background: color-mix(in srgb, var(--yellow) 34%, transparent) !important;
+  border-top: 4px solid var(--black); color: var(--black);
+  font: 400 0.8em/1.55 var(--f-mono); tab-size: 2;
 }
 .prose-article pre code { background: none; padding: 0; font-size: inherit; }
 .prose-article hr { border: 0; border-top: 4px solid var(--dk); margin: 2.4em 0; width: 30%; }
@@ -712,6 +761,29 @@ dialog.fold-ask::before {
 .jump-a .prose-cols, .jump-b .prose-cols { flex: 1; min-height: 0; overflow: hidden; }
 .layout-notes .jump-b { grid-column: 7 / 11; padding-right: 1.8cqw; }
 .layout-notes .jump-b .prose-cols { columns: 1; }
+/* the foot of a piece's last jump, when there's room under the text */
+.jump-tail { display: none; }
+.has-room .jump-tail { display: contents; }
+.sheet:not(.has-more-room) .jt-ill { display: none; }
+.jt-ill {
+  position: relative; z-index: 1; grid-row: 1 / -1; grid-column: 1 / 7; align-self: end; justify-self: center;
+  height: min(22cqw, calc(var(--room) - 9cqw)); aspect-ratio: var(--ar); margin-bottom: 8cqw;
+  background: var(--fig) center / contain no-repeat; rotate: -6deg; mix-blend-mode: multiply;
+}
+.jt-bar {
+  grid-row: 1 / -1; grid-column: 7 / 13; align-self: end; margin: 0 4.4cqw 4.6cqw 3cqw; position: relative;
+  display: flex; align-items: center; gap: 0; height: 2cqw;
+}
+.jt-bar i { flex: 1; height: 100%; background: var(--c); mix-blend-mode: multiply; }
+.jt-bar .jt-over { background: color-mix(in srgb, var(--lt) 60%, transparent); box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--dk) 60%, transparent); }
+.jt-reg {
+  flex: none; width: 2cqw; height: 2cqw; margin: 0 1cqw; border-radius: 50%; border: 0.12cqw solid var(--black);
+  background: linear-gradient(var(--black), var(--black)) center / 100% 0.12cqw no-repeat, linear-gradient(var(--black), var(--black)) center / 0.12cqw 100% no-repeat;
+}
+.jt-slug {
+  position: absolute; left: 4cqw; top: calc(100% + 0.7cqw); white-space: nowrap;
+  font: 600 clamp(8px, 0.62cqw, 11px)/1 var(--f-display); letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.7;
+}
 .jump-from { margin: 0 0 1.6cqw; display: flex; align-items: baseline; justify-content: space-between; gap: 2cqw; font: 700 var(--fs-cap)/1.2 var(--f-display); }
 .jump-from a { text-decoration: none; border-bottom: 0.25em solid var(--lt); }
 .jump-slug { font-weight: 300; font-variation-settings: 'wdth' 125; text-transform: uppercase; letter-spacing: 0.24em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }

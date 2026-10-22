@@ -1,76 +1,31 @@
 /* desktop-tools: its own spreads. */
 
 .dt-open { gap: 1cqw; }
-.dt-window {
-  position: relative; flex: none; height: 17cqw; border: 0.22cqw solid var(--dk); border-radius: 0.8cqw;
-  overflow: hidden; background: var(--sheet);
-}
-.dt-lights { position: absolute; top: 0; left: 0; right: 0; height: 2cqw; border-bottom: 0.22cqw solid var(--dk); display: flex; gap: 0.6cqw; align-items: center; padding-left: 0.9cqw; }
-.dt-lights i { width: 0.9cqw; height: 0.9cqw; border-radius: 50%; border: 0.18cqw solid var(--dk); }
-.dt-screen {
-  position: absolute; inset: 2cqw 0 0;
-  background: radial-gradient(circle, var(--dk) 38%, transparent 41%) 0 0 / 0.62cqw 0.62cqw;
-  -webkit-mask: linear-gradient(115deg, #000 10%, transparent 75%);
-  mask: linear-gradient(115deg, #000 10%, transparent 75%);
-  mix-blend-mode: multiply;
-}
-.dt-cursor {
-  position: absolute; right: 22%; top: 46%; width: 2.6cqw; height: 3.6cqw; background: var(--lt);
-  clip-path: polygon(0 0, 0 78%, 24% 60%, 42% 100%, 56% 94%, 39% 55%, 72% 55%);
-  mix-blend-mode: multiply;
-}
-.dt-title { --fs: 6.6cqw; margin-top: -9.6cqw; position: relative; z-index: 2; padding-left: 1cqw; }
+/* the agent on strings, hung from the head of the page; the title is set over its foot */
+.dt-strings { flex: none; width: 80%; margin: -1.6cqw 0 0 4%; }
+.dt-title { --fs: 6.6cqw; margin-top: -3.2cqw; position: relative; z-index: 2; }
 .dt-deck { display: flex; flex-direction: column; gap: 0.8cqw; }
-.dt-manual { gap: 1cqw; }
-.dt-fig1 { flex: none; }
-.dt-fig1 figcaption { max-width: 90%; }
-.dt-hook { position: relative; flex: none; display: flex; gap: 2.2cqw; padding: 1cqw 0 0 1.6cqw; }
-.dt-hook-bar { position: absolute; left: 0; right: 30%; top: 0.4cqw; height: 0.4cqw; background: var(--black); border-radius: 0.2cqw; }
-.dt-key { display: flex; flex-direction: column; align-items: center; gap: 0.2cqw; transform-origin: 50% -0.6cqw; rotate: calc((var(--i) - 1) * 7deg); color: var(--black); font: 800 clamp(9px, 0.78cqw, 12px)/1 var(--f-display); letter-spacing: 0.12em; text-transform: uppercase; }
-.dt-key svg { width: 6cqw; height: 2.4cqw; rotate: -90deg; translate: 0 1.6cqw; margin-bottom: 3.2cqw; fill: none; stroke: var(--lt); stroke-width: 2.6; mix-blend-mode: multiply; }
+.dt-body { gap: 1.2cqw; }
+.dt-fig { flex: none; }
+.dt-fig figcaption { max-width: 92%; }
+.dt-fig-foot { margin-top: auto; }
 
-.dt-strip { grid-column: 1 / 9; grid-row: 1 / 4; padding: 3.6cqw 1cqw 0 4cqw; }
-.dt-strip .inkfig-plates { aspect-ratio: 3.15; }
-.dt-strip .inkfig-key { background-size: 100% auto; background-position: center top; }
-.dt-body { grid-column: 1 / 9; grid-row: 4 / 7; padding: 0.4cqw 1.5cqw 0.6cqw 4cqw; display: flex; flex-direction: column; gap: 0.6cqw; min-height: 0; }
-.dt-body .cols-3 { columns: 3; column-gap: 2.4cqw; column-fill: auto; }
-.dt-stamps { grid-column: 1 / 9; grid-row: 7 / 9; padding: 0.6cqw 2cqw 3.8cqw 4cqw; display: flex; align-items: center; gap: 2.4cqw; }
-.dt-out {
-  display: inline-block; padding: 0.4cqw 1cqw; border: 0.3cqw solid currentColor; outline: 0.12cqw solid currentColor; outline-offset: 0.24cqw;
-  font: 900 clamp(13px, 1.7cqw, 26px)/1 var(--f-display); letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--blue); filter: url(#rubber); mix-blend-mode: multiply; rotate: -4deg;
+/* what the rewrite bought, as the numbers the text gives: before struck in blue, after in red */
+.dt-nums { flex: none; margin: 2.4cqw 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 2cqw; border-top: 0.35cqw solid var(--black); padding-top: 1.2cqw; }
+.dt-num { display: grid; grid-template-columns: auto 1fr; align-items: baseline; column-gap: 0.8cqw; }
+.dt-num-was {
+  font: 800 3.2cqw/1 var(--f-display); font-variation-settings: 'wdth' 70; color: var(--blue);
+  text-decoration: line-through; text-decoration-color: var(--black); text-decoration-thickness: 0.22cqw;
 }
-.out-refused { rotate: 3deg; }
-.out-unknown {
-  position: relative; font-size: clamp(18px, 2.9cqw, 44px); color: var(--black); border-color: var(--red); outline-color: var(--red); rotate: -7deg;
-  text-shadow: calc(var(--mx) * 2) calc(var(--my) * 2) 0 var(--red);
-}
-.dt-stack { grid-column: 9 / 13; grid-row: 1 / 9; position: relative; }
-.dt-stack .inkfig { position: absolute; left: 0; right: 2cqw; top: 6cqw; }
-.dt-war { position: absolute; left: 1cqw; right: 3cqw; bottom: 3.6cqw; display: grid; grid-template-columns: 1fr 1fr; gap: 1cqw; }
-.dt-war-note {
-  margin: 0; padding: 0.6cqw 0.8cqw; background: var(--copy); box-shadow: 0 1px 2px rgb(0 0 0 / 0.2); rotate: -1.5deg;
-  font: 400 clamp(10px, 0.85cqw, 13px)/1.3 var(--f-display);
-}
-.dt-war-note + .dt-war-note { rotate: 1.8deg; }
-.dt-war-no { display: block; color: var(--red); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.9em; margin-bottom: 0.2cqw; }
+.dt-num-is { font: 900 8cqw/0.86 var(--f-display); font-variation-settings: 'wdth' 62; letter-spacing: -0.02em; color: var(--red); mix-blend-mode: multiply; }
+.dt-num-is small { font-size: 0.26em; letter-spacing: 0.06em; margin-left: 0.2em; color: var(--black); }
+.dt-num-what { grid-column: 1 / -1; margin-top: 0.6cqw; font: 500 var(--fs-cap)/1.25 var(--f-display); }
+.dt-nums figcaption { grid-column: 1 / -1; margin-top: 1cqw; }
 
 /* phones: one page at a time */
 @media (max-width: 760px) {
-  .zine .dt-strip, .zine .dt-body, .zine .dt-stamps { padding: 20px; margin: 0; }
-  .zine .dt-window { height: 44vw; }
-  .zine .dt-title { --fs: 13vw; font-size: 13vw; margin-top: -20vw; }
-  .zine .dt-key { font-size: 10px; }
-  .zine .dt-key svg { width: 46px; height: 18px; translate: 0 12px; margin-bottom: 24px; }
-  .zine .dt-strip { padding-top: 44px; }
-  .zine .dt-strip .inkfig-plates { aspect-ratio: 1.6; }
-  .zine .dt-strip .inkfig-key { background-size: contain; }
-  .zine .dt-body .cols-3 { columns: 1; }
-  .zine .dt-stamps { flex-wrap: wrap; }
-  .zine .dt-out { font-size: 18px; } .zine .out-unknown { font-size: 28px; }
-  .zine .dt-stack { padding: 20px; }
-  .zine .dt-stack .inkfig { position: static; width: 100%; translate: none; rotate: none; }
-  .zine .dt-stack .inkfig figcaption { position: static; }
-  .zine .dt-war { position: static; margin-top: 14px; grid-template-columns: 1fr; }
-  .zine .dt-war-note { font-size: 13px; }
+  .zine .dt-strings { width: 100%; margin: 0; }
+  .zine .dt-title { --fs: 13vw; font-size: 13vw; margin-top: -2vw; }
+  .zine .dt-nums { grid-template-columns: 1fr; gap: 16px; margin-top: 18px; padding-top: 14px; }
+  .zine .dt-num-was { font-size: 28px; } .zine .dt-num-is { font-size: 64px; }
 }

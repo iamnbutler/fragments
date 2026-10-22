@@ -1,4 +1,4 @@
-import type { Piece } from './pieces';
+import type { Piece, PieceImage } from './pieces';
 import { SPOT, PAPERS } from './spectrum';
 
 /**
@@ -43,6 +43,8 @@ export interface JumpItem {
   title: string;
   text: string;
   href: string;
+  /** a piece's figures; its title illustration closes the last jump */
+  images?: PieceImage[];
 }
 
 /**
@@ -57,9 +59,9 @@ export interface Design {
 }
 export const DESIGNS: Record<string, Design> = {
   'desktop-tools': {
-    caps: [1500, 2300],
-    inks: [['blue', 'red'], ['blue', 'red']],
-    paper: ['newsprint', 'bone'],
+    caps: [1300, 2600, 5200],
+    inks: [['blue', 'red'], ['blue', 'red'], ['blue', 'red']],
+    paper: ['newsprint', 'bone', 'newsprint'],
   },
   'jev-demos': {
     caps: [1300, 1700],
@@ -67,7 +69,7 @@ export const DESIGNS: Record<string, Design> = {
     paper: ['newsprint', 'newsprint'],
   },
   'open-remote': {
-    caps: [1900, 3000, 2700, 3000],
+    caps: [1100, 3000, 2700, 3900],
     inks: [['yellow', 'black'], ['blue', 'black'], ['red', 'black'], ['yellow', 'red']],
     paper: ['newsprint', 'bone', 'newsprint', 'bone'],
   },
@@ -281,8 +283,11 @@ export const REF_MARK = /\u0001(\d+)\u0001/g;
 
 // --- text helpers ------------------------------------------------------------
 
-/** Plain inline text from a line of markdown. */
-export function inline(md: string): string {
+/** Marks a code span in body text; render/riso.ts sets it in mono. */
+export const CODE_MARK = '\u0002';
+
+/** Plain inline text from a line of markdown; `marks` keeps code spans marked. */
+export function inline(md: string, marks = false): string {
   return md
     .replace(/u2013/g, '–')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
@@ -291,7 +296,7 @@ export function inline(md: string): string {
     .split(/(`[^`]*`)/g)
     .map((part) =>
       part.startsWith('`')
-        ? part.slice(1, -1)
+        ? (marks ? CODE_MARK + part.slice(1, -1) + CODE_MARK : part.slice(1, -1))
         : part
             .replace(/\*\*(.*?)\*\*/g, '$1')
             .replace(/\*(.*?)\*/g, '$1')
@@ -341,6 +346,8 @@ export const INK_HEX: Record<Ink | 'paper', string> = { ...SPOT, paper: PAPERS.n
 export interface Block {
   t: 'p' | 'h' | 'li' | 'code' | 'quote';
   text: string;
+  /** a code block's fence language, if it has one */
+  lang?: string;
 }
 
 /** Essay body as typeset blocks: paragraphs, run-in heads, bullets, code. */
@@ -350,9 +357,10 @@ export function blocks(md: string, title = '', opts: { refs?: boolean } = {}): B
   const parts = md.split(/(```[\s\S]*?```)/g);
   for (const part of parts) {
     if (part.startsWith('```')) {
+      const lang = part.match(/^```(\w*)/)![1] || undefined;
       const code = part.replace(/^```[^\n]*\n?/, '').replace(/```$/, '').trimEnd();
       const lines = code.split('\n').slice(0, 7);
-      if (lines.join('').trim()) out.push({ t: 'code', text: lines.join('\n') + (code.split('\n').length > 7 ? '\n…' : '') });
+      if (lines.join('').trim()) out.push({ t: 'code', lang, text: lines.join('\n') + (code.split('\n').length > 7 ? '\n…' : '') });
       continue;
     }
     for (const raw of part.split(/\n\s*\n/)) {
@@ -365,17 +373,17 @@ export function blocks(md: string, title = '', opts: { refs?: boolean } = {}): B
         continue;
       }
       if (/^>/.test(b)) {
-        out.push({ t: 'quote', text: inline(b.replace(/^>\s?/gm, ' ')) });
+        out.push({ t: 'quote', text: inline(b.replace(/^>\s?/gm, ' '), true) });
         continue;
       }
       if (/^([-*+]|\d+\.)\s/.test(b)) {
         for (const li of b.split(/\n(?=\s*(?:[-*+]|\d+\.)\s)/)) {
-          const t = inline(li.replace(/^\s*(?:[-*+]|\d+\.)\s+/, '').replace(/\n\s*/g, ' '));
+          const t = inline(li.replace(/^\s*(?:[-*+]|\d+\.)\s+/, '').replace(/\n\s*/g, ' '), true);
           if (t) out.push({ t: 'li', text: t });
         }
         continue;
       }
-      const t = inline(b.replace(/\n/g, ' '));
+      const t = inline(b.replace(/\n/g, ' '), true);
       if (t && t !== title) out.push({ t: 'p', text: t });
     }
   }

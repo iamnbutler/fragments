@@ -91,15 +91,11 @@ export function pressRun() {
     live[i].scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
   });
 
-  // Flats and the cover press wait until the page has loaded and gone idle:
-  // the cover's still is the largest paint, and the press only reprints it.
+  // Flats wait until the page has loaded and gone idle: the cover is the
+  // largest paint.
   afterLoad(() => {
     // ── flats: every spread at once ─────────────────────────────────────
     import('./flats').then((m) => m.flats(sheets));
-
-    // ── cover: a proof of one of Nate's renders ─────────────────────────
-    const cover = document.querySelector<HTMLElement>('.sheet[data-kind="cover"]');
-    if (cover) import('./cover-press').then((m) => m.coverPress(cover)).catch(() => {});
   });
 }
 

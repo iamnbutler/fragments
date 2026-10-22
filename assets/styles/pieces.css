@@ -63,6 +63,3 @@
   .zine .dr-kicker { font-size: 11px; }
   .zine .dr-dek { font-size: 18px; }
 }
-
-/* code inside poured prose wraps instead of running out of its column */
-.dr-prose pre.b-code { white-space: pre-wrap; overflow-wrap: anywhere; font-size: clamp(8.5px, 0.74cqw, 12px); }
