@@ -57,9 +57,9 @@ export interface Design {
 }
 export const DESIGNS: Record<string, Design> = {
   'desktop-tools': {
-    caps: [1500, 2300],
-    inks: [['blue', 'red'], ['blue', 'red']],
-    paper: ['newsprint', 'bone'],
+    caps: [1300, 2600, 5200],
+    inks: [['blue', 'red'], ['blue', 'red'], ['blue', 'red']],
+    paper: ['newsprint', 'bone', 'newsprint'],
   },
   'jev-demos': {
     caps: [1300, 1700],

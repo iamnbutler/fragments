@@ -53,6 +53,30 @@ function pour(frames: HTMLElement[]) {
   for (const f of frames) f.style.maxHeight = '';
   fill(frames);
   balance(frames);
+  level(frames);
+}
+
+/**
+ * On a designed spread the text usually ends partway down its last frame,
+ * one column full and the next empty. Shorten that frame alone until the
+ * text only just fits, so its columns end level.
+ */
+function level(frames: HTMLElement[]) {
+  const last = [...frames].reverse().find((f) => f.childElementCount > 0);
+  if (!last || last.closest('[data-kind="jump"]') || overflows(last)) return;
+  if (getComputedStyle(last).columnCount === 'auto') return;
+  const full = last.clientHeight;
+  const fits = (k: number) => {
+    last.style.maxHeight = `${Math.ceil(full * k)}px`;
+    return !overflows(last);
+  };
+  let lo = 0.1, hi = 1;
+  for (let i = 0; i < 8; i++) {
+    const mid = (lo + hi) / 2;
+    if (fits(mid)) hi = mid;
+    else lo = mid;
+  }
+  fits(hi);
 }
 
 /**

@@ -329,32 +329,39 @@
     "height": 320
   },
   "figs/desktop-tools/fig-1-boundary": {
-    "key": "figs/desktop-tools/fig-1-boundary.f00686afdf.svg",
+    "key": "figs/desktop-tools/fig-1-boundary.2bcfe13b53.svg",
     "type": "image/svg+xml",
-    "bytes": 281882,
-    "width": 990,
-    "height": 650
+    "bytes": 231873,
+    "width": 1000,
+    "height": 620
   },
   "figs/desktop-tools/fig-2-loop": {
-    "key": "figs/desktop-tools/fig-2-loop.cf9faabd6a.svg",
+    "key": "figs/desktop-tools/fig-2-loop.3e2818f348.svg",
     "type": "image/svg+xml",
-    "bytes": 228352,
-    "width": 960,
-    "height": 560
+    "bytes": 237075,
+    "width": 1000,
+    "height": 640
   },
   "figs/desktop-tools/fig-3-stack-to-port": {
-    "key": "figs/desktop-tools/fig-3-stack-to-port.34c015389b.svg",
+    "key": "figs/desktop-tools/fig-3-stack-to-port.318535fa00.svg",
     "type": "image/svg+xml",
-    "bytes": 172393,
+    "bytes": 145946,
     "width": 1000,
-    "height": 520
+    "height": 560
   },
   "figs/desktop-tools/fig-4-handover": {
-    "key": "figs/desktop-tools/fig-4-handover.f724bdff43.svg",
+    "key": "figs/desktop-tools/fig-4-handover.229c36e35f.svg",
     "type": "image/svg+xml",
-    "bytes": 254569,
+    "bytes": 158744,
     "width": 1000,
-    "height": 660
+    "height": 590
+  },
+  "figs/desktop-tools/ill-1-strings": {
+    "key": "figs/desktop-tools/ill-1-strings.f3b9c4be44.svg",
+    "type": "image/svg+xml",
+    "bytes": 6409,
+    "width": 960,
+    "height": 640
   },
   "figs/desktop-tools/ill-1-ticket": {
     "key": "figs/desktop-tools/ill-1-ticket.1ee718acbc.svg",
