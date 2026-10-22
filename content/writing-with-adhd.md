@@ -16,6 +16,14 @@ facts:
     value: Geraint Evans, “This is how an ADHD person actually writes.” (May 2021)
   - label: The four traits
     value: Impulsivity, attention to detail, being socially inappropriate, feeling misunderstood
+images:
+  - src: figs/writing-with-adhd/fig-1-four-traits
+    alt: "Geraint Evans's four traits set in order along a line with four dots, each numbered with his gloss quoted beneath: 1, Impulsivity, 'I need to say this now!'; 2, Attention to detail, 'Yeah, probably fine, ill just post it.'; 3, Being socially inappropriate, 'Sorry, why do I have to change how I communicate when you clearly understand what I mean?'; 4, Feeling misunderstood, which has no gloss and whose dot is ringed with the note 'the biggest one'."
+    caption: "Fig. 1. Geraint Evans's four traits, with his glosses in his words. The fourth is the one this essay calls the biggest."
+  - src: figs/writing-with-adhd/ill-1-odd-piece
+    alt: "A jigsaw puzzle seen from above with one gap of an unusual shape, two small knobs on every side; below it, an ordinary loose piece and, outlined in teal, the odd-shaped piece that fits the gap exactly."
+  - src: figs/writing-with-adhd/ill-2-drafts-then-sent
+    alt: "A small stack of pages, the top one covered in lines of writing, several struck through and one rewritten above with a caret, and a teal paper plane leaving the stack along a dashed arc."
 ---
 
 This is a response to Geraint Evans's “[This is how an ADHD person actually writes.](https://web.archive.org/web/20210614140757/https://www.geraint.works/post/adhd-writing-styles)” Start there if you can.

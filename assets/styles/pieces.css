@@ -2,29 +2,21 @@
 
 /* ─── shared parts ───────────────────────────────────────────────────── */
 
-/* a line drawing printed as an ink plate: the file is the mask, the ink is
-   whatever the page asks for */
+/* a figure, drawn in the four spot inks on transparent and overprinted on
+   the spread's paper */
 .inkfig { margin: 0; min-width: 0; }
 .inkfig-plates { position: relative; width: 100%; aspect-ratio: var(--ar); }
-.inkfig-key, .inkfig-ghost {
+.inkfig-key {
   position: absolute; inset: 0;
-  background: var(--ink);
-  -webkit-mask: var(--fig) center / contain no-repeat;
-  mask: var(--fig) center / contain no-repeat;
+  background: var(--fig) center / contain no-repeat;
   mix-blend-mode: multiply;
 }
-.inkfig-ghost {
-  background: var(--ghost);
-  opacity: 0.6;
-  /* fixed out of register: diagrams don't follow the pointer, so they stay readable */
-  transform: translate(calc(var(--mx) * 1.6), calc(var(--my) * 1.6));
-}
-.fit-cover .inkfig-key, .fit-cover .inkfig-ghost { -webkit-mask-size: cover; mask-size: cover; }
+.fit-cover .inkfig-key { background-size: cover; }
 /* the looping version, once it's loaded and the figure is in view */
 @media (prefers-reduced-motion: no-preference) {
-  .inkfig.is-playing .inkfig-key { -webkit-mask-image: var(--fig-motion); mask-image: var(--fig-motion); }
+  .inkfig.is-playing .inkfig-key { background-image: var(--fig-motion); }
 }
-.flat .inkfig .inkfig-key { -webkit-mask-image: var(--fig); mask-image: var(--fig); }
+.flat .inkfig .inkfig-key { background-image: var(--fig); }
 .inkfig figcaption { margin-top: 0.6cqw; }
 
 .layout-dr .pg { display: flex; flex-direction: column; gap: 1.2cqw; }

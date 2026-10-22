@@ -61,7 +61,7 @@ export async function piecePage(d: Piece): Promise<SinglePage> {
   const sections = parts.map((h, i) => ({ html: h, figs: i === 0 ? [] : figs.slice((i - 1) * per, i * per) }));
   const leftover = figs.slice((parts.length - 1) * per);
   const fig = (im: Piece['images'][number]) => im.figure
-    ? inkFig(im, { ink: 'dk', class: 'draft-fig' })
+    ? inkFig(im, { class: 'draft-fig' })
     : html`<figure class="draft-shot single-plate">
         ${plate({ media: plateOf(im)!, inks: [lt, dk], fit: 'contain', proof: true })}
         <figcaption class="cap">${im.caption} <button class="proof-toggle" type="button" aria-pressed="false">Show original color</button></figcaption>

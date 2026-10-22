@@ -1,0 +1,16 @@
+/* spool: its own spreads. */
+
+/* the thread across the head of every spread, one bead per event */
+.sp-thread {
+  position: absolute; z-index: 3; top: 2.4cqw; left: 4cqw; right: 4cqw; height: 0.8cqw;
+  background:
+    radial-gradient(circle, var(--dk) 0.3cqw, transparent 0.34cqw) 0 50% / 3.1cqw 100% repeat-x,
+    linear-gradient(var(--dk), var(--dk)) 0 50% / 100% 0.12cqw no-repeat;
+  opacity: 0.85;
+}
+.sp-open { justify-content: space-between; gap: 1.4cqw; }
+.sp-head { display: flex; flex-direction: column; gap: 1cqw; }
+.sp-title { --fs: 8.4cqw; position: relative; z-index: 2; }
+.sp-spool { flex: 1 1 0; min-height: 0; }
+.sp-spool .inkfig-plates { height: 100%; aspect-ratio: auto; }
+.sp-fig { flex: none; }

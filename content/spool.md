@@ -29,6 +29,21 @@ facts:
     value: Event files in the repo. No server, no database
   - label: Pairs with
     value: Telephone, for messages between agents
+images:
+  - src: figs/spool/fig-1-two-places
+    alt: "A repository on one machine, drawn as a main checkout and two linked worktrees, each with its own .spool/events/ folder. Arrows from all three point down to one live board at .git/spool/, which holds events/ (tasks, notes, completions) and .local/events/ (claims and renewals, which never leave the board). An arrow labelled spool sync copies durable events from the board up into one worktree's .spool/events/, which you then commit. Across a dashed line, push and pull carry that folder to a clone on another machine, whose own .git/spool/ board starts with the history and then makes its own claims."
+    caption: "Fig. 1. Two places. Every worktree shares one live board in .git/spool; Git carries only what spool sync exports, and claims stay on the machine."
+  - src: figs/spool/fig-2-lease
+    alt: "A timeline with three lanes: agent A, the task and agent B. Agent A runs next, which claims the task with token A, renews twice, then goes quiet. Fifteen minutes after the last renewal the lease runs out and the task is ready again. Agent B runs next and gets a new token, token B. Later agent A calls complete --token A; the call is crossed out with claim_conflict and exit 2."
+    caption: "Fig. 2. A lease, not a lock. A worker that goes quiet loses the task, and its old token can't touch the new claim."
+  - src: figs/spool/fig-3-append
+    alt: "Two halves. On the left, January: two branches each add a line to the end of the same daily log, 2026-01-25.jsonl, and the merged file holds Git's conflict markers around the two lines; Git stops and both lines are kept by hand. On the right, September: each branch adds its own file, named by timestamp and SHA-256 hash (20260915T191011…-c9d4321d….jsonl and 20260915T191106…-1d8f9603….jsonl); merging adds both files to .spool/events/, and replay sorts every event by time."
+    caption: "Fig. 3. Appending to one file conflicts. Adding new files doesn't."
+  - src: figs/spool/fig-4-race
+    alt: "Two panels. Top: sixteen agents, agent-0 to agent-15, each run claim against one task; one arrow reaches the task and the other fifteen stop short with a cross, getting claim_conflict and exit 2. Bottom: sixteen agents each run next against eight tasks; eight arrows each reach a different task and the other eight agents get null."
+    caption: "Fig. 4. The test that defines 'works'. Sixteen processes claim one task and exactly one wins; sixteen calls to next share eight tasks, each handed out once."
+  - src: figs/spool/ill-1-spool
+    alt: "A wooden spool of thread. Its loose end runs off the spool and across the page, knotted at intervals, and ends in a small tag tied on with a loop of string."
 ---
 
 Spool is a task tracker that lives in the repository it tracks. There's no server and no web app. Tasks, notes and completions are events, written as small JSON files under `.spool/` and committed with the code. A command line tool reads and writes them, and a terminal UI shows them.

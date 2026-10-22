@@ -28,15 +28,22 @@ facts:
   - label: TVs
     value: Google TV and Android TV, Roku, Samsung, LG
 images:
-  - src: drafts/open-remote/fig-3-subject
-    alt: "Line drawing in two halves. Before: a phone and a Mac both present certificates whose subject reads CN equals FreeRemote. The TV has one row in its table for that subject; the Mac's pairing overwrites the phone's, and the phone is asked for a code again. After: the subjects read FreeRemote 3FA9C2E1 and FreeRemote 7B04D96A, and the TV keeps two rows."
-    caption: "Fig. 1. The display name was never the key. The TV appears to keep one pairing per certificate subject."
-  - src: drafts/open-remote/fig-4-camera
-    alt: "Line drawing of a living room seen from above. The TV on one wall shows a pairing request with the code 9F8ECF. Across the room a laptop's camera points at it. Arrows run from the laptop to a note labeled a frame, to Claude reading the code, to a file at /tmp/atv-code, to the harness, which polls the file and sends the code to the TV."
-    caption: "Fig. 2. Closing the loop. The MacBook's camera faced the TV, so the agent could read its own pairing codes."
-  - src: drafts/open-remote/fig-5-playnow
-    alt: "A timeline from zero to forty-five seconds. A tap on a pinned show starts it. The phone finds the TV's Jellyfin session by matching its IP address, launches Jellyfin only if nothing is playing, and sends PlayNow. PlayNow repeats every eight seconds, at 0, 8, 16 and 24, until the server reports the asked-for item as now playing, which ends the line with a check. A wall at 45 seconds is labeled give up and say so."
-    caption: "Fig. 3. Play, and keep asking. The TV's Jellyfin app only hears commands while it's in front, so the phone repeats itself until the server shows the right thing playing."
+  - src: figs/open-remote/fig-1-code
+    alt: "Diagram in two halves divided by a dashed line. On the TV, the screen shows the code 9F8ECF; the first two digits, 9F, are bracketed as the check and the last four, 8ECF, as hashed. A dashed arrow carries the code into the app, where it is typed in. 8ECF goes into a SHA-256 box along with the modulus and exponent of the app's certificate and of the TV's certificate. The first byte of the hash, 9F, and the code's first byte, 9F, meet at a decision circle marked equals. On a match the hash goes to the TV; on no match the app shows \"That code doesn't match.\", a typo caught before the TV sees it."
+    caption: "Fig. 1. The code checks itself. Its first byte has to match the first byte of the hash, so the app catches a typo without asking the TV."
+  - src: figs/open-remote/fig-2-subject
+    alt: "Two stacked panels. First fix, a name each: an iPhone and a Mac present certificates with different names, Open Remote (iPhone 1C3B) and Open Remote (Mac AA28), but the same subject, CN=FreeRemote. Both arrows lead to a single row in the TV's pairings, FreeRemote, where iPhone is struck out and replaced by Mac; the iPhone has to pair again. Second fix, a subject each: the subjects become CN=FreeRemote 3FA9C2E1 and CN=FreeRemote 7B04D96A, and the TV keeps a row for each, so nobody is asked for a code twice."
+    caption: "Fig. 2. The display name was never the key. The TV appears to keep one pairing per certificate subject."
+  - src: figs/open-remote/fig-3-camera
+    alt: "Plan of the living room from above, beside a loop of steps. The TV on the top wall shows the client name Open Remote (Mac AA28) and the code 9F8ECF. Across the room, past the sofa, the MacBook's camera faces the TV, shown as a dashed line of sight. An arrow carries a full-resolution frame from the MacBook to Claude, which reads the code and writes it to the file /tmp/atv-code. The harness polls that file every 300 ms. The harness has two arrows to the TV: one that starts pairing and one that submits the code."
+    caption: "Fig. 3. Closing the loop. The MacBook's camera faced the TV, so the agent could read its own pairing codes."
+  - src: figs/open-remote/fig-4-playnow
+    alt: "Flow and timeline. A tap on a pin leads to finding the TV's Jellyfin session by its IP address, then a dashed, optional step: open Jellyfin and wait 4 seconds, only if nothing is playing. A timeline then starts at 0 seconds. Dots every 1.5 seconds show the app asking the server what is playing. PlayNow is sent at the start and again whenever more than 8 seconds pass without it playing, four sends in this example. A check marks the moment the server shows the asked-for item, which ends it. A dashed line runs on to a hatched wall at 45 seconds: give up, and say so."
+    caption: "Fig. 4. Play, and keep asking. The TV's Jellyfin app only hears commands while it's in front, so the phone repeats itself until the server shows the right thing playing."
+  - src: figs/open-remote/ill-1-paywall
+    alt: "A phone showing a paywall: a TV remote at the top, lines of copy, a large price followed by one small word that is circled, a big Continue button and fine print. Behind it hangs a wall calendar with a coin in the same column of every week."
+  - src: figs/open-remote/ill-2-pocket
+    alt: "A phone tucked into the back pocket of a pair of jeans, its screen showing a remote's direction pad with the centre button picked out."
 ---
 
 One Saturday morning in October I went looking for a TV remote app. The one I found is free to download. Then comes a paywall, with a price laid out like any other subscription until you get to the last word: $12 a week.

@@ -28,19 +28,17 @@ export function plateOf(im: PieceImage | undefined): PlateMedia | undefined {
 }
 
 /**
- * A line drawing printed as an ink plate. The figures are black strokes on
- * transparent, so the file becomes a mask and the ink is whatever colour the
- * page asks for. An optional ghost plate in a second ink sits out of register.
- * A figure with a looping version plays it while it's in view.
+ * A figure: drawn in the four spot inks on transparent, so it overprints the
+ * spread's paper like another run through the press. A figure with a looping
+ * version plays it while it's in view.
  */
-export function inkFig(image: PieceImage | undefined, p: { ink?: string; ghost?: string; class?: string; style?: string; caption?: boolean | string; fit?: 'contain' | 'cover' } = {}): Html {
+export function inkFig(image: PieceImage | undefined, p: { class?: string; style?: string; caption?: boolean | string; fit?: 'contain' | 'cover' } = {}): Html {
   if (!image) return raw('');
-  const { ink = 'dk', ghost, style = '', caption = true, fit = 'contain' } = p;
+  const { style = '', caption = true, fit = 'contain' } = p;
   const ar = image.aspect ?? 1.4;
   const cap = typeof caption === 'string' ? caption : caption ? image.caption : undefined;
-  return html`<figure${attr('class', cls('inkfig', `fit-${fit}`, image.motion && 'has-motion', p.class))}${attr('data-motion', image.motion)}${attr('style', `--ar:${ar.toFixed(4)};--fig:url("${image.src}");${image.motion ? `--fig-motion:url("${image.motion}");` : ''}--ink:var(--${ink});${ghost ? `--ghost:var(--${ghost});` : ''}${style}`)}>
+  return html`<figure${attr('class', cls('inkfig', `fit-${fit}`, image.motion && 'has-motion', p.class))}${attr('data-motion', image.motion)}${attr('style', `--ar:${ar.toFixed(4)};--fig:url("${image.src}");${image.motion ? `--fig-motion:url("${image.motion}");` : ''}${style}`)}>
     <div class="inkfig-plates" role="img"${attr('aria-label', image.alt)}>
-      ${ghost && html`<span class="inkfig-ghost" aria-hidden="true"></span>`}
       <span class="inkfig-key" aria-hidden="true"></span>
     </div>
     ${cap && html`<figcaption class="cap">${cap}</figcaption>`}

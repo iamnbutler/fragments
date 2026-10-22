@@ -23,6 +23,12 @@ facts:
     value: A 128 × 512 black frame with a 1px white border, and 256 or 512 marks
   - label: Saved
     value: Six Automator JSON files, free to reuse
+images:
+  - src: figs/fig-gen/fig-1-one-gen
+    alt: "Left, the saved gen3 recipe as a nested stack of Automator actions: Create frame 128 x 512, black; inside it Add stroke 1 px white, inside, and Repeat 256 times; inside the repeat, Set variable sin = Math.sin(2 * index), Set variable cos = Math.cos(index), and Create frame 1 x 1, white, x = index, y = cos * (index + sin) + 256, which is highlighted. An arrow leads to three tall frames showing the marks after 16, 64 and 256 passes: a wedge of dots opens rightward from the middle of the left edge. In the 64-pass frame the dot for index 63 is ringed and labelled x 63, y 318.4. Under the first frame an arrow along the bottom reads x = index; under the last, a bracket marks faint dots beyond the frame's right edge, labelled x 128 to 255 falls outside the frame."
+    caption: "Fig. 1. The gen3 recipe and what it draws. Each pass places one mark: x is the index, y is a function of it. The dots are computed from the saved recipe."
+  - src: figs/fig-gen/ill-1-graphing-calculator
+    alt: "A school graphing calculator, tilted slightly, its screen showing a teal sine curve whose swing grows from left to right."
 ---
 
 I spent an evening trying out Automator, a new Figma plugin from [Jordan Singer](https://twitter.com/jsngr). You build a design out of stacked actions (create a frame, repeat, set a variable) instead of drawing it. A minimal generative series, made from pixels and equations, seemed like a good way to find out what it could do.

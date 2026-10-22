@@ -258,6 +258,335 @@
     "width": 960,
     "height": 510
   },
+  "figs/autoblog/fig-1-checkpoint": {
+    "key": "figs/autoblog/fig-1-checkpoint.3bc958942d.svg",
+    "type": "image/svg+xml",
+    "bytes": 339223,
+    "width": 960,
+    "height": 700
+  },
+  "figs/autoblog/fig-2-two-passes": {
+    "key": "figs/autoblog/fig-2-two-passes.6dbe5dbc0f.svg",
+    "type": "image/svg+xml",
+    "bytes": 330863,
+    "width": 960,
+    "height": 720
+  },
+  "figs/autoblog/fig-3-recall": {
+    "key": "figs/autoblog/fig-3-recall.9892948a56.svg",
+    "type": "image/svg+xml",
+    "bytes": 373013,
+    "width": 960,
+    "height": 720
+  },
+  "figs/autoblog/fig-4-timeline": {
+    "key": "figs/autoblog/fig-4-timeline.d6ae554c8f.svg",
+    "type": "image/svg+xml",
+    "bytes": 242254,
+    "width": 960,
+    "height": 700
+  },
+  "figs/autoblog/ill-1-card": {
+    "key": "figs/autoblog/ill-1-card.4678a1a1ec.svg",
+    "type": "image/svg+xml",
+    "bytes": 10294,
+    "width": 320,
+    "height": 320
+  },
+  "figs/design-docs-v2/fig-1-words-in-files": {
+    "key": "figs/design-docs-v2/fig-1-words-in-files.4198aa0d5a.svg",
+    "type": "image/svg+xml",
+    "bytes": 322204,
+    "width": 960,
+    "height": 660
+  },
+  "figs/design-docs-v2/ill-1-branching-road": {
+    "key": "figs/design-docs-v2/ill-1-branching-road.375590ae00.svg",
+    "type": "image/svg+xml",
+    "bytes": 7015,
+    "width": 960,
+    "height": 540
+  },
+  "figs/design-docs-v2/ill-2-many-hands": {
+    "key": "figs/design-docs-v2/ill-2-many-hands.31c0e54f0e.svg",
+    "type": "image/svg+xml",
+    "bytes": 3344,
+    "width": 320,
+    "height": 320
+  },
+  "figs/desktop-tools/fig-1-boundary": {
+    "key": "figs/desktop-tools/fig-1-boundary.f00686afdf.svg",
+    "type": "image/svg+xml",
+    "bytes": 281882,
+    "width": 990,
+    "height": 650
+  },
+  "figs/desktop-tools/fig-2-loop": {
+    "key": "figs/desktop-tools/fig-2-loop.cf9faabd6a.svg",
+    "type": "image/svg+xml",
+    "bytes": 228352,
+    "width": 960,
+    "height": 560
+  },
+  "figs/desktop-tools/fig-3-stack-to-port": {
+    "key": "figs/desktop-tools/fig-3-stack-to-port.34c015389b.svg",
+    "type": "image/svg+xml",
+    "bytes": 172393,
+    "width": 1000,
+    "height": 520
+  },
+  "figs/desktop-tools/fig-4-handover": {
+    "key": "figs/desktop-tools/fig-4-handover.f724bdff43.svg",
+    "type": "image/svg+xml",
+    "bytes": 254569,
+    "width": 1000,
+    "height": 660
+  },
+  "figs/desktop-tools/ill-1-ticket": {
+    "key": "figs/desktop-tools/ill-1-ticket.1ee718acbc.svg",
+    "type": "image/svg+xml",
+    "bytes": 3004,
+    "width": 320,
+    "height": 320
+  },
+  "figs/ferrotype/fig-1-tree": {
+    "key": "figs/ferrotype/fig-1-tree.34aa10c206.svg",
+    "type": "image/svg+xml",
+    "bytes": 319254,
+    "width": 1020,
+    "height": 760
+  },
+  "figs/ferrotype/fig-2-registry": {
+    "key": "figs/ferrotype/fig-2-registry.52ffdc4953.svg",
+    "type": "image/svg+xml",
+    "bytes": 189713,
+    "width": 1040,
+    "height": 420
+  },
+  "figs/ferrotype/fig-3-compile-error": {
+    "key": "figs/ferrotype/fig-3-compile-error.add216626a.svg",
+    "type": "image/svg+xml",
+    "bytes": 363950,
+    "width": 1000,
+    "height": 930
+  },
+  "figs/ferrotype/fig-4-drift": {
+    "key": "figs/ferrotype/fig-4-drift.9ccaad667f.svg",
+    "type": "image/svg+xml",
+    "bytes": 257429,
+    "width": 1020,
+    "height": 690
+  },
+  "figs/ferrotype/fig-5-timeline": {
+    "key": "figs/ferrotype/fig-5-timeline.163b2e61f9.svg",
+    "type": "image/svg+xml",
+    "bytes": 222230,
+    "width": 1000,
+    "height": 410
+  },
+  "figs/ferrotype/ill-1-tintype": {
+    "key": "figs/ferrotype/ill-1-tintype.156c232443.svg",
+    "type": "image/svg+xml",
+    "bytes": 7523,
+    "width": 320,
+    "height": 320
+  },
+  "figs/fig-gen/fig-1-one-gen": {
+    "key": "figs/fig-gen/fig-1-one-gen.e11cafa738.svg",
+    "type": "image/svg+xml",
+    "bytes": 190059,
+    "width": 960,
+    "height": 600
+  },
+  "figs/fig-gen/ill-1-graphing-calculator": {
+    "key": "figs/fig-gen/ill-1-graphing-calculator.7dc953feae.svg",
+    "type": "image/svg+xml",
+    "bytes": 6964,
+    "width": 320,
+    "height": 320
+  },
+  "figs/jev-demos/fig-1-call": {
+    "key": "figs/jev-demos/fig-1-call.72ab923cfa.svg",
+    "type": "image/svg+xml",
+    "bytes": 332581,
+    "width": 960,
+    "height": 700
+  },
+  "figs/jev-demos/fig-2-modes": {
+    "key": "figs/jev-demos/fig-2-modes.6ce44e710d.svg",
+    "type": "image/svg+xml",
+    "bytes": 181592,
+    "width": 960,
+    "height": 640
+  },
+  "figs/jev-demos/fig-3-budget": {
+    "key": "figs/jev-demos/fig-3-budget.e9502e1c4e.svg",
+    "type": "image/svg+xml",
+    "bytes": 392355,
+    "width": 960,
+    "height": 855
+  },
+  "figs/jev-demos/fig-4-pairs": {
+    "key": "figs/jev-demos/fig-4-pairs.f8b9e87b1f.svg",
+    "type": "image/svg+xml",
+    "bytes": 179581,
+    "width": 960,
+    "height": 640
+  },
+  "figs/jev-demos/ill-1-stopwatch": {
+    "key": "figs/jev-demos/ill-1-stopwatch.832f035aad.svg",
+    "type": "image/svg+xml",
+    "bytes": 9014,
+    "width": 320,
+    "height": 320
+  },
+  "figs/open-remote/fig-1-code": {
+    "key": "figs/open-remote/fig-1-code.b1620d7b02.svg",
+    "type": "image/svg+xml",
+    "bytes": 156054,
+    "width": 1000,
+    "height": 620
+  },
+  "figs/open-remote/fig-2-subject": {
+    "key": "figs/open-remote/fig-2-subject.6b06886f12.svg",
+    "type": "image/svg+xml",
+    "bytes": 295724,
+    "width": 1000,
+    "height": 640
+  },
+  "figs/open-remote/fig-3-camera": {
+    "key": "figs/open-remote/fig-3-camera.6edaba8f27.svg",
+    "type": "image/svg+xml",
+    "bytes": 151001,
+    "width": 1000,
+    "height": 610
+  },
+  "figs/open-remote/fig-4-playnow": {
+    "key": "figs/open-remote/fig-4-playnow.6354526aa7.svg",
+    "type": "image/svg+xml",
+    "bytes": 169793,
+    "width": 1000,
+    "height": 380
+  },
+  "figs/open-remote/ill-1-paywall": {
+    "key": "figs/open-remote/ill-1-paywall.bcdc688f15.svg",
+    "type": "image/svg+xml",
+    "bytes": 4396,
+    "width": 480,
+    "height": 560
+  },
+  "figs/open-remote/ill-2-pocket": {
+    "key": "figs/open-remote/ill-2-pocket.9a3f24f922.svg",
+    "type": "image/svg+xml",
+    "bytes": 2917,
+    "width": 320,
+    "height": 320
+  },
+  "figs/spool/fig-1-two-places": {
+    "key": "figs/spool/fig-1-two-places.aed7beefee.svg",
+    "type": "image/svg+xml",
+    "bytes": 283559,
+    "width": 960,
+    "height": 530
+  },
+  "figs/spool/fig-2-lease": {
+    "key": "figs/spool/fig-2-lease.afd690df8e.svg",
+    "type": "image/svg+xml",
+    "bytes": 110288,
+    "width": 960,
+    "height": 400
+  },
+  "figs/spool/fig-3-append": {
+    "key": "figs/spool/fig-3-append.356b0c8f62.svg",
+    "type": "image/svg+xml",
+    "bytes": 328511,
+    "width": 1000,
+    "height": 600
+  },
+  "figs/spool/fig-4-race": {
+    "key": "figs/spool/fig-4-race.80903efe16.svg",
+    "type": "image/svg+xml",
+    "bytes": 127353,
+    "width": 1000,
+    "height": 590
+  },
+  "figs/spool/ill-1-spool": {
+    "key": "figs/spool/ill-1-spool.30e5966064.svg",
+    "type": "image/svg+xml",
+    "bytes": 5117,
+    "width": 480,
+    "height": 560
+  },
+  "figs/tasks/fig-1-shapes": {
+    "key": "figs/tasks/fig-1-shapes.3cd8409372.svg",
+    "type": "image/svg+xml",
+    "bytes": 154324,
+    "width": 1000,
+    "height": 730
+  },
+  "figs/tasks/fig-2-barrier": {
+    "key": "figs/tasks/fig-2-barrier.a23f41f446.svg",
+    "type": "image/svg+xml",
+    "bytes": 254061,
+    "width": 1000,
+    "height": 790
+  },
+  "figs/tasks/fig-3-tick": {
+    "key": "figs/tasks/fig-3-tick.0bf0463eca.svg",
+    "type": "image/svg+xml",
+    "bytes": 242688,
+    "width": 1060,
+    "height": 630
+  },
+  "figs/tasks/fig-4-charter": {
+    "key": "figs/tasks/fig-4-charter.0e947509b1.svg",
+    "type": "image/svg+xml",
+    "bytes": 281632,
+    "width": 1000,
+    "height": 700
+  },
+  "figs/tasks/fig-5-merged": {
+    "key": "figs/tasks/fig-5-merged.9c86d8a3f2.svg",
+    "type": "image/svg+xml",
+    "bytes": 131306,
+    "width": 1000,
+    "height": 560
+  },
+  "figs/tasks/ill-1-lid": {
+    "key": "figs/tasks/ill-1-lid.1081166248.svg",
+    "type": "image/svg+xml",
+    "bytes": 1767,
+    "width": 320,
+    "height": 320
+  },
+  "figs/tasks/ill-2-scroll": {
+    "key": "figs/tasks/ill-2-scroll.a0d446ac6d.svg",
+    "type": "image/svg+xml",
+    "bytes": 8761,
+    "width": 320,
+    "height": 320
+  },
+  "figs/writing-with-adhd/fig-1-four-traits": {
+    "key": "figs/writing-with-adhd/fig-1-four-traits.fddfda80dc.svg",
+    "type": "image/svg+xml",
+    "bytes": 176969,
+    "width": 960,
+    "height": 320
+  },
+  "figs/writing-with-adhd/ill-1-odd-piece": {
+    "key": "figs/writing-with-adhd/ill-1-odd-piece.f401f17068.svg",
+    "type": "image/svg+xml",
+    "bytes": 49432,
+    "width": 480,
+    "height": 560
+  },
+  "figs/writing-with-adhd/ill-2-drafts-then-sent": {
+    "key": "figs/writing-with-adhd/ill-2-drafts-then-sent.6997646f57.svg",
+    "type": "image/svg+xml",
+    "bytes": 3207,
+    "width": 320,
+    "height": 320
+  },
   "fonts/archivo": {
     "key": "fonts/archivo.4c98b9d490.woff2",
     "type": "font/woff2",

@@ -31,6 +31,24 @@ facts:
     value: 258 Rust tests, all passing
   - label: Install
     value: "cargo add ferro-type"
+images:
+  - src: figs/ferrotype/fig-1-tree
+    alt: "The Message enum from ferrotype's test suite, with variants Ping, Text(String), Binary(Vec<u8>) and Error { code, message }, becomes through Message::typescript() a TypeDef tree: a Named node (name \"Message\", module \"derive_enum\") whose def is a Union of four Objects, each tagged with a type literal; that tree renders to the TypeScript union { type: \"Ping\" } | { type: \"Text\"; value: string } | { type: \"Binary\"; value: number[] } | { type: \"Error\"; code: number; message: string }."
+    caption: "Fig. 1. Rust in, a tree in the middle, TypeScript out. Nothing is a string until render(). The real output is one line, wrapped here at ; and |."
+  - src: figs/ferrotype/fig-2-registry
+    alt: "Every type with #[derive(TS)] adds itself to TYPESCRIPT_TYPES, a linkme slice filled by the linker; TypeRegistry::from_distributed() reads it and keeps one entry per name; ferro-type-gen adds export, skips unchanged writes and writes types.ts, or one file per module. A dashed side path shows registering each type by hand with registry.register::<T>(), which is what agent-foundry does: 14 types, listed twice."
+    caption: "Fig. 2. How a derived type reaches the file: added at link time, or by hand."
+  - src: figs/ferrotype/fig-3-compile-error
+    alt: "A struct field marked #[ts(index = Profile, key = nonexistent)] makes the derive write a hidden const holding fn _validate_indexed_access_0(__val: &Profile) { let _ = &__val.nonexistent; }, so cargo build fails with error E0609, no field `nonexistent` on type `&Profile`, noting the available fields login and email. Beside it, key = login builds and renders username: Profile[\"login\"]."
+    caption: "Fig. 3. A TypeScript mistake, caught by the Rust compiler."
+  - src: figs/ferrotype/fig-4-drift
+    alt: "agent-foundry's SessionDetail struct has #[serde(flatten)] on its info: ApiSession field. serde reads the attribute and sends JSON with id, number, title and the other session fields at the top level next to messages, with no info key; ferrotype reads only #[ts] attributes, so the generated type is export type SessionDetail = { info: ApiSession; messages: ApiMessage[] }. Nothing caught it because the UI only reads messages."
+    caption: "Fig. 4. Two readers of the same struct, and only one of them saw serde's attribute."
+  - src: figs/ferrotype/fig-5-timeline
+    alt: "Every ferrotype commit as a dot on a timeline, marked as a worker agent, the mayor, or under Nate's name: 28 commits on January 9, 5 on the 10th, 39 on the 11th, 3 on the 12th, then 3 on March 19. Notes mark the RPC brief and the decision to start the core over on January 9, the RPC code removed and five crates.io releases from 0.1.0 to 0.2.0 in under nine hours on January 11, the pause on January 12, and agent-foundry adopting 0.2.0 on February 18."
+    caption: "Fig. 5. Three days, 78 commits. One dot per commit, by author date (EST); January 11 shaded."
+  - src: figs/ferrotype/ill-1-tintype
+    alt: "A small cased tintype: a brass mat with a beaded oval window and, on the dark iron plate inside, a single piece of metal type facing the camera, its face a reversed F."
 ---
 
 When a Rust service talks to a TypeScript client, I want the client's types generated from the server's, so the two can't drift apart. There are crates for this, but I couldn't find one that wrote good types. They compile, but they use hardly any of what makes TypeScript good, and you wouldn't want to have written them by hand.

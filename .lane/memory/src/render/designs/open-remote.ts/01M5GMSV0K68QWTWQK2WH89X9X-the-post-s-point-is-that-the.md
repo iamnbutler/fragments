@@ -4,8 +4,9 @@ anchor: function openRemote
 created: 2026-10-22T01:49:53Z
 norm: '1'
 sig: cab237abb4ba79f6
-body_hash: 800035b93fc08815
-raw_hash: ac5bd7125bf21fcb
+body_hash: 07af144adfe31879
+raw_hash: f7f670936bb3ad62
+vouched: 2026-10-22T02:21:07Z
 lines: 12-136
 supersedes: 01M5GMSJG9AXTFKE2EMFYRXBG6
 ---

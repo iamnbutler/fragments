@@ -1,8 +1,5 @@
 /* open-remote: its own spreads. */
 
-/* an orange for the paywall, from the Printmaking ramp; nothing else here uses it */
-.dr-open-remote { --orange: #ff6000; }
-
 /* the one day it took, 08:00 to 20:00, across the head of the spread;
    the hours this spread covers are inked in */
 .or-clock {
@@ -42,7 +39,7 @@
 .dr-open-remote-3 .or-fig { width: 74%; }
 .dr-open-remote-2 .pg-r .or-fig { width: 78%; }
 
-/* the paywall, pulled out in orange, with the word that matters marked up like a proof */
+/* the paywall, pulled out in yellow, with the word that matters marked up like a proof */
 .or-wall {
   position: relative; flex: none; margin: auto 0; display: grid; grid-template-columns: 27cqw 1fr;
   column-gap: 1.8cqw; align-items: start;
@@ -54,7 +51,7 @@
 }
 .or-wall-card {
   position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.9cqw;
-  padding: 2.4cqw 2.6cqw 2cqw; background: var(--orange); mix-blend-mode: multiply;
+  padding: 2.4cqw 2.6cqw 2cqw; background: var(--yellow); mix-blend-mode: multiply;
 }
 /* the light plate, out of register under it */
 .or-wall-lt {
@@ -66,25 +63,25 @@
 .or-wall-price b { font: 900 12cqw/0.8 var(--f-display); font-variation-settings: 'wdth' 62; letter-spacing: -0.03em; }
 .or-wall-price span { font: 800 clamp(11px, 1.6cqw, 26px)/1 var(--f-display); align-self: flex-start; padding-top: 0.4cqw; }
 .or-wall-price .or-wall-per { position: relative; align-self: baseline; padding: 0; font: 500 clamp(8px, 0.8cqw, 13px)/1 var(--f-display); }
-/* the proofreader's ring, in teal, round the word that does the damage */
+/* the proofreader's ring, in red, round the word that does the damage */
 .or-wall-per::after {
-  content: ''; position: absolute; inset: -0.9cqw -1cqw -0.8cqw -0.9cqw; border: 0.24cqw solid var(--teal);
+  content: ''; position: absolute; inset: -0.9cqw -1cqw -0.8cqw -0.9cqw; border: 0.24cqw solid var(--red);
   border-radius: 50%; rotate: -8deg; filter: url(#rubber);
 }
 .or-wall-go {
-  align-self: stretch; padding: 0.8cqw; border-radius: 99px; background: #000; color: var(--orange); text-align: center;
+  align-self: stretch; padding: 0.8cqw; border-radius: 99px; background: var(--black); color: var(--yellow); text-align: center;
   font: 800 clamp(10px, 1cqw, 16px)/1 var(--f-display); letter-spacing: 0.1em; text-transform: uppercase;
 }
 .or-wall-fine { font: 400 clamp(8px, 0.62cqw, 11px)/1.3 var(--f-display); color: #000; opacity: 0.75; }
 .or-note {
-  margin: 7.4cqw 0 0; position: relative; color: var(--teal); rotate: -3deg;
+  margin: 7.4cqw 0 0; position: relative; color: var(--red); rotate: -3deg;
   font: italic 400 clamp(14px, 1.7cqw, 27px)/1.12 var(--f-serif); text-wrap: balance;
 }
 .or-note b { font-weight: 700; }
 /* a leader back to the ring */
 .or-note::before {
   content: ''; position: absolute; right: calc(100% + 0.4cqw); top: 0.9cqw; width: 4.6cqw; height: 0.2cqw;
-  background: var(--teal); rotate: 10deg; transform-origin: right center;
+  background: var(--red); rotate: 10deg; transform-origin: right center;
 }
 .layout-dr .or-wall figcaption { grid-column: 1 / -1; margin-top: 2.8cqw; max-width: 30cqw; }
 
