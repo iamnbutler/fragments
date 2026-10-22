@@ -276,7 +276,7 @@ function markRefs(md: string): { md: string; refs: Ref[] } {
         ? part
         : part.replace(/(?<!!)\[([^\]]+)\]\((https?:[^)\s]+)\)/g, (_m, label: string, url: string) => {
             refs.push({ n: refs.length + 1, url, label: inline(label) });
-            return `${label}\u0001${refs.length}\u0001`;
+            return `${LINK_OPEN}${label}\u0001${refs.length}\u0001`;
           }),
     )
     .join('');
@@ -285,6 +285,9 @@ function markRefs(md: string): { md: string; refs: Ref[] } {
 
 /** Marker left in block text where a numbered reference sits. */
 export const REF_MARK = /\u0001(\d+)\u0001/g;
+
+/** Opens a link's label in block text; the reference marker closes it. */
+export const LINK_OPEN = '\u0003';
 
 // --- text helpers ------------------------------------------------------------
 
@@ -354,11 +357,14 @@ export interface Block {
   text: string;
   /** a code block's fence language, if it has one */
   lang?: string;
+  /** where each numbered reference in the text links to */
+  urls?: Record<number, string>;
 }
 
 /** Essay body as typeset blocks: paragraphs, run-in heads, bullets, code. */
 export function blocks(md: string, title = '', opts: { refs?: boolean } = {}): Block[] {
-  if (opts.refs) md = markRefs(md).md;
+  const marked = opts.refs ? markRefs(md) : null;
+  if (marked) md = marked.md;
   const out: Block[] = [];
   const parts = md.split(/(```[\s\S]*?```)/g);
   for (const part of parts) {
@@ -392,6 +398,10 @@ export function blocks(md: string, title = '', opts: { refs?: boolean } = {}): B
       const t = inline(b.replace(/\n/g, ' '), true);
       if (t && t !== title) out.push({ t: 'p', text: t });
     }
+  }
+  if (marked) for (const b of out) {
+    const ns = [...b.text.matchAll(REF_MARK)].map((m) => Number(m[1]));
+    if (ns.length) b.urls = Object.fromEntries(ns.map((n) => [n, marked.refs[n - 1].url]));
   }
   return out;
 }

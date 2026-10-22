@@ -55,8 +55,8 @@ body {
 a { color: inherit; }
 /* Quiet links: names that are links but print as type, marked by a hairline
    of red that thickens under the pointer or focus. */
-a.ql, .margin-notes a { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--red) 75%, transparent); text-decoration-thickness: 1px; text-underline-offset: 0.18em; transition: text-decoration-color 0.15s; }
-a.ql:hover, a.ql:focus-visible, .margin-notes a:hover, .margin-notes a:focus-visible { text-decoration-color: var(--red); text-decoration-thickness: 0.12em; }
+a.ql, .margin-notes a, .prose-article a { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--red) 75%, transparent); text-decoration-thickness: 1px; text-underline-offset: 0.18em; transition: text-decoration-color 0.15s; }
+a.ql:hover, a.ql:focus-visible, .margin-notes a:hover, .margin-notes a:focus-visible, .prose-article a:hover, .prose-article a:focus-visible { text-decoration-color: var(--red); text-decoration-thickness: 0.12em; }
 img, video, svg { display: block; max-width: 100%; }
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
@@ -719,8 +719,6 @@ dialog.fold-ask::before {
   text-shadow: calc(var(--mx) * 1.6) calc(var(--my) * 1.6 + 1px) 0 var(--lt);
 }
 .prose-article h3 { font-size: 1.15em; font-weight: 750; font-variation-settings: 'wdth' 90; }
-.prose-article a { text-decoration-color: var(--lt); text-decoration-thickness: 0.18em; text-underline-offset: 0.12em; }
-.prose-article a:hover { text-decoration-color: var(--dk); }
 .prose-article blockquote {
   margin: 1.6em 0; padding: 0.2em 0 0.2em 1em; border-left: 0.5em solid var(--lt);
   font-style: italic; font-size: 1.12em;

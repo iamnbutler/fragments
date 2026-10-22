@@ -31,7 +31,7 @@ images:
     alt: "A school graphing calculator, tilted slightly, its screen showing a teal sine curve whose swing grows from left to right."
 ---
 
-I spent an evening trying out Automator, a new Figma plugin from [Jordan Singer](https://twitter.com/jsngr). You build a design out of stacked actions (create a frame, repeat, set a variable) instead of drawing it. A minimal generative series, made from pixels and equations, seemed like a good way to find out what it could do.
+I spent an evening trying out Automator, a new [Figma](https://www.figma.com) plugin from [Jordan Singer](https://twitter.com/jsngr). You build a design out of stacked actions (create a frame, repeat, set a variable) instead of drawing it. A minimal generative series, made from pixels and equations, seemed like a good way to find out what it could do.
 
 ![Twenty-six gens in two rows: tall black frames with thin white borders, each holding a different scatter of short white dashes. Some form chevrons and fans that open from one edge, some trace arcs, one collapses into a single horizontal line.](media:posts/fig-gen/1)
 

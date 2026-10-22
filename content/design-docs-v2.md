@@ -39,7 +39,7 @@ images:
 
 Design Docs is a guide for early-career designers. It's meant to give them a roadmap: how to improve their craft, put a portfolio together, and get their first job in the industry, or the job they're chasing.
 
-Version two is out. It's a new site built in Next.js, the content has been through another pass, and you can [read it here](https://design-docs.vercel.app).
+Version two is out. It's a new site built in [Next.js](https://nextjs.org), the content has been through another pass, and you can [read it here](https://design-docs.vercel.app).
 
 ## What's in it
 
@@ -47,13 +47,13 @@ There's no single right way into this industry, and the guide says so on its fir
 
 The sections run in order: build a foundation, discover the roles, have work to show, have a portfolio, talk about your work, and further reading. Most of the advice is the kind I wish I'd had early. Don't over-invest in your website: spend about a week on a first portfolio, and only build something elaborate once you have at least three strong projects. Don't use placeholder content in your designs. Show, don't tell. A long write-up doesn't make a better project.
 
-Everything is CC0, which means public domain. Anyone can use any of it for anything, including copying it word for word into something commercial. I think education belongs in the public domain without strings attached.
+Everything is [CC0](https://creativecommons.org/publicdomain/zero/1.0/), which means public domain. Anyone can use any of it for anything, including copying it word for word into something commercial. I think education belongs in the public domain without strings attached.
 
 ## Why rebuild it
 
-The first version went up in November 2021, built in Nuxt in about five days. Every section was a Vue page, with the words written straight into the markup. That was fine while I was the only one writing it, and it got in the way of anyone else.
+The first version went up in November 2021, built in [Nuxt](https://nuxt.com) in about five days. Every section was a [Vue](https://vuejs.org) page, with the words written straight into the markup. That was fine while I was the only one writing it, and it got in the way of anyone else.
 
-In version two the words live in seven MDX files in a `content` folder, and one template renders them. If you want to fix a paragraph you edit a text file, not a component. Most of the work since has gone into making the project easy to contribute to: a short `CONTRIBUTING.md`, a TODO list in the README, and tasks broken down over the next few versions so there's always something clear to pick up.
+In version two the words live in seven [MDX](https://mdxjs.com) files in a `content` folder, and one template renders them. If you want to fix a paragraph you edit a text file, not a component. Most of the work since has gone into making the project easy to contribute to: a short `CONTRIBUTING.md`, a [TODO list](https://github.com/iamnbutler/design-docs/tree/v2.0.0#todo) in the README, and tasks broken down over the next few versions so there's always something clear to pick up.
 
 ## Who I want writing it
 
@@ -61,7 +61,7 @@ I don't want this to stay one designer's opinions. I'd like it to show work from
 
 ## How to help
 
-Everything is open for contributions. Send a pull request, open an issue, or start a discussion on GitHub. If you'd rather not use GitHub, `CONTRIBUTING.md` has an email address, and content, links, reviews and feedback are all welcome that way too.
+Everything is open for contributions. Send a pull request, open an issue, or [start a discussion](https://github.com/iamnbutler/design-docs/discussions) on GitHub. If you'd rather not use GitHub, `CONTRIBUTING.md` has an email address, and content, links, reviews and feedback are all welcome that way too.
 
 I'd like Design Docs to become a resource students and new designers can use wherever they are.
 

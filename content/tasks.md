@@ -47,7 +47,7 @@ images:
     alt: "A long paper scroll unrolling from a roll at the top, curving down the page and covered in short lines of writing, with one dashed seam across it."
 ---
 
-Tasks is a server that runs on my Mac. It reads a repository's GitHub issues, hands them to Claude Code agents working in throwaway VMs, and turns what they make into merged pull requests. Beside that pipeline sits an orchestrator: one Claude Code conversation that doesn't end. It reviews the agents' plans, starts builds, lands them and talks to me.
+[Tasks](https://nate.rip/tasks/) is a server that runs on my Mac. It reads a repository's GitHub issues, hands them to [Claude Code](https://claude.com/product/claude-code) agents working in throwaway VMs, and turns what they make into merged pull requests. Beside that pipeline sits an orchestrator: one Claude Code conversation that doesn't end. It reviews the agents' plans, starts builds, lands them and talks to me.
 
 Over five months it collected 719 commits on main, 608 pull requests and 491 issues, and it's about 135,000 lines today. Before that, one commit deleted 81,716 lines. Most of what's interesting about Tasks happened between those two numbers.
 
@@ -74,7 +74,7 @@ Exploring is parallel. A **Scout** takes one issue into a fresh VM and implement
 
 Building is serial. Once a spec is approved, a **Builder** implements it in another fresh VM, without ever seeing the Scout's code. There's exactly one build lane. Approved specs wait for it, and when it frees up, whatever is waiting goes in together as one branch and one pull request.
 
-Two ideas hold this up. The first is the barrier: "Reimplementing from the spec alone is what proves the spec is complete." If the Builder can't get there from the text, the text was missing something. The second is that text composes and branches don't. The resume plan is blunt about it: "at 70+ issues no tool keeps N branches conflict-free, but N documents merge trivially."
+Two ideas hold this up. The first is the barrier: "Reimplementing from the spec alone is what proves the spec is complete." If the Builder can't get there from the text, the text was missing something. The second is that text composes and branches don't. The [resume plan](https://github.com/iamnbutler/tasks/blob/main/docs/plans/2026-08-09-v2-resume.md) is blunt about it: "at 70+ issues no tool keeps N branches conflict-free, but N documents merge trivially."
 
 There's a small rule hiding in the Scout. It keeps NOTES.md as it goes, saved every 30 seconds, and writes SPEC.md only once it has actually concluded. If it dies early, the notes survive, but they never become a spec, because "a half-explored spec in the review queue looks finished." A valid SPEC.md finishes a Scout whatever its exit code. A missing one is the failure.
 
@@ -86,7 +86,7 @@ The orchestrator is the part I find most interesting.
 
 It isn't an agent framework. Every second, the server checks whether anything is waiting for it. If something is, it shells out to headless Claude Code and resumes the same session it resumed last time: one conversation, days long, picking up where it left off. By default the only tool it has is curl, pointed at Tasks' own HTTP API.
 
-It's serial on purpose. The plan that defines it says:
+It's serial on purpose. The [plan that defines it](https://github.com/iamnbutler/tasks/blob/main/docs/plans/2026-08-14-orchestrator-mind.md) says:
 
 > Accumulated context is the product, not an implementation detail. … without it, the platform is N parallel Claude Code sessions with extra steps.
 
@@ -111,27 +111,27 @@ What the orchestrator may do isn't written in its prompt. It's in a table.
 
 The charter has one row per capability, eleven in the code, from `queue_tasks` and `auto_review_specs` to `land_builds` and `dispatch_workers`. Each is set to off, shadow or live, and only I can write the rows. Every turn, the authority section of the prompt is generated from them, and the server enforces the same rows on its endpoints. A comment in the orchestrator explains why: "A prompt sentence is the weakest mechanism this codebase has — the charter exists because authority should not be something a long conversation can talk itself out of."
 
-The interesting part is the defaults. Every capability shipped live. The rejected alternatives are written down: everything off ("wrong safe"), shadow first, daily caps, and a "the human told me to" flag, which "would hand the charter's keys to the thing it governs." Instead of approval gates, every write lands in an append-only decisions ledger to be read afterwards. The README's version: "Oversight happens after the fact, where it's cheap, instead of as pre-approval gates, where it's the bottleneck."
+The interesting part is the defaults. Every capability shipped live. The rejected alternatives are written down: everything off ("wrong safe"), shadow first, daily caps, and a "the human told me to" flag, which "would hand the charter's keys to the thing it governs." Instead of approval gates, every write lands in an append-only decisions ledger to be read afterwards. The [README](https://github.com/iamnbutler/tasks/blob/main/README.md)'s version: "Oversight happens after the fact, where it's cheap, instead of as pre-approval gates, where it's the bottleneck."
 
 Shadow mode got one real day. With `auto_review_specs` in shadow, the orchestrator "wrote a correct and well-argued verdict — and then handed it back as prose for the human to read and re-enter by hand." That's the most expensive setting there is for the one resource that's actually short. The same plan says plainly that tokens aren't the constraint: "the scarce resource is the human's attention, not tokens." Shadow is now only for demoting a capability that misbehaves.
 
-The model has a sharp edge, and the code says so. A write the server can't attribute is recorded as mine, and I'm never gated, so a broken agent credential "does not fail closed, it *escalates*." That's why workers get no curl at all. A comment on the issue that proposed workers, opening with "Orchestrator here.", spelled out what would happen otherwise: a worker with curl and no credential has "full human authority over the entire API."
+The model has a sharp edge, and the code says so. A write the server can't attribute is recorded as mine, and I'm never gated, so a broken agent credential "does not fail closed, it *escalates*." That's why workers get no curl at all. A comment on the [issue that proposed workers](https://github.com/iamnbutler/tasks/issues/1053), opening with "Orchestrator here.", spelled out what would happen otherwise: a worker with curl and no credential has "full human authority over the entire API."
 
 ## Confident and wrong
 
 Give an agent authority and it will sometimes use it wrongly, with complete confidence.
 
-The orchestrator once rewrote a Builder's pull request body from "Implements #N" to "Closes #N" and reported it as a bug fix. The original wording was deliberate. The server neutralizes closing keywords so GitHub won't close an issue just because a pull request merged. The issue that recorded this says: "The orchestrator was confident and wrong, and nothing in the system would have caught it." It had also been counting opened pull requests as shipped work.
+The orchestrator once rewrote a Builder's pull request body from "Implements #N" to "Closes #N" and reported it as a bug fix. The original wording was deliberate. The server neutralizes closing keywords so GitHub won't close an issue just because a pull request merged. The [issue that recorded this](https://github.com/iamnbutler/tasks/issues/820) says: "The orchestrator was confident and wrong, and nothing in the system would have caught it." It had also been counting opened pull requests as shipped work.
 
-That produced a rule that sounds obvious and took two tries: done means shipped. The second try came from #863, a pull request GitHub shows as merged whose work never reached main. It was stacked on another branch and merged into that branch after the branch had already landed. The work was recovered from refs/pull/863/head. Now a task is done only when its pull request is merged *and* the merge commit is an ancestor of trunk, and only that check closes the issue.
+That produced a rule that sounds obvious and took two tries: done means shipped. The second try came from [#863](https://github.com/iamnbutler/tasks/pull/863), a pull request GitHub shows as merged whose work never reached main. It was stacked on another branch and merged into that branch after the branch had already landed. The work was recovered from refs/pull/863/head. Now a task is done only when its pull request is merged *and* the merge commit is an ancestor of trunk, and only that check closes the issue.
 
 ## A laptop is not a server
 
 Tasks runs on a Mac, and Macs sleep.
 
-In #929, a build went out at 03:44 UTC. The lid opened at 12:34, and the build was declared timed out against its 3,600-second budget. It had held the only build lane for nearly nine hours and charged each of three specs a strike for a closed lid. Deadlines now run on two clocks, wall time and awake time. The first fix waived the strike for any sleep over 60 seconds, which meant "a 61-second nap waives the strike for a build that timed out with the lid open," so it got split again.
+In [#929](https://github.com/iamnbutler/tasks/issues/929), a build went out at 03:44 UTC. The lid opened at 12:34, and the build was declared timed out against its 3,600-second budget. It had held the only build lane for nearly nine hours and charged each of three specs a strike for a closed lid. Deadlines now run on two clocks, wall time and awake time. The first fix waived the strike for any sleep over 60 seconds, which meant "a 61-second nap waives the strike for a build that timed out with the lid open," so it got split again.
 
-Under that is the strike rule: a strike is charged for a verdict, and only a verdict. Three strikes reject a task. Infrastructure kept charging them anyway. Agent processes died around 380 seconds in, when the VM's connection dropped mid-response. GitHub had outages. The container runtime stopped. Each became a hold or a retry instead, and agents now resume in the same VM, up to twice, after a dropped connection.
+Under that is the strike rule: a strike is charged for a verdict, and only a verdict. Three strikes reject a task. Infrastructure kept charging them anyway. Agent processes died around 380 seconds in, when the VM's connection dropped mid-response. GitHub had outages. The [container runtime](https://github.com/apple/container) stopped. Each became a hold or a retry instead, and agents now resume in the same VM, up to twice, after a dropped connection.
 
 Some lessons were about deploying more than code:
 
@@ -144,7 +144,7 @@ Some lessons were about deploying more than code:
 
 Through August, Tasks was mostly building Tasks. The Builder opened 91 pull requests, and 81 merged. The pipeline's own identity, Tasks Builder, has 254 commits across branches. When a Builder left work uncommitted, a server step committed it anyway, as "Sweep: work the agent left uncommitted."
 
-Self-hosting had a cost that's easy to miss. CLAUDE.md, the file every agent reads, went from 8,823 characters to 190,413 in seven days, the same seven days the pipeline was building its own repository. That's about 48k tokens on every agent turn. Each lesson had become a rule, and every rule was read every time. It was cut back, and a test now fails if the file passes 20,000 characters. The rule that replaced the sprawl: CLAUDE.md holds universal rules, and the code holds its own reasoning.
+Self-hosting had a cost that's easy to miss. [CLAUDE.md](https://github.com/iamnbutler/tasks/blob/main/CLAUDE.md), the file every agent reads, went from 8,823 characters to 190,413 in seven days, the same seven days the pipeline was building its own repository. That's about 48k tokens on every agent turn. Each lesson had become a rule, and every rule was read every time. It was cut back, and a test now fails if the file passes 20,000 characters. The rule that replaced the sprawl: CLAUDE.md holds universal rules, and the code holds its own reasoning.
 
 That reasoning has a house style. Doc comments and commit messages open with the failure that produced the design, so you could rebuild most of this piece from the source. The comment above the deadline code tells you about the lid. The one above the orchestrator's environment notes tells you about the time an orchestrator was told it had a checkout, "spent a turn reaching for `python3`, `Write` and a heredoc, had all three denied, and reported the denials as a tooling failure. It was right; the prompt was lying to it."
 

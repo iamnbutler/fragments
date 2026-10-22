@@ -51,19 +51,19 @@ images:
     alt: "A small cased tintype: a brass mat with a beaded oval window and, on the dark iron plate inside, a single piece of metal type facing the camera, its face a reversed F."
 ---
 
-When a Rust service talks to a TypeScript client, I want the client's types generated from the server's, so the two can't drift apart. There are crates for this, but I couldn't find one that wrote good types. They compile, but they use hardly any of what makes TypeScript good, and you wouldn't want to have written them by hand.
+When a [Rust](https://www.rust-lang.org) service talks to a [TypeScript](https://www.typescriptlang.org) client, I want the client's types generated from the server's, so the two can't drift apart. There are crates for this, but I couldn't find one that wrote good types. They compile, but they use hardly any of what makes TypeScript good, and you wouldn't want to have written them by hand.
 
-The bar I had in mind was a types package in ace, the collaborative coding app I was working on at GitHub Next. It was written by an engineer who contributes to Svelte's core, and it uses the language well: discriminated unions with a rich `type` tag, template literal IDs like `` `vm-${string}` ``, intersections like `Claude.Todo & { createdAt: UNIX }`, nested names like `VM.Git.State`, and indexed access to keep one type's field in step with another's. I wanted a Rust derive to produce types like those.
+The bar I had in mind was a types package in [ace](https://github.com/githubnext/ace), the collaborative coding app I was working on at GitHub Next. It was written by an engineer who contributes to Svelte's core, and it uses the language well: discriminated unions with a rich `type` tag, template literal IDs like `` `vm-${string}` ``, intersections like `Claude.Todo & { createdAt: UNIX }`, nested names like `VM.Git.State`, and indexed access to keep one type's field in step with another's. I wanted a Rust derive to produce types like those.
 
-[Ferrotype](https://github.com/iamnbutler/ferrotype) is that derive. It's published as `ferro-type`, because someone already had `ferrotype` on crates.io.
+[Ferrotype](https://github.com/iamnbutler/ferrotype) is that derive. It's published as `ferro-type`, because someone already had `ferrotype` on [crates.io](https://crates.io/crates/ferrotype).
 
 ## It started as RPC
 
-It didn't start as a type generator. On January 9 I asked for an RPC library like tRPC, with a Rust server and a TypeScript client. The brief was that the Rust side "generates sophisticated, modern types, with proper unions, no use of `as`, `any`, etc." and to "focus on correctness of types over codebase simplicity."
+It didn't start as a type generator. On January 9 I asked for an RPC library like [tRPC](https://trpc.io), with a Rust server and a TypeScript client. The brief was that the Rust side "generates sophisticated, modern types, with proper unions, no use of `as`, `any`, etc." and to "focus on correctness of types over codebase simplicity."
 
 By that evening it was clear the RPC wasn't the hard part. As I put it then, "the type gen and validation of the type gen is most of the work, and useful beyond the rpc bit." I often want Rust services that talk to TypeScript without RPC at all. So the plan changed: `ferrotype` would be type generation only, and an RPC layer could come later as its own crate. It never did.
 
-The other decision that night was to start over. serde was the model, and rather than refactor the RPC-era code toward it, the core was rewritten from scratch, "so we aren't trying to both do api design AND keep all the things we've built so far working at the same time." The RPC traits and tests were deleted two days later, once the new core could stand on its own.
+The other decision that night was to start over. [serde](https://serde.rs) was the model, and rather than refactor the RPC-era code toward it, the core was rewritten from scratch, "so we aren't trying to both do api design AND keep all the things we've built so far working at the same time." The RPC traits and tests were deleted two days later, once the new core could stand on its own.
 
 ## A tree, not a string
 
@@ -148,17 +148,17 @@ That's a broken TypeScript reference caught by `cargo build`, before any TypeScr
 
 ## Built by a swarm
 
-Almost none of this was typed by me. I ran it through Gas Town, a multi-agent setup in which a coordinating "mayor" session files tasks, a pool of worker agents picks them up, and a merge queue lands their branches. The commit log reads like a cast list: furiosa, nux, slit, dementus, rictus, toast. There are 78 commits, 39 of them on January 11 alone.
+Almost none of this was typed by me. I ran it through [Gas Town](https://github.com/gastownhall/gastown), a multi-agent setup in which a coordinating "mayor" session files tasks, a pool of worker agents picks them up, and a merge queue lands their branches. The commit log reads like a cast list: furiosa, nux, slit, dementus, rictus, toast. There are 78 commits, 39 of them on January 11 alone.
 
-That Sunday covered serde parity, the README, the crates.io release, auto-registration, the generator crate, template literals, namespaces, intersections, indexed access, `Prettify`, and renaming the derive from `TypeScript` to `TS`. The crates went from 0.1.0 to 0.2.0 in five releases over about nine hours. crates.io won't accept a version twice, so every release meant bumping all three to the same number. A script does that now. Rust 2024 made `gen` a keyword, which broke every example that named its generator `gen`. The root README still described the crate as an RPC library for a while after the rewrite.
+That Sunday covered serde parity, the README, the crates.io release, auto-registration, the generator crate, template literals, namespaces, intersections, indexed access, `Prettify`, and renaming the derive from `TypeScript` to `TS`. The crates went from 0.1.0 to 0.2.0 in five releases over about nine hours. crates.io won't accept a version twice, so every release meant bumping all three to the same number. A script does that now. [Rust 2024](https://doc.rust-lang.org/edition-guide/rust-2024/gen-keyword.html) made `gen` a keyword, which broke every example that named its generator `gen`. The root README still described the crate as an RPC library for a while after the rewrite.
 
-The swarm took watching. A worker renamed `typescript_type()` to `typescript()` and pushed with the fixtures crate still calling the old name, and it took two warnings, the second headed "CRITICAL: Tests failing!", to get it fixed. Merged work often never reached GitHub. On the morning of the 11th, the newest commit on `main` was 23 hours old after a full day of work. The first hello-world example only simulated its server's responses. For an example of an RPC server, that's "worse than useless", and it runs a real Axum server now.
+The swarm took watching. A worker renamed `typescript_type()` to `typescript()` and pushed with the fixtures crate still calling the old name, and it took two warnings, the second headed "CRITICAL: Tests failing!", to get it fixed. Merged work often never reached GitHub. On the morning of the 11th, the newest commit on `main` was 23 hours old after a full day of work. The first hello-world example only simulated its server's responses. For an example of an RPC server, that's "worse than useless", and it runs a real [Axum](https://github.com/tokio-rs/axum) server now.
 
 On January 12 I moved the swarm to other work, and ferrotype was paused.
 
 ## Using it
 
-I tried it first in ace on January 11, the afternoon `ferro-type-gen` went up, exporting ace's API types to a file with `collect_all()`. The problems it turned up were fixed in 0.1.2 that evening. ferro-type never landed in ace, though: its Tauri desktop client already used tauri-specta for typed commands, and kept it.
+I tried it first in ace on January 11, the afternoon `ferro-type-gen` went up, exporting ace's API types to a file with `collect_all()`. The problems it turned up were fixed in 0.1.2 that evening. ferro-type never landed in ace, though: its [Tauri](https://tauri.app) desktop client already used [tauri-specta](https://github.com/specta-rs/tauri-specta) for typed commands, and kept it.
 
 The longer use came in February, in agent-foundry, a Rust agent of mine with a Svelte UI. Nineteen request, response and event types derive `TS`. A `--gen-types` flag writes them to `ui/src/generated/types.ts`, and the server also serves them over HTTP. The streaming events come out as the kind of union I wanted:
 
@@ -180,7 +180,7 @@ It also showed where ferrotype falls short.
 
 ## Where it stands
 
-`ferro-type` 0.2.0 has been the current release since January 12. The last commit, in March, added CI: rustfmt, clippy with warnings as errors, tests and docs. All 258 Rust tests still pass on today's stable Rust. The repo still carries leftovers: a TypeScript client package from the RPC days that was never published, and `ferro-type-import`, an unpublished crate that goes the other way, parsing TypeScript with swc and writing Rust structs and enums with serde derives.
+`ferro-type` 0.2.0 has been the current release since January 12. The last commit, in March, added CI: rustfmt, clippy with warnings as errors, tests and docs. All 258 Rust tests still pass on today's stable Rust. The repo still carries leftovers: a TypeScript client package from the RPC days that was never published, and `ferro-type-import`, an unpublished crate that goes the other way, parsing TypeScript with [swc](https://swc.rs) and writing Rust structs and enums with serde derives.
 
 ## What I'd keep
 
