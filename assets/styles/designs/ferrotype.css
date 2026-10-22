@@ -10,6 +10,16 @@
 .fe-tintype { position: absolute; inset: 2cqw 2cqw 30% 2cqw; }
 .fe-tintype .inkfig-plates { height: 100%; aspect-ratio: auto; }
 .fe-tintype .inkfig-key { mix-blend-mode: normal; }
+/* Safari multiplies the SVG's own plates through onto the black plate behind
+   it; an opacity group keeps them overprinting only each other. */
+.fe-tintype .inkfig-plates { isolation: isolate; opacity: 0.999; }
 .fe-title { --fs: 6.4cqw; --dk: var(--newsprint); position: relative; z-index: 2; color: var(--newsprint); }
 .fe-fig { flex: none; }
 .fe-tall .inkfig-plates { max-height: 26cqw; }
+
+/* phones: one page at a time; the plate holds its picture above the title */
+@media (max-width: 760px) {
+  .zine .fe-plate { flex: none; gap: 14px; padding: 20px; border-radius: 14px; }
+  .zine .fe-tintype { position: static; width: 78%; align-self: center; }
+  .zine .fe-title { --fs: 13vw; font-size: 13vw; }
+}

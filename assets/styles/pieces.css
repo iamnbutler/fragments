@@ -62,4 +62,8 @@
   .zine .layout-dr .cap { font-size: 12px; }
   .zine .dr-kicker { font-size: 11px; }
   .zine .dr-dek { font-size: 18px; }
+  /* A figure that fills the rest of its page on a spread has no page height
+     to fill here, so every figure goes back to its own proportions. */
+  .zine .layout-dr .inkfig { flex: none; min-height: 0; }
+  .zine .layout-dr .inkfig .inkfig-plates { flex: none; height: auto; max-height: none; aspect-ratio: var(--ar); }
 }
