@@ -7,6 +7,12 @@ import manifest from '../media.json';
 
 export const MEDIA_PATH = '/m/';
 
+/**
+ * Where media URLs point: the site itself, or under `bongo dev` (which has no
+ * worker in front) a deployed one, from MEDIA_ORIGIN. Set by bongo.config.ts.
+ */
+const origin = () => process.env.FRAGMENTS_MEDIA_ORIGIN ?? '';
+
 export interface MediaFile {
   url: string;
   type: string;
@@ -22,7 +28,7 @@ export function media(name: string): MediaFile {
   const m = files[name];
   if (!m) throw new Error(`No media named "${name}". Add it with: npm run media -- put <file> ${name}`);
   const { key, ...rest } = m;
-  return { url: MEDIA_PATH + key, ...rest };
+  return { url: origin() + MEDIA_PATH + key, ...rest };
 }
 
 export const hasMedia = (name: string) => name in files;

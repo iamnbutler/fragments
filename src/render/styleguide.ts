@@ -1,0 +1,399 @@
+/**
+ * The specimen book: _fragments' inks, papers, type, grid, print effects,
+ * motion and every part and spread layout, printed from the live issue so
+ * the examples are the real thing. Tune the system here.
+ */
+import { html, attr, cls, type Html } from './html';
+import { reg, plate, blocks as blocksHtml } from './riso';
+import { spread as spreadHtml } from './pages';
+import { loadDrafts } from '../lib/drafts';
+import { loadPosts } from '../lib/posts';
+import { impose, blocks, INK_PAIRS, type Spread, type Ink, type Block } from '../lib/zine';
+import { RAMP, MID, MAIN, SPOT, PAPERS, contrast } from '../lib/spectrum';
+import { COVER_MAPS, COVER_WORKS } from '../lib/covers';
+import { ISSUE } from '../lib/issue';
+
+const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
+
+export function styleguide(): Html {
+  const drafts = loadDrafts();
+  const spreads = impose(drafts, loadPosts());
+
+  // ── specimens: one of every spread in the issue ──
+  type S = Spread;
+  /** Give each specimen its own copyfitting chain, apart from the feature it came from. */
+  const own = (s: S): S => {
+    const tag = `~sg${s.page}`;
+    if (s.kind === 'draft') return { ...s, draft: { ...s.draft, key: s.draft.key + tag } };
+    if (s.kind === 'jump' || s.kind === 'post') return { ...s, item: { ...s.item, key: s.item.key + tag } } as S;
+    return s;
+  };
+  const find = (pred: (s: S) => boolean) => spreads.find(pred);
+
+  interface Spec { id: string; name: string; when: string; file: string; spread: S }
+  const used = new Set<number>();
+  const spec = (id: string, name: string, file: string, when: string, s: S | undefined): Spec[] => {
+    if (!s || used.has(s.page)) return [];
+    used.add(s.page);
+    return [{ id, name, when, file, spread: own(s) }];
+  };
+  const DESIGN_FILE: Record<string, string> = { 'desktop-tools': 'desktopTools', 'jev-demos': 'jevDemos', tasks: 'tasks', 'open-remote': 'openRemote' };
+
+  const groups: { key: string; no: string; title: string; dek: string; specs: Spec[] }[] = [
+    {
+      key: 'front', no: 'G1', title: 'Front matter', dek: 'The two spreads every issue opens on.',
+      specs: [
+        ...spec('cover', 'Cover', 'render/riso.ts cover() + scripts/cover-press.ts', 'Always spread 0. One of Nate’s 2017 renders pulled as a stepped gradient-map proof across the spread, numbered and signed on the line beneath it, then the name and the issue.', find((s) => s.kind === 'cover')),
+        ...spec('bio', 'Hi friends', 'render/riso.ts bio()', 'Always spread 1. Who Nate is, in his words: a greeting overprinted on a yellow flood, then where he works and has worked.', find((s) => s.kind === 'bio')),
+      ],
+    },
+    {
+      key: 'features', no: 'G2', title: 'Features', dek: 'Each piece prints as its own art-directed spreads with an ink pair from the ramp, then plain jumps for the text the design has no room for.',
+      specs: [
+        ...drafts.flatMap((d) => spec(`draft-${d.slug}`, `${d.title}, opening`, `render/drafts.ts ${DESIGN_FILE[d.slug] ?? 'generic'}()`, `${d.kicker ? `${d.kicker}. ` : ''}Inks: ${(spreads.find((s) => s.kind === 'draft' && s.draft.slug === d.slug)?.inks ?? []).join(' and ')}.`, find((s) => s.kind === 'draft' && s.draft.slug === d.slug && s.part === 0))),
+        ...spec('draft-later', 'A later spread of a feature', 'render/drafts.ts', 'Later spreads carry the same design further, under a running head with the part number.', find((s) => s.kind === 'draft' && s.part === 1)),
+        ...spec('jump-plain', 'Jump', 'render/riso.ts jumpSpread()', 'Where a feature continues. Four columns, a link back to where it came from.', find((s) => s.kind === 'jump' && !s.refs.length)),
+        ...spec('jump-notes', 'Jump with margin notes', 'render/riso.ts jumpSpread()', 'When the text links out, the links are numbered in the copy and listed in the outer margin.', find((s) => s.kind === 'jump' && s.refs.length > 0)),
+      ],
+    },
+    {
+      key: 'essays', no: 'G3', title: 'Essays', dek: 'Finished pieces from content/e, newest first, after the features. Each opens on a stock layout, never the same one twice running, then jumps. Essays over three years old wear a “from the archive” mark.',
+      specs: [
+        ...spec('post-tower', 'Tower', 'render/riso.ts postSpread()', 'A tall title page with a pull quote, facing two columns of text.', find((s) => s.kind === 'post' && s.layout === 'tower')),
+        ...spec('post-banner', 'Banner', 'render/riso.ts postSpread()', 'A spaced title across both pages over a rule, text in four columns with a pull quote.', find((s) => s.kind === 'post' && s.layout === 'banner')),
+        ...spec('post-toner', 'Toner', 'render/riso.ts postSpread()', 'A photocopied black spread: the year huge in the light ink, the opening on a taped slip.', find((s) => s.kind === 'post' && s.layout === 'toner')),
+      ],
+    },
+  ];
+
+  // ── parts ──
+  // A plate specimen: the canonical cover render, printed through the plates.
+  const cover = COVER_WORKS[ISSUE.cover - 1];
+  const sample = { src: cover.still, alt: '', aspect: cover.aspect };
+  // Running text from the first feature, one of each kind of block it has.
+  const bs = drafts[0] ? blocks(drafts[0].text, drafts[0].title) : [];
+  const trim = (b: Block): Block => {
+    if (b.text.length < 260) return b;
+    const cut = b.text.slice(0, 260);
+    const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '));
+    return { ...b, text: end > 80 ? cut.slice(0, end + 1) : cut.replace(/\s+\S*$/, '') + '…' };
+  };
+  const ps = bs.filter((b) => b.t === 'p');
+  const prose = [ps[0], bs.find((b) => b.t === 'h'), ps[1], ...bs.filter((b) => b.t === 'li').slice(0, 2), bs.find((b) => b.t === 'quote'), bs.find((b) => b.t === 'code')]
+    .filter((b): b is Block => !!b)
+    .map(trim);
+  const paper = PAPERS.newsprint;
+  const pct = (i: number, n: number) => `${((i / (n - 1)) * 100).toFixed(1)}%`;
+  const SPOT_ROLE: Record<string, string> = {
+    yellow: 'Light plate. Floods and halftone highlights. Too pale for small type.',
+    blue: 'Light plate under teal or black, key plate on yellow.',
+    teal: 'Key plate and the accent: rules and the PROOF stamp.',
+    black: 'Key plate. Type, rules, shadows.',
+  };
+  const TOKENS: [string, string, string][] = [
+    ['--lt', 'per spread', 'The light plate of the spread’s ink pair.'],
+    ['--dk', 'per spread', 'The key plate: shadows, type in ink, page numbers.'],
+    ['--sheet', 'per paper', 'The paper colour of the spread.'],
+    ['--desk', '#BDB9B0 / #1D1C1B', 'The pasteboard behind the spreads, light and dark.'],
+    ['--desk-ink', '#2B2A28 / #B7B2A7', 'Type set on the desk.'],
+    ['--mx, --my', '±2.4px, ±1.8px', 'Each spread’s seeded misregistration.'],
+    ['--lx, --ly', '±26px, ±18px', 'Where a spread’s plates come from as they land.'],
+  ];
+  const EASES: [string, string, string, string][] = [
+    ['--ease-press', 'cubic-bezier(0.16, 1, 0.3, 1)', '1.1s', 'Plates landing: the light plate first, the key plate 0.32s after.'],
+    ['--ease-roller', 'cubic-bezier(0.65, 0, 0.25, 1)', '0.8s', 'The roller wiping ink on (clip-path).'],
+    ['--ease-paper', 'cubic-bezier(0.34, 1.45, 0.5, 1)', '0.9s', 'Paper things with a bit of spring: the wave, the avatar.'],
+    ['stamp', 'cubic-bezier(0.5, 0, 0.9, 0.4)', '0.35s', 'The PROOF stamp coming down, 0.9s in.'],
+  ];
+  const SCREENS = [
+    ['Light plate', 'lt', '5px square cell, 0°', 'The whole tonal range.'],
+    ['Key plate', 'dk', '8px cell, 45°', 'Only the shadows (curve exponent 0.42).'],
+  ];
+
+  return html`<main class="sb" style="--lt:var(--yellow);--dk:var(--black);--mx:1.6px;--my:-1.1px;--lx:0px;--ly:0px">
+    <nav class="single-nav sb-nav" aria-label="Site">
+      <a href="/">_fragments, issue ${ISSUE.number}</a>
+      <span>Specimen book</span>
+    </nav>
+
+    <header class="sb-board sb-title paper-newsprint">
+      <p class="cap sb-kicker">The house style of _fragments</p>
+      ${reg({ as: 'h1', text: 'Specimen book', class: 't-tower', style: '--fs:13cqw' })}
+      <div class="sb-title-foot">
+        <p class="sb-lede">Every ink, paper, typeface, screen and spread the zine prints with, set from the live issue. The colourway is the Printmaking Challenge spectrum: four spot inks cut from one ramp, on warm newsprint and bone.</p>
+        <ol class="sb-toc" aria-label="In this book">
+          <li><a href="#inks"><span>A</span>Inks and paper</a></li>
+          <li><a href="#type"><span>B</span>Type</a></li>
+          <li><a href="#grid"><span>C</span>Space and grid</a></li>
+          <li><a href="#print"><span>D</span>Print</a></li>
+          <li><a href="#motion"><span>E</span>Motion</a></li>
+          <li><a href="#parts"><span>F</span>Parts</a></li>
+          <li><a href="#spreads"><span>G</span>Spreads</a></li>
+          <li><a href="#flats"><span>H</span>Flats</a></li>
+        </ol>
+      </div>
+    </header>
+
+    <aside class="sb-knobs" aria-label="Press settings">
+      <p class="sb-knobs-head">Press settings</p>
+      <label>Misregistration <input type="range" min="0" max="4" step="0.1" value="1" data-knob="mis" /> <output>1×</output></label>
+      <label>Desk grain <input type="range" min="0" max="0.4" step="0.01" value="0.11" data-knob="grain" /> <output>0.11</output></label>
+      <button type="button" class="sb-btn" data-replay>Print again</button>
+    </aside>
+
+    <section class="sb-part" id="inks" aria-labelledby="inks-h">
+      <header class="sb-part-head"><span class="sb-part-no">A</span><h2 id="inks-h" class="sb-h">Inks and paper</h2></header>
+
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Spot inks</h3>
+        <p class="sb-note">Four inks from the main row of the swatch sheet. Each spread prints in a pair: a light plate and a key plate. Contrast is against newsprint.</p>
+        <ul class="sb-inks">
+          ${Object.entries(SPOT).map(([name, hex]) => html`<li class="sb-ink"${attr('style', `--c:var(--${name})`)}>
+              <span class="sb-ink-chip" aria-hidden="true"></span>
+              <span class="sb-ink-name">${cap(name)}</span>
+              <code class="sb-hex">${hex}</code>
+              <span class="sb-ink-var">var(--${name})</span>
+              <span class="sb-ink-cr">${contrast(hex, paper).toFixed(1)}:1</span>
+              <span class="sb-ink-role">${SPOT_ROLE[name]}</span>
+            </li>`)}
+        </ul>
+
+        <h3 class="sb-sub">Ink pairs</h3>
+        <p class="sb-note">The generator picks one of these for each spread and never repeats the last pair. Overprinted, the two plates multiply.</p>
+        <ul class="sb-pairs">
+          ${INK_PAIRS.map(([lt, dk]) => html`<li${attr('style', `--lt:var(--${lt});--dk:var(--${dk})`)}>
+              <span class="sb-over" aria-hidden="true"><i></i><b></b></span>
+              ${reg({ as: 'p', text: 'Aa', class: 'sb-pair-reg t-tower', style: '--fs:5cqw' })}
+              <span class="cap">${lt} + ${dk}</span>
+            </li>`)}
+        </ul>
+      </div>
+
+      <div class="sb-board paper-newsprint sb-swatchbook">
+        <h3 class="sb-sub">The ramp</h3>
+        <p class="sb-note">The whole spectrum, light to dark, as the swatch sheet sets it: the nine named swatches, every other step, and all 39. The spot inks are marked.</p>
+        <div class="sb-sheet-rows">
+          <ol class="sb-row sb-row-main">
+            ${MAIN.map((h) => html`<li${attr('style', `--c:${h}`)}${attr('class', cls(Object.values(SPOT).includes(h as any) && 'is-spot') || undefined)}><span>${h.slice(1)}</span></li>`)}
+          </ol>
+          <ol class="sb-row sb-row-mid">
+            ${MID.map((h) => html`<li${attr('style', `--c:${h}`)}><span>${h.slice(1)}</span></li>`)}
+          </ol>
+          <ol class="sb-row sb-row-ramp">
+            ${RAMP.map((h) => html`<li${attr('style', `--c:${h}`)}><span>${h.slice(1)}</span></li>`)}
+          </ol>
+          <div class="sb-sweep" aria-hidden="true"${attr('style', `background:linear-gradient(90deg, ${RAMP.map((h, i) => `${h} ${pct(i, RAMP.length)}`).join(', ')})`)}></div>
+          <p class="sb-sheet-cap cap">Printmaking Challenge<br />the Wonderful Spectrum<br />Src: src/lib/spectrum.ts</p>
+        </div>
+      </div>
+
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Papers</h3>
+        <ul class="sb-papers">
+          ${Object.entries(PAPERS).map(([name, hex]) => html`<li${attr('class', `paper-${name}`)}>
+              <span class="sb-paper-chip" aria-hidden="true"></span>
+              <span class="sb-ink-name">${cap(name)}</span>
+              <code class="sb-hex">${hex}</code>
+              <span class="sb-ink-var">.paper-${name}</span>
+            </li>`)}
+        </ul>
+        <p class="sb-note">Each feature’s design picks its papers; jumps print on newsprint.</p>
+
+        <h3 class="sb-sub">Semantic tokens</h3>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Use</th></tr></thead>
+          <tbody>${TOKENS.map(([t, v, u]) => html`<tr><th scope="row"><code>${t}</code></th><td>${v}</td><td>${u}</td></tr>`)}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sb-part" id="type" aria-labelledby="type-h">
+      <header class="sb-part-head"><span class="sb-part-no">B</span><h2 id="type-h" class="sb-h">Type</h2></header>
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Families</h3>
+        <div class="sb-faces">
+          <figure class="sb-face">
+            <p class="sb-face-big" style="font-variation-settings:'wdth' 62;font-weight:860">Press run</p>
+            <p class="sb-face-big" style="font-variation-settings:'wdth' 100;font-weight:500">Press run</p>
+            <p class="sb-face-big" style="font-variation-settings:'wdth' 125;font-weight:300">PRESS RUN</p>
+            <figcaption class="cap">Archivo, variable: width 62–125, weight 100–900. Display, labels, folios. <code>--f-display</code></figcaption>
+          </figure>
+          <figure class="sb-face">
+            <p class="sb-face-serif">The collected work of Nate Butler, and the posts from other people he couldn’t stop thinking about. <i>Set in italic for decks and pull quotes.</i></p>
+            <figcaption class="cap">Source Serif 4, optical sizes 8–60. Running text, decks, quotes. <code>--f-serif</code></figcaption>
+          </figure>
+        </div>
+
+        <h3 class="sb-sub">Styles</h3>
+        <dl class="sb-styles">
+          <dt><code>.reg .t-tower</code><span>Display titles: the greeting, feature titles, the outcome stamps. Width 62, weight 860, caps, line height 0.84. Size fitted to title length: <code>min(12, max(4.4, 112 / len^0.72))</code> cqw.</span></dt>
+          <dd>${reg({ as: 'p', text: drafts[0]?.title ?? 'Hi friends', class: 't-tower', style: '--fs:7cqw' })}</dd>
+          <dt><code>.prose-cols .dropcap</code><span>Running text. <code>--fs-body: clamp(12px, 1.06cqw, 17px)</code>, line height 1.5, hyphenated, indented paragraphs, run-in heads and square bullets.</span></dt>
+          <dd>
+            <div class="prose-cols cols-2 dropcap sb-prose">
+              ${blocksHtml(prose)}
+            </div>
+          </dd>
+          <dt><code>.cap</code><span>Captions and credits. <code>--fs-cap: clamp(10.5px, 0.8cqw, 13px)</code>, width 82.</span></dt>
+          <dd><p class="cap">Fig. 2, the loop. About 6 minutes to read.</p></dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="sb-part" id="grid" aria-labelledby="grid-h">
+      <header class="sb-part-head"><span class="sb-part-no">C</span><h2 id="grid-h" class="sb-h">Space and grid</h2></header>
+      <div class="sb-board paper-newsprint">
+        <p class="sb-note">A spread is two pages at an aspect of 1.45, as wide as the screen allows. Inside it, everything is sized in container units (1cqw is 1% of the spread’s width, 12.8px at the 1280px design width), so a spread composes the same way at every desktop size. Below 760px a spread becomes a stack of pages set in pixels.</p>
+        <div class="sb-gridspread" aria-label="The spread grid: 12 columns, 8 rows">
+          <div class="sb-grid-cells" aria-hidden="true">${Array.from({ length: 96 }, () => html`<i></i>`)}</div>
+          <span class="sb-gpad sb-gpad-l" aria-hidden="true"><b>pg-l</b> 5 / 4.5 / 5 / 4cqw</span>
+          <span class="sb-gpad sb-gpad-r" aria-hidden="true"><b>pg-r</b> 5 / 4 / 5 / 4.5cqw</span>
+          <span class="sb-ggutter" aria-hidden="true"><b>gutter</b> 9cqw</span>
+          <span class="sb-gfolio sb-gfolio-l" aria-hidden="true">folio 2.6 / 1.9cqw</span>
+          <span class="sb-gfolio sb-gfolio-r" aria-hidden="true">running head 1.7cqw</span>
+        </div>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">At 1280px</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Columns, rows</th><td>12 × 8</td><td>107 × 110px</td></tr>
+            <tr><th scope="row">Page margin, top and bottom</th><td>5cqw</td><td>64px</td></tr>
+            <tr><th scope="row">Page margin, outside / inside</th><td>4 / 4.5cqw</td><td>51 / 58px</td></tr>
+            <tr><th scope="row">Column gap</th><td>2.4cqw</td><td>31px</td></tr>
+            <tr><th scope="row">Heavy rule</th><td>0.35cqw</td><td>4.5px</td></tr>
+            <tr><th scope="row">Phone page padding</th><td>44 / 20 / 40px</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sb-part" id="print" aria-labelledby="print-h">
+      <header class="sb-part-head"><span class="sb-part-no">D</span><h2 id="print-h" class="sb-h">Print</h2></header>
+      <div class="sb-board paper-newsprint">
+        <h3 class="sb-sub">Cover proofs</h3>
+        <p class="sb-note">The cover pulls one of Nate's 2017 renders as a gradient-map proof: its luminance is cut into flat steps of one of these maps, and grain decides every pixel at a step's edge. The pointer sets the step count across the plate; a click pulls another render. Gradients belong to images like this, never to type or controls. In <code>scripts/cover-press.ts</code>, with the works in <code>lib/covers.ts</code>.</p>
+        <ul class="sb-maps">
+          ${Object.entries(COVER_MAPS).map(([name, stops]) => html`<li>
+              <span class="sb-map" aria-hidden="true">${stops.map((h) => html`<i${attr('style', `--c:${h}`)}></i>`)}</span>
+              <span class="cap"><b>${cap(name)}.</b> ${COVER_WORKS.filter((w) => w.map === name).length} renders</span>
+            </li>`)}
+        </ul>
+
+        <h3 class="sb-sub">Plates</h3>
+        <p class="sb-note">Photos are separated at build time by SVG filters in <code>render/riso.ts</code>: each plate is a halftone of one ink on transparent, stacked and multiplied, and knocked out of register by the spread’s <code>--mx</code>/<code>--my</code> and the pointer.</p>
+        <div class="sb-plates">
+          <figure class="sb-plate">${plate({ media: sample, inks: ['yellow', 'black'], alt: '', proof: true })}<figcaption class="cap">Duotone, yellow + black <button class="sb-btn sb-proof" type="button" aria-pressed="false">Original</button></figcaption></figure>
+          <figure class="sb-plate" style="--lt:var(--blue);--dk:var(--teal)">${plate({ media: sample, inks: ['blue', 'teal'], alt: '' })}<figcaption class="cap">Duotone, blue + teal</figcaption></figure>
+          <figure class="sb-plate">${plate({ media: sample, inks: ['yellow', 'blue'], mode: 'key', alt: '' })}<figcaption class="cap">Key plate only, blue</figcaption></figure>
+          <figure class="sb-plate">${plate({ media: sample, inks: ['black', 'black'], mode: 'mono', alt: '' })}<figcaption class="cap">Mono, black</figcaption></figure>
+        </div>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Screen</th><th scope="col">Filter</th><th scope="col">Cell</th><th scope="col">Carries</th></tr></thead>
+          <tbody>${SCREENS.map(([n, id, c, u]) => html`<tr><th scope="row">${n}</th><td><code>ht-${id}-*</code></td><td>${c}</td><td>${u}</td></tr>`)}</tbody>
+        </table>
+
+        <h3 class="sb-sub">Registration</h3>
+        <p class="sb-note">Display type prints twice: the light plate is a pseudo-element offset by 1.8 × the misregistration, the key plate is the text. Move the pointer over a spread to push the plates apart; the Misregistration dial above scales every spread’s offset.</p>
+        <div class="sb-reg-row">
+          ${(['yellow', 'teal'] as Ink[]).map((lt) => reg({ as: 'p', text: 'Out of register', class: 't-tower', style: `--fs:6cqw;--lt:var(--${lt});--mx:3px;--my:-2px` }))}
+        </div>
+
+        <h3 class="sb-sub">Texture</h3>
+        <ul class="sb-textures">
+          <li><span class="sb-tex sb-tex-grain" aria-hidden="true"></span><span class="cap"><b>Desk grain.</b> A fixed noise layer over everything at 0.11 opacity.</span></li>
+          <li><span class="sb-tex sb-tex-paper paper-newsprint" aria-hidden="true"></span><span class="cap"><b>Paper.</b> Fibre noise and a soft vignette on every spread.</span></li>
+          <li><span class="sb-tex sb-tex-rubber" aria-hidden="true"><span>STAMPED</span></span><span class="cap"><b>#rubber.</b> Uneven ink and chewed edges.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="sb-part" id="motion" aria-labelledby="motion-h">
+      <header class="sb-part-head"><span class="sb-part-no">E</span><h2 id="motion-h" class="sb-h">Motion</h2></header>
+      <div class="sb-board paper-newsprint">
+        <p class="sb-note">Motion is the press at work: plates land as a spread scrolls into view, a page lifts as it leaves, the stamp comes down. With reduced motion everything prints at once and nothing moves. <span class="sb-rm">Reduced motion is on, so these demos jump to their end.</span></p>
+        <ul class="sb-eases">
+          ${EASES.map(([name, fn, dur, use]) => html`<li class="sb-ease"${attr('style', `--fn:${fn};--dur:${dur}`)}>
+              <code class="sb-ease-name">${name}</code>
+              <span class="sb-track" aria-hidden="true"><i></i></span>
+              <span class="sb-ease-meta"><code>${fn}</code>, ${dur}</span>
+              <span class="sb-ease-use">${use}</span>
+            </li>`)}
+        </ul>
+        <button type="button" class="sb-btn" data-ease-run>Run all</button>
+
+        <h3 class="sb-sub">A spread printing</h3>
+        <p class="sb-note">The same sequence the issue runs, on one block: light plate, then the key plate 0.32s later.</p>
+        <div class="sb-printdemo" data-printdemo>
+          <span class="sb-pd-lt" aria-hidden="true"></span>
+          <span class="sb-pd-dk" aria-hidden="true">Press run</span>
+        </div>
+        <button type="button" class="sb-btn" data-print-run>Print it</button>
+        <table class="sb-table">
+          <thead><tr><th scope="col">Moment</th><th scope="col">How</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Spread arrives, leaves</th><td>Scroll-driven <code>view()</code> timeline: tilts in from rotateX(−16°), lifts away to rotateX(18°). Desktop only.</td></tr>
+            <tr><th scope="row">Print-in</th><td><code>.is-printed</code> added at 28% visibility; plates translate from <code>--lx</code>/<code>--ly</code> and wipe on with the roller.</td></tr>
+            <tr><th scope="row">Pointer push</th><td><code>--px</code>/<code>--py</code> eased at 0.12 a frame; light plate moves ×9px, key plate ×−3px.</td></tr>
+            <tr><th scope="row">Flats zoom</th><td>One continuous scale from the spread you’re on to the whole pasteboard.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sb-part" id="parts" aria-labelledby="parts-h">
+      <header class="sb-part-head"><span class="sb-part-no">F</span><h2 id="parts-h" class="sb-h">Parts</h2></header>
+      <div class="sb-board paper-newsprint sb-parts">
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage sb-stage-text">
+            <p class="jump-from"><a href="#parts">Continued from page 6</a><span class="jump-slug">${drafts[0]?.title ?? 'A feature'}</span></p>
+            <a class="cont" href="#parts">Continued on page 10</a>
+          </div>
+          <figcaption class="cap"><b>Jump lines.</b> <code>.jump-from</code>, <code>.cont</code></figcaption>
+        </figure>
+        <figure class="sb-part-cell">
+          <div class="sb-part-stage sb-stage-text">
+            <p class="prose-cols">Ace has a rule that all Ace development happens in Ace<sup class="ref">1</sup>, and it serves a patched Peekaboo Bridge<sup class="ref">2</sup>.<span class="end-mark" aria-hidden="true"></span></p>
+            <aside class="margin-notes sb-mn"><p class="mn-head">Notes</p><ol><li><a href="https://github.com/githubnext/ace2">Ace</a><span class="mn-where">github.com</span></li><li><a href="https://github.com/openclaw/Peekaboo">Peekaboo</a><span class="mn-where">github.com</span></li></ol></aside>
+          </div>
+          <figcaption class="cap"><b>References, margin notes, end mark.</b> <code>sup.ref</code>, <code>.margin-notes</code>, <code>.end-mark</code></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sb-part" id="spreads" aria-labelledby="spreads-h">
+      <header class="sb-part-head"><span class="sb-part-no">G</span><h2 id="spreads-h" class="sb-h">Spreads</h2></header>
+      <p class="sb-desk-note">Every spread in the current issue, printed with its real content. Each spread’s misregistration is seeded from its content, so the same issue always prints the same way.</p>
+      <ol class="sb-spec-toc" aria-label="Spread layouts">
+        ${groups.map((g) => html`<li><a${attr('href', `#${g.specs[0]?.id ?? g.key}`)}><span>${g.no}</span>${g.title}</a></li>`)}
+      </ol>
+      <div class="zine sb-spreads">
+        ${groups.map((g) => html`<header class="sb-group-head"${attr('id', g.key)}>
+              <span class="sb-part-no">${g.no}</span>
+              <h3 class="sb-h3">${g.title}</h3>
+              <p>${g.dek}</p>
+            </header>
+            ${g.specs.map((sp) => {
+              const s = sp.spread;
+              return html`<article class="sb-spec"${attr('id', sp.id)}${attr('aria-label', sp.name)}>
+                  <p class="sb-ticket">
+                    <span class="sb-ticket-name">${sp.name}</span>
+                    <span class="sb-ticket-when">${sp.when}</span>
+                    <span class="sb-ticket-file"><code>${sp.file}</code>, inks ${s.inks[0]} + ${s.inks[1]}, ${s.paper}</span>
+                  </p>
+                  ${spreadHtml(s)}
+                </article>`;
+            })}`)}
+      </div>
+    </section>
+
+    <section class="sb-part" id="flats" aria-labelledby="flats-h">
+      <header class="sb-part-head"><span class="sb-part-no">H</span><h2 id="flats-h" class="sb-h">Flats</h2></header>
+      <div class="sb-board paper-newsprint sb-flats-board">
+        <p class="sb-note">Press F, or the Flats button at the bottom right, to zoom out from the spread you’re on to every spread on the pasteboard, grouped by feature, with crop marks and a colour bar. Here it lays out the specimens above; in the issue, the whole issue. Click a spread to zoom back in; Escape returns to where you were.</p>
+        <button type="button" class="sb-btn" data-flats>Show the flats</button>
+        <p class="cap">Thumbnails are live clones of the spreads at a 1280px design width, with the halftone filters swapped for cheap CSS duotones. <code>scripts/flats.ts</code></p>
+      </div>
+    </section>
+
+    <footer class="colophon-end"><p>End of the specimen book. Back to <a href="/">the issue</a>.</p></footer>
+  </main>`;
+}

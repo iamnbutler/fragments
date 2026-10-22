@@ -1,15 +1,15 @@
 # _fragments
 
-Nate Butler's site, printed as a riso zine: an Astro static site served by a
-Cloudflare Worker, with media in R2.
+Nate Butler's site, printed as a riso zine: a static site built with
+[bongo](https://bongo.build) and served by a Cloudflare Worker, with media in R2.
 
 ## Develop
 
-Use Node 22.
+Use Node 24.
 
 ```sh
 npm ci
-npm run dev          # astro dev; /m/ media is proxied to the deployed worker
+npm run dev          # bongo dev; media comes from the deployed worker
 npm test             # unit tests
 npm run check        # type-check libraries, scripts, tests and the worker
 npm run test:build   # build, then check the output (tests/build-smoke.mjs)
@@ -21,15 +21,21 @@ https://fragments.iamnbutler.workers.dev.
 
 ## Layout
 
-- `content/drafts/*.md`: pieces, with front matter for title, dek, figures
-  and links.
-- `src/pages/index.astro`: the issue (cover, bio, then each piece's spreads).
-- `src/pages/d/[slug].astro`: a piece on its own page.
-- `src/pages/styleguide.astro`: the house style and every spread design.
-- `src/components/riso/`: spreads; `drafts/` holds each piece's art-directed design.
+- `content/d/*.md`: features, with front matter for title, dek, figures and
+  links; each is a page at `/d/<slug>/`.
+- `content/e/*.md`: essays, each a page at `/e/<slug>/`.
+- `content/index.hbs`, `content/styleguide.hbs`: the issue, and the house
+  style with every spread design.
+- `bongo.config.ts`: the Markdown loader for those pages, and the partials
+  that render the issue and the styleguide.
+- `layouts/html.hbs`: the document around every page: head, fonts, scripts.
+- `src/render/`: the pages and spreads as HTML strings; `drafts.ts` holds
+  each feature's art-directed design.
 - `src/lib/zine.ts`: imposition, turning pieces into spreads and pages.
 - `src/lib/issue.ts`: issue number, season and cover.
-- `worker/index.ts`: serves `dist/` and media from R2.
+- `assets/`: client scripts (`scripts/entry/` are the per-page entries) and
+  styles.
+- `worker/index.ts`: serves `public/` and media from R2.
 
 ## Media
 

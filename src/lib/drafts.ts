@@ -1,5 +1,5 @@
 /**
- * Drafts: long-form pieces that live in `content/drafts/<slug>.md`, with
+ * Drafts: long-form pieces that live in `content/d/<slug>.md`, with
  * their images in media as `drafts/<slug>/<name>`. They print in the issue
  * as features, each with its own art-directed spreads, and get a reading
  * page at `/d/<slug>`.
@@ -59,7 +59,7 @@ export interface Draft {
   href: string;
 }
 
-const DIR = path.join(process.cwd(), 'content/drafts');
+const DIR = path.join(process.cwd(), 'content/d');
 
 const str = (v: unknown) => (v == null ? '' : v instanceof Date ? v.toISOString().slice(0, 10) : String(v));
 
