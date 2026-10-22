@@ -67,7 +67,7 @@ export const DESIGNS: Record<string, Design> = {
     paper: ['newsprint', 'newsprint'],
   },
   'open-remote': {
-    caps: [1900, 3000, 2700, 3000],
+    caps: [1100, 3000, 2700, 3900],
     inks: [['yellow', 'black'], ['blue', 'black'], ['red', 'black'], ['yellow', 'red']],
     paper: ['newsprint', 'bone', 'newsprint', 'bone'],
   },
