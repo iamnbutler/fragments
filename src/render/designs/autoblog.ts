@@ -4,7 +4,7 @@ import { img } from '../../lib/pieces';
 import { split, inkFig, prose, cont, type PieceSpread } from './kit';
 
 /**
- * autoblog, "How did we do that again?". Yellow and black, then blue. The
+ * autoblog, "The Next Agent Already Knows". Yellow and black, then blue. The
  * journal's index card sits on the opener; the figures walk through how an
  * entry gets written, then how it's found again.
  */
