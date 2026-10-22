@@ -5,7 +5,9 @@
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "fragments-media", "remote": true }],
-  // nate.rip is this site; the zone is on this account.
+  // nate.rip is this site; the zone is on this account. workers.dev stays on:
+  // npm run dev and the figure tools load media from it (src/render/dev-media.ts).
+  "workers_dev": true,
   "routes": [
     { "pattern": "nate.rip", "custom_domain": true },
     { "pattern": "www.nate.rip", "custom_domain": true }
