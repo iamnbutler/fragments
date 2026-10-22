@@ -102,6 +102,11 @@ function balance(frames: HTMLElement[]) {
     else lo = mid;
   }
   fits(hi);
+  // room under the text for the piece's tail
+  const room = Math.min(...tail.map((f, i) => full[i] - f.clientHeight));
+  sheet.classList.toggle('has-room', room > sheet.clientWidth * 0.07);
+  sheet.classList.toggle('has-more-room', room > sheet.clientWidth * 0.16);
+  (sheet as HTMLElement).style.setProperty('--room', `${room}px`);
 }
 
 function fill(frames: HTMLElement[]) {

@@ -221,6 +221,7 @@ export function jumpSpread(spread: Kind<'jump'>): Html {
         ? html`<a class="cont cont-single"${attr('href', item.href)}>Read on its own page</a>`
         : html`<a class="cont"${attr('href', item.href)}>The rest is on its own page</a>`}
   </div>
+  ${last && jumpTail(spread)}
   ${hasNotes && html`<aside class="margin-notes" aria-label="Notes">
     <p class="mn-head">Notes</p>
     <ol>
@@ -230,6 +231,29 @@ export function jumpSpread(spread: Kind<'jump'>): Html {
       </li>`)}
     </ol>
   </aside>`}`);
+}
+
+/**
+ * The foot of a piece's last jump, shown only when the text ends high enough
+ * to leave the room (flow.ts marks the sheet): its title illustration again,
+ * stuck on at an angle, and a press sheet's colour bar and slug in the
+ * spread's two inks.
+ */
+function jumpTail(spread: Kind<'jump'>): Html {
+  const { item } = spread;
+  const ill = item.images?.find((i) => /\/ill-/.test(i.name));
+  const [lt, dk] = spread.inks;
+  const steps = [100, 70, 40, 15];
+  return html`<div class="jump-tail" aria-hidden="true">
+    ${ill && html`<span class="jt-ill"${attr('style', `--fig:url("${ill.src}");--ar:${(ill.aspect ?? 1.4).toFixed(4)}`)}></span>`}
+    <div class="jt-bar">
+      <span class="jt-reg"></span>
+      ${['lt', 'dk'].map((k) => steps.map((n) => html`<i${attr('style', `--c:color-mix(in srgb, var(--${k}) ${n}%, transparent)`)}></i>`))}
+      <i class="jt-over"></i>
+      <span class="jt-slug">_fragments ${ISSUE.number} \u00b7 ${item.title} \u00b7 ${lt} + ${dk}</span>
+      <span class="jt-reg"></span>
+    </div>
+  </div>`;
 }
 
 /** A rubber stamp for pieces over three years old, with the year they were first printed. */

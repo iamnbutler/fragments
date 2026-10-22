@@ -1,4 +1,4 @@
-import type { Piece } from './pieces';
+import type { Piece, PieceImage } from './pieces';
 import { SPOT, PAPERS } from './spectrum';
 
 /**
@@ -43,6 +43,8 @@ export interface JumpItem {
   title: string;
   text: string;
   href: string;
+  /** a piece's figures; its title illustration closes the last jump */
+  images?: PieceImage[];
 }
 
 /**
