@@ -72,7 +72,11 @@ const spans = (t: string) => (t.includes(CODE_MARK) ? t.split(CODE_MARK).map((s,
 export function blocks(bs: Block[], o: { refs?: boolean; end?: boolean } = {}): Html {
   const last = bs.length - 1;
   return html`${bs.map((b, bi) => {
-    const body = b.text.split(/\u0001(\d+)\u0001/).map((t, i) => (i % 2 ? (o.refs ? html`<sup class="ref"><span class="sr">note </span>${t}</sup>` : null) : spans(t)));
+    // a link's label runs from LINK_OPEN to its reference marker
+    const body = b.text.split(/\u0003([^\u0001\u0003]*)\u0001(\d+)\u0001/).map((t, i, parts) =>
+      i % 3 === 0 ? spans(t)
+      : i % 3 === 1 ? html`<a class="ql"${attr('href', b.urls?.[Number(parts[i + 1])])}>${spans(t)}</a>`
+      : o.refs ? html`<sup class="ref"><span class="sr">note </span>${t}</sup>` : null);
     const tail = o.end && bi === last ? html`<span class="end-mark" aria-hidden="true"></span>` : null;
     return b.t === 'h' ? html`<p class="b-h">${body}</p>`
       : b.t === 'li' ? html`<p class="b-li">${body}${tail}</p>`
