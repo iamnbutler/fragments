@@ -1,5 +1,5 @@
 /**
- * Essays: finished pieces in `content/posts/<slug>.md`. They print in the
+ * Essays: finished pieces in `content/e/<slug>.md`. They print in the
  * issue after the features, each on a stock opener (tower, banner or toner)
  * plus jump spreads, and get a reading page at `/e/<slug>`.
  *
@@ -22,7 +22,7 @@ export interface Post {
   href: string;
 }
 
-const DIR = path.join(process.cwd(), 'content/posts');
+const DIR = path.join(process.cwd(), 'content/e');
 
 const str = (v: unknown) => (v == null ? '' : v instanceof Date ? v.toISOString().slice(0, 10) : String(v));
 
@@ -59,7 +59,7 @@ export function loadPosts(): Post[] {
       slug,
       title: str(data.title) || slug,
       date: str(data.date),
-      text: resolveMedia(content.trim(), `content/posts/${f}`),
+      text: resolveMedia(content.trim(), `content/e/${f}`),
       href: `/e/${slug}/`,
     };
   });

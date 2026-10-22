@@ -2,7 +2,7 @@
 
 ## Development
 
-This is Nate's Astro site, _fragments, served by a Cloudflare Worker with
+This is Nate's bongo site, _fragments, served by a Cloudflare Worker with
 media in R2. Use npm: `npm ci` to install dependencies, `npm run dev` to
 develop, and `npm test`, `npm run check` and `npm run test:build` to validate
 application changes. Documentation-only edits do not need an application build.

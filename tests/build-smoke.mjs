@@ -1,12 +1,12 @@
-// Checks the built site in dist/: run after `astro build`.
+// Checks the built site in public/: run after `bongo build`.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
-const read = (path) => readFileSync(`dist/${path}`, 'utf8');
+const read = (path) => readFileSync(`public/${path}`, 'utf8');
 const manifest = JSON.parse(readFileSync('src/media.json', 'utf8'));
 const keys = new Set(Object.values(manifest).map((m) => m.key));
 
-const essays = readdirSync('dist/e').map((slug) => `e/${slug}/index.html`);
+const essays = readdirSync('public/e').map((slug) => `e/${slug}/index.html`);
 const pages = ['index.html', 'd/desktop-tools/index.html', 'd/jev-demos/index.html', 'd/tasks/index.html', 'styleguide/index.html', ...essays];
 
 // The issue: cover, bio, then each feature in its own spreads.
@@ -24,14 +24,14 @@ for (const layout of ['tower', 'banner', 'toner']) assert.match(home, new RegExp
 assert.match(home, /class="[^"]*\barchive-mark\b/);
 // Cover loops are made in JS when the cover is on screen, never autoplayed in the HTML.
 assert.doesNotMatch(home, /<video\b/);
-assert.ok(!existsSync('dist/f'), 'no /f/ pages');
+assert.ok(!existsSync('public/f'), 'no /f/ pages');
 
 // Every local reference is a hashed bundle or a media file that exists in R2.
 for (const page of pages) {
   const html = read(page);
   for (const [, url] of html.matchAll(/(?:src|href|srcset)="(\/[^"#?\s,]+)/g)) {
     if (url.startsWith('/m/')) assert.ok(keys.has(url.slice(3)), `${page}: unknown media ${url}`);
-    else assert.ok(url.startsWith('/_astro/') || existsSync(`dist${url}`) || existsSync(`dist${url}/index.html`), `${page}: ${url} is not built`);
+    else assert.ok(existsSync(`public${url}`) || existsSync(`public${url}/index.html`), `${page}: ${url} is not built`);
   }
   // Media lives in R2: nothing loads from another host.
   const external = [...html.matchAll(/<(?:img|video|source|audio|iframe)\b[^>]*\ssrc="(https?:[^"]+)"/g)].map((m) => m[1]);
@@ -50,6 +50,8 @@ assert.deepEqual(missing, [], `classes without CSS rules: ${missing.join(', ')}`
 // The draft's own page, and cache headers for hashed bundles.
 const single = read('d/desktop-tools/index.html');
 assert.match(single, /<h1\b/);
-assert.match(read('_headers'), /^\/_astro\/\*\n\s+Cache-Control: public, max-age=31536000, immutable/m);
+for (const ext of ['js', 'css']) assert.match(read('_headers'), new RegExp(`^/\\*\\.${ext}\\n\\s+Cache-Control: public, max-age=31536000, immutable`, 'm'));
+// Dev-only tools stay out of the build.
+assert.doesNotMatch(home, /data-dev|annotate/);
 
 console.log(`Build smoke checks passed (${pages.length} pages, ${keys.size} media files).`);

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"{{#if $site.dev}} data-dev{{/if}}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ $page.params.title ? `${$page.params.title} | _fragments` : '_fragments' }}</title>
+  {{#var description = $page.path === '/' ? $utils.issueDescription() : $page.params.description}}
+  {{#if description}}<meta name="description" content="{{ description }}" />{{/if}}
+  <meta name="theme-color" content="#ece9e3" />
+  <link rel="icon" href="{{ $site.icon }}" />
+  {{#if $page.params.noindex}}<meta name="robots" content="noindex" />{{/if}}
+  {{{ $utils.head($page.params) }}}
+  <bongo:style src="styles/site.css" inline />
+  {{#if $page.params.styleguide}}<bongo:style src="styles/styleguide.css" inline />{{/if}}
+</head>
+<body class="{{ $page.params.bodyClass }}">
+  {{#partial src="inks"}}
+  {{{ $page.content }}}
+  <div class="grain" aria-hidden="true"></div>
+  {{#if $page.params.script === 'issue'}}<bongo:script src="scripts/entry/issue.ts" />{{/if}}
+  {{#if $page.params.script === 'single'}}<bongo:script src="scripts/entry/single.ts" />{{/if}}
+  {{#if $page.params.script === 'styleguide'}}<bongo:script src="scripts/entry/styleguide.ts" />{{/if}}
+  {{#if $site.dev}}<bongo:script src="scripts/annotate.ts" />{{/if}}
+</body>
+</html>

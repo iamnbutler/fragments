@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { inline, takeBlocks, type Block } from '../src/lib/zine';
-import { split } from '../src/components/riso/drafts/util';
+import { split } from '../src/render/drafts';
 
 const p = (n: number): Block => ({ t: 'p', text: 'x'.repeat(n) }) as Block;
 const h = (text: string): Block => ({ t: 'h', text }) as Block;

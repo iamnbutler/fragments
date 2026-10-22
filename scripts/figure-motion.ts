@@ -2,7 +2,7 @@
  * Looping versions of the process figures. Each one takes the still figure
  * from media and adds SMIL motion: tokens that travel the arrows, steps that
  * take a tint of the ink while they're active, and things that slide. The
- * page swaps the loop in while the figure is in view (src/scripts/figmotion.ts).
+ * page swaps the loop in while the figure is in view (assets/scripts/figmotion.ts).
  *
  * Every animation in a figure shares one clock (dur D, begin 0, repeating), so
  * timings below are fractions of the loop.
